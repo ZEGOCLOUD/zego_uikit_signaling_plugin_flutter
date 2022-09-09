@@ -8,6 +8,7 @@ import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 // Project imports:
 import 'package:zego_uikit_signal_plugin/src/components/components.dart';
 import 'package:zego_uikit_signal_plugin/src/components/internal/internal.dart';
+import 'package:zego_uikit_signal_plugin/src/services/services.dart';
 import 'package:zego_uikit_signal_plugin/src/plugins/call_invitation/internal/defines.dart';
 import 'package:zego_uikit_signal_plugin/src/plugins/call_invitation/internal/page_manager.dart';
 import 'package:zego_uikit_signal_plugin/src/plugins/call_invitation/prebuilt_call_invitation_defines.dart';
@@ -76,7 +77,7 @@ class _ZegoSendCallInvitationButtonState
     var now = DateTime.now();
     var timestamp =
         "${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString()}";
-    callID = 'call_${ZegoUIKit().getLocalUser().id}_$timestamp';
+    callID = 'call_${ZegoSignalPlugin().getLocalUser().id}_$timestamp';
     return ScreenUtilInit(
       designSize: const Size(750, 1334),
       minTextAdapt: true,

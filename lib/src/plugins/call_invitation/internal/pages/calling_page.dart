@@ -9,6 +9,7 @@ import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 // Project imports:
 import 'package:zego_uikit_signal_plugin/src/plugins/call_invitation/internal/page_manager.dart';
 import 'package:zego_uikit_signal_plugin/src/plugins/call_invitation/prebuilt_call_invitation_defines.dart';
+import 'package:zego_uikit_signal_plugin/src/services/services.dart';
 import 'calling_machine.dart';
 import 'calling_view.dart';
 
@@ -76,7 +77,7 @@ class ZegoCallingPageState extends State<ZegoCallingPage> {
 
   @override
   Widget build(BuildContext context) {
-    var localUserInfo = ZegoUIKit().getLocalUser();
+    var localUserInfo = ZegoSignalPlugin().getLocalUser();
 
     late Widget view;
     switch (currentState) {

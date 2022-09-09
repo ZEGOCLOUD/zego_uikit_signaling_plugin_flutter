@@ -75,7 +75,7 @@ class _ZegoStartInvitationButtonState extends State<ZegoStartInvitationButton> {
 
   void onPressed() async {
     var result = await ZegoSignalPlugin().sendInvitation(
-      ZegoUIKit().getLocalUser().name,
+      ZegoSignalPlugin().getLocalUser().name,
       widget.invitees,
       widget.timeoutSeconds,
       widget.invitationType,

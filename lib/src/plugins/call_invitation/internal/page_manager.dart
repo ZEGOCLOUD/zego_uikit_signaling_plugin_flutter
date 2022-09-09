@@ -114,7 +114,7 @@ class ZegoInvitationPageManager {
     ZegoInvitationType invitationType,
   ) {
     invitationData.callID = callID;
-    invitationData.inviter = ZegoUIKit().getLocalUser();
+    invitationData.inviter = ZegoSignalPlugin().getLocalUser();
     invitationData.invitees = invitees;
     invitationData.type = invitationType;
 

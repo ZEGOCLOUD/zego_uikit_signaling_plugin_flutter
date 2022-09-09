@@ -10,6 +10,7 @@ import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
 import 'package:zego_uikit_signal_plugin/src/services/core/call_invitation/call_invitation.dart';
+import 'package:zego_uikit_signal_plugin/src/services/core/signal_core.dart';
 import 'package:zego_uikit_signal_plugin/src/services/defines/defines.dart';
 
 class ZegoSignalCoreZimPlugin with ZegoCallInvitationStream {
@@ -25,7 +26,7 @@ class ZegoSignalCoreZimPlugin with ZegoCallInvitationStream {
 
   Map<String, String> _userCallIDs = {}; //  <user id, zim call id>
 
-  String get _localUserID => ZegoUIKit().getLocalUser().id;
+  String get _localUserID => ZegoSignalCore.shared.getLocalUser().id;
 
   Future<void> create({required int appID, String appSign = ''}) async {
     if (isCreated) {

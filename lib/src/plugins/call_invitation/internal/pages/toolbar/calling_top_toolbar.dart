@@ -8,6 +8,7 @@ import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 // Project imports:
 import 'package:zego_uikit_signal_plugin/src/components/internal/internal.dart';
+import 'package:zego_uikit_signal_plugin/src/services/services.dart';
 
 class ZegoCallingTopToolBarButton extends StatelessWidget {
   final String iconURL;
@@ -49,7 +50,7 @@ class ZegoInviterCallingVideoTopToolBar extends StatelessWidget {
             const Expanded(child: SizedBox()),
             ValueListenableBuilder<bool>(
               valueListenable: ZegoUIKit().getUseFrontFacingCameraStateNotifier(
-                  ZegoUIKit().getLocalUser().id),
+                  ZegoSignalPlugin().getLocalUser().id),
               builder: (context, isFrontFacing, _) {
                 return ZegoCallingTopToolBarButton(
                   iconURL: InvitationStyleIconUrls.toolbarTopSwitchCamera,

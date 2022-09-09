@@ -47,7 +47,7 @@ mixin ZegoInvitationService {
     config.extendedData = data;
 
     var callID = ZegoSignalCore.shared.zimPlugin
-            ?.queryCallID(ZegoUIKit().getLocalUser().id) ??
+            ?.queryCallID(ZegoSignalCore.shared.getLocalUser().id) ??
         "";
     debugPrint(
         'cancel invitation: callID:$callID, invitees:$invitees, data:$data');
