@@ -19,20 +19,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: HomePage());
+    return const MaterialApp(home: CallPage(isVideoCall: true));
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({
-    Key? key,
-  }) : super(key: key);
+class CallPage extends StatefulWidget {
+  final bool isVideoCall;
+
+  const CallPage({Key? key, required this.isVideoCall}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<CallPage> createState() => _CallPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _CallPageState extends State<CallPage> {
   TextEditingController inviteeUserIDTextCtrl = TextEditingController();
 
   @override
@@ -44,18 +44,12 @@ class _HomePageState extends State<HomePage> {
       userName: "user_$localUserID",
       //  we will ask you for config when we need it, you can customize your app with data
       requireConfig: (ZegoCallInvitationData data) {
-        var config = ZegoUIKitPrebuiltCallConfig();
-        config.turnOnCameraWhenJoining =
-            ZegoInvitationType.videoCall == data.type;
-        if (ZegoInvitationType.videoCall == data.type) {
-          config.bottomMenuBarConfig.extendButtons = [
-            IconButton(color: Colors.white, icon: const Icon(Icons.phone), onPressed:() {}),
-            IconButton(color: Colors.white, icon: const Icon(Icons.cookie), onPressed:() {}),
-            IconButton(color: Colors.white, icon: const Icon(Icons.speaker), onPressed:() {}),
-            IconButton(color: Colors.white, icon: const Icon(Icons.air), onPressed:() {}),
-          ];
-        }
-        return config;
+        return ZegoUIKitPrebuiltCallConfig.oneOnOne(
+          isVideo: true,
+          onOnlySelfInRoom: () {
+            Navigator.of(context).pop();
+          },
+        );
       },
       child: body(context),
     );
@@ -88,16 +82,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget inviteeUserIDInput() => SizedBox(
-    width: 200,
-    child: TextFormField(
-      controller: inviteeUserIDTextCtrl,
-      decoration: const InputDecoration(
-        isDense: true,
-        hintText: "Please Enter Invitee User ID",
-        labelText: "Invitee User ID",
-      ),
-    ),
-  );
+        width: 200,
+        child: TextFormField(
+          controller: inviteeUserIDTextCtrl,
+          decoration: const InputDecoration(
+            isDense: true,
+            hintText: "Please Enter Invitee User ID",
+            labelText: "Invitee User ID",
+          ),
+        ),
+      );
 
   Widget callButton(bool isVideoCall) =>
       ValueListenableBuilder<TextEditingValue>(
