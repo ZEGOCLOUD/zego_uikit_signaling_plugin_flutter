@@ -1,7 +1,11 @@
 ## 0.0.1
 
-* Upload Initial release.
+* upload initial release.
 
 ## 1.0.0
 
 * Congratulations!
+
+## 1.0.1
+
+* update a dependency to the latest release..

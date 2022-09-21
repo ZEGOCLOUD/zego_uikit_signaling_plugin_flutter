@@ -293,8 +293,7 @@ class ZegoInvitationPageManager {
         },
         child: ZegoCallInvitationDialog(
           invitationData: invitationData,
-          avatarBuilder:
-              configQuery(invitationData).audioVideoViewConfig.avatarBuilder,
+          avatarBuilder: configQuery(invitationData).avatarBuilder,
         ),
       ),
       barrierDismissible: false,

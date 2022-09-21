@@ -96,7 +96,6 @@ class ZegoCallingPageState extends State<ZegoCallingPage> {
                 invitationType: pageService.invitationData.type,
                 avatarBuilder: pageService
                     .configQuery(pageService.invitationData)
-                    .audioVideoViewConfig
                     .avatarBuilder,
               )
             : ZegoCallingInviteeView(
@@ -105,7 +104,6 @@ class ZegoCallingPageState extends State<ZegoCallingPage> {
                 invitationType: pageService.invitationData.type,
                 avatarBuilder: pageService
                     .configQuery(pageService.invitationData)
-                    .audioVideoViewConfig
                     .avatarBuilder,
               );
         view = ScreenUtilInit(
