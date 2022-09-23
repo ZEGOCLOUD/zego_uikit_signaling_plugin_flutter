@@ -9,3 +9,7 @@
 ## 1.0.1
 
 * update a dependency to the latest release..
+
+## 1.0.2
+
+* fix some bugs
