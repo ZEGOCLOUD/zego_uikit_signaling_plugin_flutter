@@ -28,6 +28,10 @@ class ZegoSignalCoreZimPlugin with ZegoCallInvitationStream {
 
   String get _localUserID => ZegoSignalCore.shared.getLocalUser().id;
 
+  Future<String> getVersion() async {
+    return await ZIM.getVersion();
+  }
+
   Future<void> create({required int appID, String appSign = ''}) async {
     if (isCreated) {
       debugPrint("[zim] has created.");
@@ -203,6 +207,9 @@ class ZegoSignalCoreZimPlugin with ZegoCallInvitationStream {
     ZIMEventHandler.onCallInvitationRejected = null;
     ZIMEventHandler.onCallInvitationTimeout = null;
     ZIMEventHandler.onCallInviteesAnsweredTimeout = null;
+
+    ZIMEventHandler.onError = null;
+    ZIMEventHandler.onConnectionStateChanged = null;
   }
 
   void clear() {

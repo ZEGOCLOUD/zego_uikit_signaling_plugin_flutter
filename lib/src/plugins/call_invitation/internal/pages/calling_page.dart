@@ -90,7 +90,7 @@ class ZegoCallingPageState extends State<ZegoCallingPage> {
 
         var localUserIsInviter = localUserInfo.id == widget.inviter.id;
         var callingView = localUserIsInviter
-            ? ZegoInviterCallingView(
+            ? ZegoCallingInviterView(
                 inviter: widget.inviter,
                 invitees: widget.invitees,
                 invitationType: pageService.invitationData.type,

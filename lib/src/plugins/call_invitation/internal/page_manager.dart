@@ -25,6 +25,8 @@ class ZegoInvitationPageManager {
 
   ZegoInvitationPageManager._internal();
 
+  String defaultPackagePrefix = 'packages/zego_uikit_signal_plugin/';
+
   late int appID;
   late String appSign;
   late String userID;
@@ -34,7 +36,9 @@ class ZegoInvitationPageManager {
   late ContextQuery
       contextQuery; // we need a context object, to push/pop page when receive invitation request
 
-  var ring = ZegoNotificationRing();
+  var callerRingtone = ZegoRingtone();
+  var calleeRingtone = ZegoRingtone();
+
   late ZegoCallingMachine callingMachine;
   bool invitationTopSheetVisibility = false;
   List<StreamSubscription<dynamic>> streamSubscriptions = [];
@@ -54,6 +58,7 @@ class ZegoInvitationPageManager {
     required String userName,
     required ConfigQuery configQuery,
     required ContextQuery contextQuery,
+    required ZegoRingtoneConfig ringtoneConfig,
   }) async {
     this.appID = appID;
     this.appSign = appSign;
@@ -68,9 +73,7 @@ class ZegoInvitationPageManager {
     callingMachine = ZegoCallingMachine();
     callingMachine.init();
 
-    //  ZegoUIKitCoreUser.localDefault() will set camera true at the first time
-    //  reset to false, otherwise start preview will fail
-    ZegoUIKit.instance.turnCameraOn(false);
+    initRing(ringtoneConfig);
 
     debugPrint(
         'init, appID:$appID, appSign:$appSign, tokenServerUrl:$tokenServerUrl, userID:$userID, userName:$userName');
@@ -78,6 +81,37 @@ class ZegoInvitationPageManager {
 
   void uninit() {
     removeStreamListener();
+  }
+
+  void initRing(ZegoRingtoneConfig ringtoneConfig) {
+    if (ringtoneConfig.callerPath != null) {
+      debugPrint("reset caller ring, source path:${ringtoneConfig.callerPath}");
+      callerRingtone.init(
+        prefix: "",
+        sourcePath: ringtoneConfig.callerPath!,
+        isVibrate: false,
+      );
+    } else {
+      callerRingtone.init(
+        prefix: defaultPackagePrefix,
+        sourcePath: "assets/audio/callerRing.mp3",
+        isVibrate: false,
+      );
+    }
+    if (ringtoneConfig.calleePath != null) {
+      debugPrint("reset callee ring, source path:${ringtoneConfig.calleePath}");
+      calleeRingtone.init(
+        prefix: "",
+        sourcePath: ringtoneConfig.calleePath!,
+        isVibrate: true,
+      );
+    } else {
+      calleeRingtone.init(
+        prefix: defaultPackagePrefix,
+        sourcePath: "assets/audio/calleeRing.wav",
+        isVibrate: true,
+      );
+    }
   }
 
   void listenStream() {
@@ -122,6 +156,8 @@ class ZegoInvitationPageManager {
     FocusManager.instance.primaryFocus?.unfocus();
 
     if (result) {
+      callerRingtone.startRing();
+
       if (isGroupCall) {
         /// group call, enter room directly
         callingMachine.stateOnlineAudioVideo.enter();
@@ -145,7 +181,7 @@ class ZegoInvitationPageManager {
   void onLocalAcceptInvitation() {
     debugPrint("local accept invitation");
 
-    ring.stopRing();
+    calleeRingtone.stopRing();
 
     //  if inputting right now
     FocusManager.instance.primaryFocus?.unfocus();
@@ -174,7 +210,7 @@ class ZegoInvitationPageManager {
       return;
     }
 
-    ring.startRing();
+    calleeRingtone.startRing();
 
     //  if inputting right now
     FocusManager.instance.primaryFocus?.unfocus();
@@ -193,6 +229,8 @@ class ZegoInvitationPageManager {
   }
 
   void onInvitationAccepted(StreamDataInvitationAccepted data) {
+    callerRingtone.stopRing();
+
     //  if inputting right now
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -246,7 +284,8 @@ class ZegoInvitationPageManager {
   void restoreToIdle() {
     debugPrint("invitation page service to be idle");
 
-    ring.stopRing();
+    callerRingtone.stopRing();
+    calleeRingtone.stopRing();
 
     ZegoUIKit.instance.turnCameraOn(false);
 

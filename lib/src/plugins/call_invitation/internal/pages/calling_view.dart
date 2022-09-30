@@ -17,8 +17,8 @@ import 'toolbar/calling_top_toolbar.dart';
 typedef AvatarBuilder = Widget Function(
     BuildContext context, Size size, ZegoUIKitUser? user, Map extraInfo);
 
-class ZegoInviterCallingView extends StatelessWidget {
-  const ZegoInviterCallingView({
+class ZegoCallingInviterView extends StatelessWidget {
+  const ZegoCallingInviterView({
     Key? key,
     required this.inviter,
     required this.invitees,

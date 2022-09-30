@@ -18,7 +18,8 @@ class ZegoSignalCore {
   ZegoSignalCore._internal();
 
   Future<String> getSignalPluginVersion() async {
-    return "todo";
+    var version = await zimPlugin?.getVersion();
+    return "zego_zim:$version";
   }
 
   Future<void> loadZim({required int appID, String appSign = ''}) async {

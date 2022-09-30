@@ -1,8 +1,10 @@
 // Flutter imports:
 import 'package:flutter/cupertino.dart';
+import 'dart:developer';
 
 // Package imports:
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // Project imports:
 import 'package:zego_uikit_signal_plugin/src/services/services.dart';
@@ -11,6 +13,18 @@ import 'prebuilt_call_invitation_defines.dart';
 
 typedef ConfigQuery = ZegoUIKitPrebuiltCallConfig Function(
     ZegoCallInvitationData);
+
+class ZegoRingtoneConfig {
+  final String? packageName;
+  final String? callerPath;
+  final String? calleePath;
+
+  const ZegoRingtoneConfig({
+    this.packageName,
+    this.callerPath,
+    this.calleePath,
+  });
+}
 
 class ZegoUIKitPrebuiltCallWithInvitation extends StatefulWidget {
   const ZegoUIKitPrebuiltCallWithInvitation({
@@ -22,7 +36,9 @@ class ZegoUIKitPrebuiltCallWithInvitation extends StatefulWidget {
     this.tokenServerUrl = '',
     required this.requireConfig,
     required this.child,
-  }) : super(key: key);
+    ZegoRingtoneConfig? ringtoneConfig,
+  })  : ringtoneConfig = ringtoneConfig ?? const ZegoRingtoneConfig(),
+        super(key: key);
 
   /// you need to fill in the appID you obtained from console.zegocloud.com
   final int appID;
@@ -51,6 +67,9 @@ class ZegoUIKitPrebuiltCallWithInvitation extends StatefulWidget {
   ///
   final ConfigQuery requireConfig;
 
+  /// you can customize your ringing bell
+  final ZegoRingtoneConfig ringtoneConfig;
+
   final Widget child;
 
   @override
@@ -63,6 +82,20 @@ class _ZegoUIKitPrebuiltCallWithInvitationState
   @override
   void initState() {
     super.initState();
+
+    ZegoSignalPlugin().getSignalPluginVersion().then((signalPluginVersion) {
+      ZegoUIKit().getZegoUIKitVersion().then((uikitVersion) {
+        log("version: zego_uikit_signal_plugin:1.0.4; $signalPluginVersion; "
+            "zego_uikit:$uikitVersion");
+      });
+    });
+
+    Permission.camera.status.then((PermissionStatus status) {
+      if (status != PermissionStatus.granted &&
+          status != PermissionStatus.permanentlyDenied) {
+        Permission.camera.request();
+      }
+    });
 
     initContext();
   }
@@ -91,6 +124,14 @@ class _ZegoUIKitPrebuiltCallWithInvitationState
         .loadZim(appID: widget.appID, appSign: widget.appSign);
     await ZegoSignalPlugin().login(widget.userID, widget.userName);
 
+    ZegoUIKit().login(widget.userID, widget.userName).then((value) {
+      ZegoUIKit().init(appID: widget.appID, appSign: widget.appSign);
+
+      //  ZegoUIKitCoreUser.localDefault() will set camera true at the first time
+      //  reset to false, otherwise start preview will fail
+      ZegoUIKit.instance.turnCameraOn(false);
+    });
+
     ZegoInvitationPageManager.instance.init(
       appID: widget.appID,
       appSign: widget.appSign,
@@ -101,6 +142,7 @@ class _ZegoUIKitPrebuiltCallWithInvitationState
       contextQuery: () {
         return context;
       },
+      ringtoneConfig: widget.ringtoneConfig,
     );
   }
 

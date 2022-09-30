@@ -13,3 +13,12 @@
 ## 1.0.2
 
 * fix some bugs
+
+## 1.0.3
+
+* support the callee ringing
+* support custom ringing
+
+## 1.0.4
+
+* fix some bugs

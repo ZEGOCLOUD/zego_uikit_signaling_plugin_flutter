@@ -8,12 +8,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
-class ZegoNotificationRing {
+class ZegoRingtone {
   bool isRingTimerRunning = false;
   var audioPlayer = AudioPlayer();
 
-  ZegoNotificationRing() {
-    AudioCache.instance.prefix = 'packages/zego_uikit_signal_plugin/assets/';
+  bool isVibrate = true;
+  String sourcePath = "";
+
+  ZegoRingtone();
+
+  void init({
+    required String prefix,
+    required String sourcePath,
+    required bool isVibrate,
+  }) {
+    debugPrint('init: prefix:$prefix, source path:$sourcePath');
+
+    AudioCache.instance.prefix = prefix;
+    this.sourcePath = sourcePath;
+    this.isVibrate = isVibrate;
   }
 
   void startRing() async {
@@ -22,12 +35,15 @@ class ZegoNotificationRing {
       return;
     }
 
-    debugPrint('start ring');
+    debugPrint('start ring, source path:$sourcePath');
 
     isRingTimerRunning = true;
 
-    await audioPlayer.play(AssetSource('audio/CallRing.wav'));
-    Vibrate.vibrate();
+    audioPlayer.setReleaseMode(ReleaseMode.loop);
+    await audioPlayer.play(AssetSource(sourcePath));
+    if (isVibrate) {
+      Vibrate.vibrate();
+    }
 
     Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
       // debugPrint('ring timer periodic');
@@ -38,7 +54,9 @@ class ZegoNotificationRing {
 
         timer.cancel();
       } else {
-        Vibrate.vibrate();
+        if (isVibrate) {
+          Vibrate.vibrate();
+        }
       }
     });
   }
