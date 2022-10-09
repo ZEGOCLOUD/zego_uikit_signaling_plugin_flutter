@@ -36,13 +36,12 @@ class ZegoCallingPageState extends State<ZegoCallingPage> {
   CallingState currentState = CallingState.kIdle;
 
   VoidCallback? callConfigHandUp;
-  VoidCallback? callConfigOnlySelfInRoom;
   ZegoUIKitPrebuiltCallConfig? callConfig;
 
   final ZegoCallingMachine machine =
       ZegoInvitationPageManager.instance.callingMachine;
 
-  ZegoInvitationPageManager get pageService =>
+  ZegoInvitationPageManager get pageManager =>
       ZegoInvitationPageManager.instance;
 
   @override
@@ -93,17 +92,17 @@ class ZegoCallingPageState extends State<ZegoCallingPage> {
             ? ZegoCallingInviterView(
                 inviter: widget.inviter,
                 invitees: widget.invitees,
-                invitationType: pageService.invitationData.type,
-                avatarBuilder: pageService
-                    .configQuery(pageService.invitationData)
+                invitationType: pageManager.invitationData.type,
+                avatarBuilder: pageManager
+                    .configQuery(pageManager.invitationData)
                     .avatarBuilder,
               )
             : ZegoCallingInviteeView(
                 inviter: widget.inviter,
                 invitees: widget.invitees,
-                invitationType: pageService.invitationData.type,
-                avatarBuilder: pageService
-                    .configQuery(pageService.invitationData)
+                invitationType: pageManager.invitationData.type,
+                avatarBuilder: pageManager
+                    .configQuery(pageManager.invitationData)
                     .avatarBuilder,
               );
         view = ScreenUtilInit(
@@ -131,22 +130,16 @@ class ZegoCallingPageState extends State<ZegoCallingPage> {
 
   void onCallHandUp() {
     callConfigHandUp?.call();
-    pageService.onHangUp();
-  }
-
-  void onOnlySelfInRoom() {
-    callConfigOnlySelfInRoom?.call();
-    pageService.onOnlySelfInRoom();
+    pageManager.onHangUp();
   }
 
   Widget prebuiltCallPage() {
-    callConfig = pageService.configQuery(pageService.invitationData);
+    callConfig = pageManager.configQuery(pageManager.invitationData);
 
     callConfigHandUp = callConfig?.onHangUp;
     callConfig?.onHangUp = onCallHandUp;
-    callConfig?.onOnlySelfInRoom = onOnlySelfInRoom;
 
-    switch (pageService.invitationData.type) {
+    switch (pageManager.invitationData.type) {
       case ZegoInvitationType.voiceCall:
         callConfig?.bottomMenuBarConfig.buttons = const [
           ZegoMenuBarButtonName.toggleMicrophoneButton,
@@ -166,13 +159,16 @@ class ZegoCallingPageState extends State<ZegoCallingPage> {
     }
 
     return ZegoUIKitPrebuiltCall(
-      appID: pageService.appID,
-      appSign: pageService.appSign,
-      callID: pageService.invitationData.callID,
-      userID: pageService.userID,
-      userName: pageService.userName,
-      tokenServerUrl: pageService.tokenServerUrl,
+      appID: pageManager.appID,
+      appSign: pageManager.appSign,
+      callID: pageManager.invitationData.callID,
+      userID: pageManager.userID,
+      userName: pageManager.userName,
+      tokenServerUrl: pageManager.tokenServerUrl,
       config: callConfig!,
+      onDispose: () {
+        pageManager.onPrebuiltCallPageDispose();
+      },
     );
   }
 }

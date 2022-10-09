@@ -91,7 +91,7 @@ class ZegoSignalCoreZimPlugin with ZegoCallInvitationStream {
     loginUser?.userName = name;
 
     debugPrint("[zim] ready to login..");
-    ZIM.getInstance()?.login(loginUser!).then((value) {
+    ZIM.getInstance()!.login(loginUser!).then((value) {
       debugPrint('[zim] login success');
     }).onError((error, stackTrace) {
       debugPrint('[zim] login error, $error');

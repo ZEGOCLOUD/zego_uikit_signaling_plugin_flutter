@@ -44,7 +44,7 @@ class ZegoInvitationPageManager {
   List<StreamSubscription<dynamic>> streamSubscriptions = [];
 
   ZegoCallInvitationData invitationData = ZegoCallInvitationData.empty();
-  List<ZegoUIKitUser> acceptInvitees = [];
+  List<ZegoUIKitUser> inviteInvitees = [];
   List<ZegoUIKitUser> refuseInvitees = [];
   List<ZegoUIKitUser> timeoutInvitees = [];
 
@@ -147,9 +147,11 @@ class ZegoInvitationPageManager {
     List<ZegoUIKitUser> invitees,
     ZegoInvitationType invitationType,
   ) {
+    inviteInvitees = List.from(invitees);
+
     invitationData.callID = callID;
     invitationData.inviter = ZegoSignalPlugin().getLocalUser();
-    invitationData.invitees = invitees;
+    invitationData.invitees = List.from(invitees);
     invitationData.type = invitationType;
 
     //  if inputting right now
@@ -197,10 +199,15 @@ class ZegoInvitationPageManager {
   void onLocalCancelInvitation() {
     debugPrint("local cancel invitation");
 
+    inviteInvitees.clear();
+
     restoreToIdle();
   }
 
   void onInvitationReceived(StreamDataInvitationReceived data) {
+    debugPrint(
+        "on invitation received, data:${data.inviter.toString()}, ${data.type} ${data.data}");
+
     if (CallingState.kIdle != callingMachine.getPageState()) {
       debugPrint("auto refuse this call, because call state is not idle, "
           "current state is ${callingMachine.getPageState()}");
@@ -217,11 +224,9 @@ class ZegoInvitationPageManager {
 
     var invitationInternalData = InvitationInternalData.fromJson(data.data);
     invitationData.callID = invitationInternalData.callID;
-    invitationData.invitees = invitationInternalData.invitees;
-
+    invitationData.invitees = List.from(invitationInternalData.invitees);
     invitationData.inviter =
         ZegoUIKitUser(id: data.inviter.id, name: data.inviter.name);
-
     invitationData.type =
         ZegoInvitationTypeExtension.mapValue[data.type] as ZegoInvitationType;
 
@@ -229,6 +234,20 @@ class ZegoInvitationPageManager {
   }
 
   void onInvitationAccepted(StreamDataInvitationAccepted data) {
+    debugPrint(
+        "on invitation accepted, data:${data.invitee.toString()}, ${data.data}");
+
+    var inviteeIndex =
+        inviteInvitees.indexWhere((invitee) => data.invitee.id == invitee.id);
+    if (-1 == inviteeIndex) {
+      debugPrint("invitation accepted, but invitee is not in list, "
+          "invitee:{${data.invitee.id}, ${data.invitee.name}}, "
+          "list:$inviteInvitees");
+      return;
+    }
+
+    inviteInvitees.removeAt(inviteeIndex);
+
     callerRingtone.stopRing();
 
     //  if inputting right now
@@ -238,16 +257,28 @@ class ZegoInvitationPageManager {
   }
 
   void onInvitationTimeout(StreamDataInvitationTimeout data) {
+    debugPrint(
+        "on invitation timeout, data:${data.inviter.toString()}, ${data.data}");
+
+    inviteInvitees.clear();
+
     restoreToIdle();
   }
 
   void onInvitationResponseTimeout(StreamDataInvitationResponseTimeout data) {
+    debugPrint(
+        "on invitation response timeout, data:${data.invitees.map((e) => e.toString())}, ${data.data}");
+
+    for (var timeoutInvitee in data.invitees) {
+      inviteInvitees.removeWhere((invitee) => timeoutInvitee.id == invitee.id);
+    }
+
     if (isGroupCall) {
       timeoutInvitees.addAll(data.invitees);
-      debugPrint(
-          "invitation timeout, invitee:${data.invitees}, now have:$timeoutInvitees");
+      debugPrint("timeout invitees: $timeoutInvitees");
       if (timeoutInvitees.length >= invitationData.invitees.length) {
-        debugPrint("invitation timeout, all timeout");
+        debugPrint("invitation timeout, all invitee timeout");
+
         restoreToIdle();
       }
     } else {
@@ -256,12 +287,18 @@ class ZegoInvitationPageManager {
   }
 
   void onInvitationRefused(StreamDataInvitationRefused data) {
+    debugPrint(
+        "on invitation refused, data:${data.invitee.toString()}, ${data.data}");
+
+    inviteInvitees.removeWhere((invitee) => data.invitee.id == invitee.id);
+
     if (isGroupCall) {
       refuseInvitees.add(data.invitee);
       debugPrint(
           "invitation refuse, invitee:${data.invitee}, now have:$refuseInvitees");
       if (refuseInvitees.length >= invitationData.invitees.length) {
         debugPrint("invitation refuse, all refuse");
+
         restoreToIdle();
       }
     } else {
@@ -270,18 +307,30 @@ class ZegoInvitationPageManager {
   }
 
   void onInvitationCanceled(StreamDataInvitationCanceled data) {
+    debugPrint(
+        "on invitation canceled, data:${data.inviter.toString()}, ${data.data}");
+
     restoreToIdle();
   }
 
   void onHangUp() {
+    debugPrint("on hang up");
+
+    ZegoSignalPlugin()
+        .cancelInvitation(inviteInvitees.map((user) => user.id).toList(), '');
+
     restoreToIdle();
   }
 
-  void onOnlySelfInRoom() {
-    restoreToIdle();
+  void onPrebuiltCallPageDispose() {
+    debugPrint("prebuilt call page dispose");
+
+    inviteInvitees.clear();
+
+    restoreToIdle(needPop: false);
   }
 
-  void restoreToIdle() {
+  void restoreToIdle({bool needPop = true}) {
     debugPrint("invitation page service to be idle");
 
     callerRingtone.stopRing();
@@ -296,13 +345,14 @@ class ZegoInvitationPageManager {
       debugPrint(
           'restore to idle, current state:${callingMachine.machine.current?.identifier}');
 
-      Navigator.of(contextQuery()).pop();
+      if (needPop) {
+        Navigator.of(contextQuery()).pop();
+      }
 
       callingMachine.stateIdle.enter();
     }
 
     invitationData = ZegoCallInvitationData.empty();
-    acceptInvitees.clear();
     refuseInvitees.clear();
     timeoutInvitees.clear();
   }

@@ -1,10 +1,12 @@
-// Flutter imports:
-import 'package:flutter/cupertino.dart';
+// Dart imports:
 import 'dart:developer';
 
+// Flutter imports:
+import 'package:flutter/cupertino.dart';
+
 // Package imports:
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 // Project imports:
 import 'package:zego_uikit_signal_plugin/src/services/services.dart';
@@ -85,7 +87,7 @@ class _ZegoUIKitPrebuiltCallWithInvitationState
 
     ZegoSignalPlugin().getSignalPluginVersion().then((signalPluginVersion) {
       ZegoUIKit().getZegoUIKitVersion().then((uikitVersion) {
-        log("version: zego_uikit_signal_plugin:1.0.4; $signalPluginVersion; "
+        log("version: zego_uikit_signal_plugin:1.0.6; $signalPluginVersion; "
             "zego_uikit:$uikitVersion");
       });
     });

@@ -25,8 +25,28 @@ class ZegoRingtone {
     debugPrint('init: prefix:$prefix, source path:$sourcePath');
 
     AudioCache.instance.prefix = prefix;
+
     this.sourcePath = sourcePath;
     this.isVibrate = isVibrate;
+
+    final AudioContext audioContext = AudioContext(
+      iOS: AudioContextIOS(
+        defaultToSpeaker: true,
+        category: AVAudioSessionCategory.ambient,
+        options: [
+          AVAudioSessionOptions.defaultToSpeaker,
+          AVAudioSessionOptions.mixWithOthers,
+        ],
+      ),
+      android: AudioContextAndroid(
+        isSpeakerphoneOn: true,
+        stayAwake: true,
+        contentType: AndroidContentType.music,
+        usageType: AndroidUsageType.media,
+        audioFocus: AndroidAudioFocus.gain,
+      ),
+    );
+    AudioPlayer.global.setGlobalAudioContext(audioContext);
   }
 
   void startRing() async {

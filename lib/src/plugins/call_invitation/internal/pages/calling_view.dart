@@ -181,7 +181,7 @@ Widget circleAvatar(String name) {
     ),
     child: Center(
       child: Text(
-        name.characters.first,
+        name.isNotEmpty ? name.characters.first : "",
         style: TextStyle(
           fontSize: 96.0.r,
           color: const Color(0xff222222),

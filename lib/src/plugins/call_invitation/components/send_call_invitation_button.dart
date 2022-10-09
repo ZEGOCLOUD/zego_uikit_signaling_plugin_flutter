@@ -91,7 +91,8 @@ class _ZegoSendCallInvitationButtonState
           invitees: widget.invitees.map((user) {
             return user.id;
           }).toList(),
-          data: InvitationInternalData(callID!, widget.invitees).toJson(),
+          data: InvitationInternalData(callID!, List.from(widget.invitees))
+              .toJson(),
           icon: widget.icon ??
               ButtonIcon(
                 icon: widget.isVideoCall
@@ -121,7 +122,7 @@ class _ZegoSendCallInvitationButtonState
     ZegoInvitationPageManager.instance.onLocalSendInvitation(
       result,
       callID!,
-      widget.invitees,
+      List.from(widget.invitees),
       widget.isVideoCall
           ? ZegoInvitationType.videoCall
           : ZegoInvitationType.voiceCall,
