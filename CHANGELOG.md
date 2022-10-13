@@ -1,32 +1,7 @@
 ## 0.0.1
 
-* upload initial release.
+* old version's pub url is: https://pub.dev/packages/zego_uikit_signal_plugin
 
-## 1.0.0
+## 1.0.7
 
-* Congratulations!
-
-## 1.0.1
-
-* update a dependency to the latest release..
-
-## 1.0.2
-
-* fix some bugs
-
-## 1.0.3
-
-* support the callee ringing
-* support custom ringing
-
-## 1.0.4
-
-* fix some bugs
-
-## 1.0.5
-
-* fix some bugs
-
-## 1.0.6
-
-* support group invitation
+* code refactoring, move CALL's logic to https://pub.dev/packages/zego_uikit_prebuilt_call, this pub focuses on the logic of signaling
