@@ -63,7 +63,6 @@
 {
     'code': code,        // int
     'message': message,  // String
-    'callID':callid,     // String
     'errorInvitees':errorInvitees  // List<String>  (userid)
 }
 

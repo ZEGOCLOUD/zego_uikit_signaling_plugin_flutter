@@ -19,6 +19,7 @@ class ZegoSignalingPluginCoreData {
   Completer? connectionStateWaiter;
   var connectionState = ZIMConnectionState.disconnected;
 
+  var streamCtrlInvitationConnectionState = StreamController<Map>.broadcast();
   var streamCtrlInvitationReceived = StreamController<Map>.broadcast();
   var streamCtrlInvitationTimeout = StreamController<Map>.broadcast();
   var streamCtrlInvitationResponseTimeout = StreamController<Map>.broadcast();
@@ -286,5 +287,14 @@ class ZegoSignalingPluginCoreData {
         "[zim] connection state changed, state:$state, event:$event, extended data:$extendedData");
 
     connectionState = state;
+
+    if (connectionState == ZIMConnectionState.disconnected) {
+      debugPrint("[zim] disconnected, auto logout");
+      logout();
+    }
+
+    streamCtrlInvitationConnectionState.add({
+      'state': connectionState.index,
+    });
   }
 }

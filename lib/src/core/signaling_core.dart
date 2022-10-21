@@ -9,13 +9,14 @@ import 'signaling_core_event.dart';
 
 class ZegoSignalingPluginCore with ZegoSignalingPluginCoreEvent {
   static ZegoSignalingPluginCore shared = ZegoSignalingPluginCore._internal();
+
   ZegoSignalingPluginCore._internal();
 
   ZegoSignalingPluginCoreData coreData = ZegoSignalingPluginCoreData();
 
   Future<String> getVersion() async {
     var version = await coreData.getVersion();
-    return "zego_zim:$version";
+    return "zego_zim:$version; zego_uikit_signaling_plugin:1.0.8";
   }
 
   Future<void> init({required int appID, String appSign = ''}) async {

@@ -125,6 +125,12 @@ class ZegoPluginInvitationService {
     return await ZegoSignalingPluginCore.shared.coreData.accept(callID, config);
   }
 
+  /// stream callback, notify connection state
+  Stream<Map> getInvitationConnectionStateStream() {
+    return ZegoSignalingPluginCore
+        .shared.coreData.streamCtrlInvitationConnectionState.stream;
+  }
+
   /// stream callback, notify invitee when call invitation received
   Stream<Map> getInvitationReceivedStream() {
     return ZegoSignalingPluginCore
@@ -163,7 +169,9 @@ class ZegoPluginInvitationService {
 
   static final ZegoPluginInvitationService shared =
       ZegoPluginInvitationService._internal();
+
   factory ZegoPluginInvitationService() => shared;
+
   ZegoPluginInvitationService._internal() {
     WidgetsFlutterBinding.ensureInitialized();
   }

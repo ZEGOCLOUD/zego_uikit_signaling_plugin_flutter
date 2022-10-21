@@ -86,6 +86,8 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
   @override
   Stream<Map> getEventStream(String name) {
     switch (name) {
+      case 'invitationConnectionState':
+        return inviteService.getInvitationConnectionStateStream();
       case 'invitationReceived':
         return inviteService.getInvitationReceivedStream();
       case 'invitationTimeout':
