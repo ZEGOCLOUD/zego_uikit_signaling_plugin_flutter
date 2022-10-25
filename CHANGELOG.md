@@ -9,3 +9,7 @@
 ## 1.0.8
 
 * fix some bugs
+
+## 1.0.9
+
+* fix some bugs

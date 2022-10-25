@@ -10,6 +10,7 @@ import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
 import '../core/core.dart';
+import '../core/defines.dart';
 
 class ZegoPluginInvitationService {
   Future<void> init({required int appID, String appSign = ''}) async {
@@ -34,7 +35,7 @@ class ZegoPluginInvitationService {
   /// [timeout]timeout of the call invitation, the unit is seconds
   /// [type] call type
   /// [data] extended field, through which the inviter can carry information to the invitee.
-  Future<List<String>> sendInvitation({
+  Future<ZegoPluginResult> sendInvitation({
     required String inviterName,
     required List<String> invitees,
     required int timeout,
@@ -44,7 +45,7 @@ class ZegoPluginInvitationService {
     invitees.removeWhere((item) => ["", null].contains(item));
     if (invitees.isEmpty) {
       debugPrint('[Error] invitees is empty');
-      return [];
+      return ZegoPluginResult("", "", <String>[]);
     }
 
     var config = ZIMCallInviteConfig();
@@ -65,12 +66,12 @@ class ZegoPluginInvitationService {
   /// cancel invitation to one or more specified users
   /// [inviteeID] invitee's id
   /// [data] extended field
-  Future<List<String>> cancelInvitation(
+  Future<ZegoPluginResult> cancelInvitation(
       {required List<String> invitees, required String data}) async {
     invitees.removeWhere((item) => ["", null].contains(item));
     if (invitees.isEmpty) {
       debugPrint('[Error] invitees is empty');
-      return [];
+      return ZegoPluginResult("", "", <String>[]);
     }
 
     var config = ZIMCallCancelConfig();
@@ -88,7 +89,7 @@ class ZegoPluginInvitationService {
   /// invitee reject the call invitation
   /// [inviterID] inviter id, who send invitation
   /// [data] extended field, you can include your reasons such as Declined
-  Future<void> refuseInvitation(
+  Future<ZegoPluginResult> refuseInvitation(
       {required String inviterID, required String data}) async {
     var config = ZIMCallRejectConfig();
     config.extendedData = data;
@@ -99,7 +100,7 @@ class ZegoPluginInvitationService {
 
     if (callID.isEmpty) {
       debugPrint('[Error] call id is empty');
-      return;
+      return ZegoPluginResult.empty();
     }
 
     return await ZegoSignalingPluginCore.shared.coreData.reject(callID, config);
@@ -108,7 +109,7 @@ class ZegoPluginInvitationService {
   /// invitee accept the call invitation
   /// [inviterID] inviter id, who send invitation
   /// [data] extended field
-  Future<void> acceptInvitation(
+  Future<ZegoPluginResult> acceptInvitation(
       {required String inviterID, required String data}) async {
     var config = ZIMCallAcceptConfig();
     config.extendedData = data;
@@ -119,7 +120,7 @@ class ZegoPluginInvitationService {
 
     if (callID.isEmpty) {
       debugPrint('[Error] call id is empty');
-      return;
+      return ZegoPluginResult.empty();
     }
 
     return await ZegoSignalingPluginCore.shared.coreData.accept(callID, config);

@@ -95,7 +95,10 @@
 
 ### refuseInvitation.result
 
-{} // void
+{
+    'code': code // int
+    'message': message // string
+} 
 
 ## acceptInvitation
 
@@ -108,7 +111,10 @@
 
 ### acceptInvitation.result
 
-{} // void
+{
+    'code': code // int
+    'message': message // string
+}
 
 # event
 

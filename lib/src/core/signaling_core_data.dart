@@ -4,12 +4,14 @@ import 'dart:convert';
 
 // Flutter imports:
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 
 // Package imports:
 import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
+import 'defines.dart';
 
 class ZegoSignalingPluginCoreData {
   bool isCreated = false;
@@ -71,7 +73,7 @@ class ZegoSignalingPluginCoreData {
       return;
     }
 
-    //  wait state be disconnect if relogin
+    //  wait state be disconnect if reconnect
     if (null != connectionStateWaiter && !connectionStateWaiter!.isCompleted) {
       connectionStateWaiter?.complete();
     }
@@ -104,66 +106,83 @@ class ZegoSignalingPluginCoreData {
     return _userCallIDs[userID] ?? "";
   }
 
-  Future<List<String>> invite(
+  Future<ZegoPluginResult> invite(
       List<String> invitees, ZIMCallInviteConfig config) async {
-    return await ZIM
-        .getInstance()!
-        .callInvite(invitees, config)
-        .then((ZIMCallInvitationSentResult result) async {
-      _userCallIDs[loginUser!.userID] = result.callID;
-      if (result.info.errorInvitees.isNotEmpty) {
-        for (var invitee in result.info.errorInvitees) {
-          debugPrint(
-              '[zim] invite error, invitee state: ${invitee.state.toString()}');
-        }
-      } else {
-        debugPrint('[zim] invite done, call id:${result.callID}');
+    late ZIMCallInvitationSentResult result;
+    try {
+      result = await ZIM.getInstance()!.callInvite(invitees, config);
+    } on PlatformException catch (error) {
+      return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
+    }
+
+    _userCallIDs[loginUser!.userID] = result.callID;
+    if (result.info.errorInvitees.isNotEmpty) {
+      for (var invitee in result.info.errorInvitees) {
+        debugPrint(
+            '[zim] invite error, invitee state: ${invitee.state.toString()}');
       }
-      return List<String>.generate(result.info.errorInvitees.length,
-          (index) => result.info.errorInvitees[index].userID);
-    });
+    } else {
+      debugPrint('[zim] invite done, call id:${result.callID}');
+    }
+
+    return ZegoPluginResult(
+        "",
+        "",
+        List<String>.generate(result.info.errorInvitees.length,
+            (index) => result.info.errorInvitees[index].userID));
   }
 
-  Future<List<String>> cancel(
+  Future<ZegoPluginResult> cancel(
       List<String> invitees, String callID, ZIMCallCancelConfig config) async {
-    return await ZIM
-        .getInstance()!
-        .callCancel(invitees, callID, config)
-        .then((ZIMCallCancelSentResult result) {
-      _userCallIDs.remove(loginUser!.userID);
+    late ZIMCallCancelSentResult result;
+    try {
+      result = await ZIM.getInstance()!.callCancel(invitees, callID, config);
+    } on PlatformException catch (error) {
+      return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
+    }
 
-      if (result.errorInvitees.isNotEmpty) {
-        for (var element in result.errorInvitees) {
-          debugPrint(
-              '[zim] cancel invitation error, call id:${result.callID}, invitee id:${element.toString()}');
-        }
-      } else {
-        debugPrint('[zim] cancel invitation done, call id:${result.callID}');
+    _userCallIDs.remove(loginUser!.userID);
+
+    if (result.errorInvitees.isNotEmpty) {
+      for (var element in result.errorInvitees) {
+        debugPrint(
+            '[zim] cancel invitation error, call id:${result.callID}, invitee id:${element.toString()}');
       }
+    } else {
+      debugPrint('[zim] cancel invitation done, call id:${result.callID}');
+    }
 
-      return result.errorInvitees;
-    });
+    return ZegoPluginResult("", "", result.errorInvitees);
   }
 
-  Future<void> accept(String callID, ZIMCallAcceptConfig config) async {
-    return await ZIM
-        .getInstance()!
-        .callAccept(callID, config)
-        .then((ZIMCallAcceptanceSentResult result) {
-      debugPrint('[zim] accept invitation done, call id:${result.callID}');
-    });
+  Future<ZegoPluginResult> accept(
+      String callID, ZIMCallAcceptConfig config) async {
+    late ZIMCallAcceptanceSentResult result;
+    try {
+      result = await ZIM.getInstance()!.callAccept(callID, config);
+    } on PlatformException catch (error) {
+      return ZegoPluginResult(error.code, error.message ?? "", "");
+    }
+
+    debugPrint('[zim] accept invitation done, call id:${result.callID}');
+
+    return ZegoPluginResult.empty();
   }
 
-  Future<void> reject(String callID, ZIMCallRejectConfig config) async {
+  Future<ZegoPluginResult> reject(
+      String callID, ZIMCallRejectConfig config) async {
     String inviteUserID = getInviteUserIDByCallID(callID);
     _userCallIDs.remove(inviteUserID);
 
-    return await ZIM
-        .getInstance()!
-        .callReject(callID, config)
-        .then((ZIMCallRejectionSentResult result) {
-      debugPrint('[zim] reject invitation done, call id:${result.callID}');
-    });
+    late ZIMCallRejectionSentResult result;
+    try {
+      result = await ZIM.getInstance()!.callReject(callID, config);
+    } on PlatformException catch (error) {
+      return ZegoPluginResult(error.code, error.message ?? "", "");
+    }
+    debugPrint('[zim] reject invitation done, call id:${result.callID}');
+
+    return ZegoPluginResult.empty();
   }
 
   String getInviteUserIDByCallID(String callID) {

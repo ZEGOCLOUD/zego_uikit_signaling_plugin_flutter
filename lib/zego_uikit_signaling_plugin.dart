@@ -9,8 +9,6 @@ import 'package:zego_uikit/zego_uikit.dart';
 import 'src/core/core.dart';
 import 'src/service/invitation_plugin_service.dart';
 
-export 'package:zego_uikit/zego_uikit.dart';
-
 class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
   static final ZegoUIKitSignalingPlugin instance =
       ZegoUIKitSignalingPlugin._internal();
@@ -52,32 +50,46 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
         await inviteService.logout();
         return {};
       case 'sendInvitation':
-        var errorInvitees = await inviteService.sendInvitation(
+        var pluginResult = await inviteService.sendInvitation(
           inviterName: params['inviterName']!,
           invitees: params['invitees']!,
           timeout: params['timeout']!,
           type: params['type']!,
           data: params['data']!,
         );
-        return {'errorInvitees': errorInvitees};
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+          'errorInvitees': pluginResult.result as List<String>,
+        };
       case 'cancelInvitation':
-        var errorInvitees = await inviteService.cancelInvitation(
+        var pluginResult = await inviteService.cancelInvitation(
           invitees: params['invitees']!,
           data: params['data']!,
         );
-        return {'errorInvitees': errorInvitees};
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+          'errorInvitees': pluginResult.result as List<String>,
+        };
       case 'refuseInvitation':
-        await inviteService.refuseInvitation(
+        var pluginResult = await inviteService.refuseInvitation(
           inviterID: params['inviterID']!,
           data: params['data']!,
         );
-        return {};
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+        };
       case 'acceptInvitation':
-        await inviteService.acceptInvitation(
+        var pluginResult = await inviteService.acceptInvitation(
           inviterID: params['inviterID']!,
           data: params['data']!,
         );
-        return {};
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+        };
       default:
         throw UnimplementedError();
     }
