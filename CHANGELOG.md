@@ -13,3 +13,7 @@
 ## 1.0.9
 
 * fix some bugs
+
+## 1.0.10
+
+* update a dependency to the latest release..
