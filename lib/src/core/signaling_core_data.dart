@@ -57,6 +57,7 @@ class ZegoSignalingPluginCoreData {
 
     debugPrint("[zim] destroy.");
 
+    isCreated = false;
     ZIM.getInstance()?.destroy();
 
     clear();
@@ -197,6 +198,8 @@ class ZegoSignalingPluginCoreData {
 
   void clear() {
     _userCallIDs = {};
+    connectionStateWaiter = null;
+    connectionState = ZIMConnectionState.disconnected;
   }
 
   Future<void> waitConnectionState(ZIMConnectionState state,
