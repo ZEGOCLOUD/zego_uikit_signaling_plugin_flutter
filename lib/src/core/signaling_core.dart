@@ -16,7 +16,7 @@ class ZegoSignalingPluginCore with ZegoSignalingPluginCoreEvent {
 
   Future<String> getVersion() async {
     var version = await coreData.getVersion();
-    return "zego_zim:$version; zego_uikit_signaling_plugin:1.0.10";
+    return "zego_zim:$version; zego_uikit_signaling_plugin:1.0.12";
   }
 
   Future<void> init({required int appID, String appSign = ''}) async {

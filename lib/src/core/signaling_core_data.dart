@@ -116,9 +116,11 @@ class ZegoSignalingPluginCoreData {
       return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
     }
 
+    String errorMessage = "";
     _userCallIDs[loginUser!.userID] = result.callID;
     if (result.info.errorInvitees.isNotEmpty) {
       for (var invitee in result.info.errorInvitees) {
+        errorMessage += invitee.state.toString() + ";";
         debugPrint(
             '[zim] invite error, invitee state: ${invitee.state.toString()}');
       }
@@ -127,8 +129,8 @@ class ZegoSignalingPluginCoreData {
     }
 
     return ZegoPluginResult(
-        "",
-        "",
+        errorMessage.isEmpty ? "" : "-1",
+        errorMessage,
         List<String>.generate(result.info.errorInvitees.length,
             (index) => result.info.errorInvitees[index].userID));
   }

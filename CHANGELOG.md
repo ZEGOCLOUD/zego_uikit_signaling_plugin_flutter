@@ -21,3 +21,7 @@
 ## 1.0.11
 
 * fix some bugs
+
+## 1.0.12
+
+* fix some bugs
