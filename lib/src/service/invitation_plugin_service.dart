@@ -9,27 +9,10 @@ import 'package:flutter/widgets.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
-import '../core/core.dart';
-import '../core/defines.dart';
+import 'package:zego_uikit_signaling_plugin/src/core/core.dart';
+import 'package:zego_uikit_signaling_plugin/src/core/defines.dart';
 
-class ZegoPluginInvitationService {
-  Future<void> init({required int appID, String appSign = ''}) async {
-    return await ZegoSignalingPluginCore.shared
-        .init(appID: appID, appSign: appSign);
-  }
-
-  Future<void> uninit() async {
-    return await ZegoSignalingPluginCore.shared.uninit();
-  }
-
-  Future<void> login({required String id, required String name}) async {
-    return await ZegoSignalingPluginCore.shared.login(id, name);
-  }
-
-  Future<void> logout() async {
-    return await ZegoSignalingPluginCore.shared.logout();
-  }
-
+mixin ZegoPluginInvitationService {
   /// send invitation to one or more specified users
   /// [invitees] list of invitees.
   /// [timeout]timeout of the call invitation, the unit is seconds
@@ -66,8 +49,10 @@ class ZegoPluginInvitationService {
   /// cancel invitation to one or more specified users
   /// [inviteeID] invitee's id
   /// [data] extended field
-  Future<ZegoPluginResult> cancelInvitation(
-      {required List<String> invitees, required String data}) async {
+  Future<ZegoPluginResult> cancelInvitation({
+    required List<String> invitees,
+    required String data,
+  }) async {
     invitees.removeWhere((item) => ["", null].contains(item));
     if (invitees.isEmpty) {
       debugPrint('[Error] invitees is empty');
@@ -89,8 +74,10 @@ class ZegoPluginInvitationService {
   /// invitee reject the call invitation
   /// [inviterID] inviter id, who send invitation
   /// [data] extended field, you can include your reasons such as Declined
-  Future<ZegoPluginResult> refuseInvitation(
-      {required String inviterID, required String data}) async {
+  Future<ZegoPluginResult> refuseInvitation({
+    required String inviterID,
+    required String data,
+  }) async {
     var config = ZIMCallRejectConfig();
     config.extendedData = data;
 
@@ -109,8 +96,10 @@ class ZegoPluginInvitationService {
   /// invitee accept the call invitation
   /// [inviterID] inviter id, who send invitation
   /// [data] extended field
-  Future<ZegoPluginResult> acceptInvitation(
-      {required String inviterID, required String data}) async {
+  Future<ZegoPluginResult> acceptInvitation({
+    required String inviterID,
+    required String data,
+  }) async {
     var config = ZIMCallAcceptConfig();
     config.extendedData = data;
 
@@ -166,14 +155,5 @@ class ZegoPluginInvitationService {
   Stream<Map> getInvitationCanceledStream() {
     return ZegoSignalingPluginCore
         .shared.coreData.streamCtrlInvitationCanceled.stream;
-  }
-
-  static final ZegoPluginInvitationService shared =
-      ZegoPluginInvitationService._internal();
-
-  factory ZegoPluginInvitationService() => shared;
-
-  ZegoPluginInvitationService._internal() {
-    WidgetsFlutterBinding.ensureInitialized();
   }
 }

@@ -4,10 +4,13 @@ import 'package:flutter/widgets.dart';
 
 // Package imports:
 import 'package:zego_uikit/zego_uikit.dart';
+import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
 import 'src/core/core.dart';
-import 'src/service/invitation_plugin_service.dart';
+import 'src/service/service.dart';
+
+export 'package:zego_zim/zego_zim.dart';
 
 class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
   static final ZegoUIKitSignalingPlugin instance =
@@ -19,7 +22,7 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
     WidgetsFlutterBinding.ensureInitialized();
   }
 
-  ZegoPluginInvitationService inviteService = ZegoPluginInvitationService();
+  ZegoUIKitSignalingPluginImpl impl = ZegoUIKitSignalingPluginImpl();
 
   @override
   ZegoUIKitPluginType getPluginType() {
@@ -36,26 +39,42 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
   Future<Map> invoke(String method, Map params) async {
     switch (method) {
       case 'init':
-        await inviteService.init(
-            appID: params['appID']!, appSign: params['appSign']!);
+        await impl.init(
+          appID: params['appID']! as int,
+          appSign: params['appSign']! as String,
+        );
         return {};
       case 'uninit':
-        await inviteService.uninit();
+        await impl.uninit();
         return {};
       case 'login':
-        await inviteService.login(
-            id: params['userID']!, name: params['userName']!);
+        await impl.login(
+          id: params['userID']! as String,
+          name: params['userName']! as String,
+        );
         return {};
       case 'logout':
-        await inviteService.logout();
+        await impl.logout();
+        return {};
+      case 'joinRoom':
+        var pluginResult = await impl.joinRoom(
+          roomID: params['roomID']! as String,
+          roomName: params['roomName']! as String,
+        );
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+        };
+      case 'leaveRoom':
+        await impl.leaveRoom();
         return {};
       case 'sendInvitation':
-        var pluginResult = await inviteService.sendInvitation(
-          inviterName: params['inviterName']!,
-          invitees: params['invitees']!,
-          timeout: params['timeout']!,
-          type: params['type']!,
-          data: params['data']!,
+        var pluginResult = await impl.sendInvitation(
+          inviterName: params['inviterName']! as String,
+          invitees: params['invitees']! as List<String>,
+          timeout: params['timeout']! as int,
+          type: params['type']! as int,
+          data: params['data']! as String,
         );
         return {
           'code': pluginResult.code,
@@ -63,9 +82,9 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
           'errorInvitees': pluginResult.result as List<String>,
         };
       case 'cancelInvitation':
-        var pluginResult = await inviteService.cancelInvitation(
-          invitees: params['invitees']!,
-          data: params['data']!,
+        var pluginResult = await impl.cancelInvitation(
+          invitees: params['invitees']! as List<String>,
+          data: params['data']! as String,
         );
         return {
           'code': pluginResult.code,
@@ -73,22 +92,44 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
           'errorInvitees': pluginResult.result as List<String>,
         };
       case 'refuseInvitation':
-        var pluginResult = await inviteService.refuseInvitation(
-          inviterID: params['inviterID']!,
-          data: params['data']!,
+        var pluginResult = await impl.refuseInvitation(
+          inviterID: params['inviterID']! as String,
+          data: params['data']! as String,
         );
         return {
           'code': pluginResult.code,
           "message": pluginResult.message,
         };
       case 'acceptInvitation':
-        var pluginResult = await inviteService.acceptInvitation(
-          inviterID: params['inviterID']!,
-          data: params['data']!,
+        var pluginResult = await impl.acceptInvitation(
+          inviterID: params['inviterID']! as String,
+          data: params['data']! as String,
         );
         return {
           'code': pluginResult.code,
           "message": pluginResult.message,
+        };
+      case 'setUsersInRoomAttributes':
+        var pluginResult = await impl.setUsersInRoomAttributes(
+          attributes: params['attributes']! as Map<String, String>,
+          userIDs: params['userIDs']! as List<String>,
+        );
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+          'errorUserList': pluginResult.result as List<String>,
+        };
+      case 'queryUsersInRoomAttributesList':
+        var queryConfig = ZIMRoomMemberAttributesQueryConfig();
+        queryConfig.nextFlag = params['nextFlag']! as String;
+        queryConfig.count = params['count']! as int;
+        var pluginResult = await impl.queryUsersInRoomAttributesList(
+          queryConfig: queryConfig,
+        );
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+          'infos': pluginResult.result as Map<String, Map<String, String>>,
         };
       default:
         throw UnimplementedError();
@@ -99,19 +140,21 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
   Stream<Map> getEventStream(String name) {
     switch (name) {
       case 'invitationConnectionState':
-        return inviteService.getInvitationConnectionStateStream();
+        return impl.getInvitationConnectionStateStream();
       case 'invitationReceived':
-        return inviteService.getInvitationReceivedStream();
+        return impl.getInvitationReceivedStream();
       case 'invitationTimeout':
-        return inviteService.getInvitationTimeoutStream();
+        return impl.getInvitationTimeoutStream();
       case 'invitationResponseTimeout':
-        return inviteService.getInvitationResponseTimeoutStream();
+        return impl.getInvitationResponseTimeoutStream();
       case 'invitationAccepted':
-        return inviteService.getInvitationAcceptedStream();
+        return impl.getInvitationAcceptedStream();
       case 'invitationRefused':
-        return inviteService.getInvitationRefusedStream();
+        return impl.getInvitationRefusedStream();
       case 'invitationCanceled':
-        return inviteService.getInvitationCanceledStream();
+        return impl.getInvitationCanceledStream();
+      case 'usersInRoomAttributes':
+        return impl.getUsersInRoomAttributesStream();
       default:
         throw UnimplementedError();
     }
