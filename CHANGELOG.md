@@ -29,3 +29,7 @@
 ## 1.0.13
 
 * fix some bugs
+
+## 1.0.14
+
+* support in-room user attributes and in-room attributes

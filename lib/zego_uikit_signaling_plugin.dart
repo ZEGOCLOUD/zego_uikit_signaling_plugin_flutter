@@ -131,6 +131,58 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
           "message": pluginResult.message,
           'infos': pluginResult.result as Map<String, Map<String, String>>,
         };
+      case "beginRoomAttributesBatchOperation":
+        var config = ZIMRoomAttributesBatchOperationConfig();
+        config.isForce = params['isForce']! as bool;
+        config.isDeleteAfterOwnerLeft =
+            params['isDeleteAfterOwnerLeft']! as bool;
+        config.isUpdateOwner = params['isUpdateOwner']! as bool;
+        var pluginResult =
+            impl.beginRoomAttributesBatchOperation(config: config);
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+        };
+      case "endRoomAttributesBatchOperation":
+        var pluginResult = await impl.endRoomAttributesBatchOperation();
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+        };
+      case "setRoomAttributes":
+        var config = ZIMRoomAttributesSetConfig();
+        config.isForce = params['isForce']! as bool;
+        config.isDeleteAfterOwnerLeft =
+            params['isDeleteAfterOwnerLeft']! as bool;
+        config.isUpdateOwner = params['isUpdateOwner']! as bool;
+        var pluginResult = await impl.setRoomAttributes(
+          roomAttributes: params['roomAttributes']! as Map<String, String>,
+          config: config,
+        );
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+          "errorKeys": pluginResult.result as List<String>,
+        };
+      case "deleteRoomAttributes":
+        var config = ZIMRoomAttributesDeleteConfig();
+        config.isForce = params['isForce']! as bool;
+        var pluginResult = await impl.deleteRoomAttributes(
+          keys: params['keys']! as List<String>,
+          config: config,
+        );
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+          "errorKeys": pluginResult.result as List<String>,
+        };
+      case 'queryRoomAllAttributes':
+        var pluginResult = await impl.queryRoomAllAttributes();
+        return {
+          'code': pluginResult.code,
+          "message": pluginResult.message,
+          'roomAttributes': pluginResult.result as Map<String, String>,
+        };
       default:
         throw UnimplementedError();
     }
@@ -155,6 +207,10 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
         return impl.getInvitationCanceledStream();
       case 'usersInRoomAttributes':
         return impl.getUsersInRoomAttributesStream();
+      case 'roomAttributesStream':
+        return impl.getRoomAttributesStream();
+      case 'roomBatchAttributesStream':
+        return impl.getRoomBatchAttributesStream();
       default:
         throw UnimplementedError();
     }

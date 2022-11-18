@@ -12,11 +12,13 @@ import 'package:zego_zim/zego_zim.dart';
 import 'defines.dart';
 import 'in_room_attributes_data.dart';
 import 'invitation_data.dart';
+import 'users_in_room_attributes_data.dart';
 
 class ZegoSignalingPluginCoreData
     with
         ZegoSignalingPluginCoreInvitationData,
-        ZegoSignalingPluginCoreInRoomAttributesData {
+        ZegoSignalingPluginCoreInRoomAttributesData,
+        ZegoSignalingPluginCoreUsersInRoomAttributesData {
   ZIM? zim;
   ZIMUserInfo? loginUser;
   ZIMRoomInfo? roomInfo;

@@ -9,9 +9,13 @@ import 'package:zego_uikit_signaling_plugin/src/core/core.dart';
 import 'package:zego_uikit_signaling_plugin/src/core/defines.dart';
 import 'in_room_attributes_plugin_service.dart';
 import 'invitation_plugin_service.dart';
+import 'users_in_room_attributes_plugin_service.dart';
 
 class ZegoUIKitSignalingPluginImpl
-    with ZegoPluginInvitationService, ZegoPluginInRoomAttributesService {
+    with
+        ZegoPluginInvitationService,
+        ZegoPluginInRoomAttributesService,
+        ZegoPluginUsersInRoomAttributesService {
   static final ZegoUIKitSignalingPluginImpl shared =
       ZegoUIKitSignalingPluginImpl._internal();
 
