@@ -211,4 +211,14 @@ class ZegoSignalingPluginCoreData
       'state': connectionState.index,
     });
   }
+
+  void onRoomStateChanged(ZIM zim, ZIMRoomState state, ZIMRoomEvent event,
+      Map extendedData, String roomID) {
+    debugPrint(
+        "[zim] room state changed, state:$state, event:$event, extended data:$extendedData, roomID:$roomID");
+
+    streamCtrlRoomState.add({
+      'state': state.index,
+    });
+  }
 }

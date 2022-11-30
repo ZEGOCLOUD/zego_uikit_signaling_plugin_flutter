@@ -25,11 +25,14 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     required ZIMRoomAttributesBatchOperationConfig config,
   }) {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] begin in-room attribute batch, room id is empty");
+      debugPrint("[zim] begin in-room attributes batch, room id is empty");
       return ZegoPluginResult("-1", "room id is empty", "");
     }
 
     _zim!.beginRoomAttributesBatchOperation(_roomInfo!.roomID, config);
+
+    debugPrint('[zim] begin in-room attributes batch operation');
+
     return ZegoPluginResult.empty();
   }
 
@@ -104,18 +107,21 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
 
   Future<ZegoPluginResult> endRoomAttributesBatchOperation() async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] query in-room attribute, room id is empty");
+      debugPrint("[zim] end room attributes batch operation, room id is empty");
       return ZegoPluginResult("-1", "room id is empty", "");
     }
 
+    debugPrint('[zim] try end in-room attributes batch operation..');
     try {
       await _zim!.endRoomAttributesBatchOperation(_roomInfo!.roomID);
     } on PlatformException catch (error) {
       debugPrint(
-          '[zim] query in-room attributes error, ${error.code} ${error.message}');
+          '[zim] end in-room attributes batch operation error, ${error.code} ${error.message}');
 
       return ZegoPluginResult(error.code, error.message ?? "", "");
     }
+
+    debugPrint('[zim] end in-room attributes batch operation finished');
 
     return ZegoPluginResult.empty();
   }
@@ -138,6 +144,9 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
       return ZegoPluginResult(
           error.code, error.message ?? "", <String, String>{});
     }
+
+    debugPrint(
+        '[zim] query in-room attributes result, room id:${result.roomID}, attributes:${result.roomAttributes}');
 
     return ZegoPluginResult("", "", result.roomAttributes);
   }

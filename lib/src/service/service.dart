@@ -11,17 +11,17 @@ import 'in_room_attributes_plugin_service.dart';
 import 'invitation_plugin_service.dart';
 import 'users_in_room_attributes_plugin_service.dart';
 
-class ZegoUIKitSignalingPluginImpl
+class ZegoPluginSignalingImpl
     with
         ZegoPluginInvitationService,
         ZegoPluginInRoomAttributesService,
         ZegoPluginUsersInRoomAttributesService {
-  static final ZegoUIKitSignalingPluginImpl shared =
-      ZegoUIKitSignalingPluginImpl._internal();
+  static final ZegoPluginSignalingImpl shared =
+      ZegoPluginSignalingImpl._internal();
 
-  factory ZegoUIKitSignalingPluginImpl() => shared;
+  factory ZegoPluginSignalingImpl() => shared;
 
-  ZegoUIKitSignalingPluginImpl._internal() {
+  ZegoPluginSignalingImpl._internal() {
     WidgetsFlutterBinding.ensureInitialized();
   }
 

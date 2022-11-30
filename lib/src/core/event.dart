@@ -13,6 +13,9 @@ mixin ZegoSignalingPluginCoreEvent {
 
     ZIMEventHandler.onConnectionStateChanged =
         ZegoSignalingPluginCore.shared.coreData.onConnectionStateChanged;
+    ZIMEventHandler.onRoomStateChanged =
+        ZegoSignalingPluginCore.shared.coreData.onRoomStateChanged;
+
     ZIMEventHandler.onError = ZegoSignalingPluginCore.shared.coreData.onError;
   }
 

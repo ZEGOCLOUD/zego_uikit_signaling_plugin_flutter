@@ -88,6 +88,8 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
     for (var info in result.infos) {
       infos[info.userID] = info.attributes;
     }
+    debugPrint('[zim] query users in-room attributes finished, info:$infos');
+
     return ZegoPluginResult("", "", infos);
   }
 

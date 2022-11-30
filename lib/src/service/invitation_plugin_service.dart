@@ -121,6 +121,11 @@ mixin ZegoPluginInvitationService {
         .shared.coreData.streamCtrlInvitationConnectionState.stream;
   }
 
+  /// stream callback, notify room state
+  Stream<Map> getRoomStateStream() {
+    return ZegoSignalingPluginCore.shared.coreData.streamCtrlRoomState.stream;
+  }
+
   /// stream callback, notify invitee when call invitation received
   Stream<Map> getInvitationReceivedStream() {
     return ZegoSignalingPluginCore

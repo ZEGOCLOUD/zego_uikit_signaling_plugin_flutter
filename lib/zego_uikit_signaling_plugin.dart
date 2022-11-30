@@ -22,7 +22,7 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
     WidgetsFlutterBinding.ensureInitialized();
   }
 
-  ZegoUIKitSignalingPluginImpl impl = ZegoUIKitSignalingPluginImpl();
+  ZegoPluginSignalingImpl impl = ZegoPluginSignalingImpl();
 
   @override
   ZegoUIKitPluginType getPluginType() {
@@ -193,6 +193,8 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
     switch (name) {
       case 'invitationConnectionState':
         return impl.getInvitationConnectionStateStream();
+      case 'roomState':
+        return impl.getRoomStateStream();
       case 'invitationReceived':
         return impl.getInvitationReceivedStream();
       case 'invitationTimeout':
