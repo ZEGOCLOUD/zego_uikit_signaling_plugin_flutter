@@ -37,3 +37,7 @@
 ## 1.0.15
 
 * fix some bugs
+
+## 1.0.16
+
+* fix some bugs
