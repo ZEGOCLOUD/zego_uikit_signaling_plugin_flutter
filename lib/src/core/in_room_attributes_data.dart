@@ -18,25 +18,25 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
 
   ZIM? get _zim => ZegoSignalingPluginCore.shared.coreData.zim;
 
-  var streamCtrlRoomAttributes = StreamController<Map>.broadcast();
-  var streamCtrlRoomBatchAttributes = StreamController<Map>.broadcast();
+  var streamCtrlRoomProperties = StreamController<Map>.broadcast();
+  var streamCtrlRoomBatchProperties = StreamController<Map>.broadcast();
 
-  ZegoPluginResult beginRoomAttributesBatchOperation({
+  ZegoPluginResult beginRoomPropertiesBatchOperation({
     required ZIMRoomAttributesBatchOperationConfig config,
   }) {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] begin in-room attributes batch, room id is empty");
+      debugPrint("[zim] begin in-room properties batch, room id is empty");
       return ZegoPluginResult("-1", "room id is empty", "");
     }
 
     _zim!.beginRoomAttributesBatchOperation(_roomInfo!.roomID, config);
 
-    debugPrint('[zim] begin in-room attributes batch operation');
+    debugPrint('[zim] begin in-room properties batch operation');
 
     return ZegoPluginResult.empty();
   }
 
-  Future<ZegoPluginResult> setRoomAttributes({
+  Future<ZegoPluginResult> updateRoomProperties({
     required Map<String, String> roomAttributes,
     required ZIMRoomAttributesSetConfig config,
   }) async {
@@ -54,13 +54,13 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
           .setRoomAttributes(roomAttributes, _roomInfo!.roomID, config);
     } on PlatformException catch (error) {
       debugPrint(
-          '[zim] set in-room attributes $roomAttributes error, ${error.code} ${error.message}');
+          '[zim] set in-room properties $roomAttributes error, ${error.code} ${error.message}');
 
       return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
     }
 
     debugPrint(
-        '[zim] set in-room attributes $roomAttributes result, room id:${result.roomID}, error user ids:${result.errorKeys}');
+        '[zim] set in-room properties $roomAttributes result, room id:${result.roomID}, error user ids:${result.errorKeys}');
 
     return ZegoPluginResult(
         result.errorKeys.isEmpty ? "" : "-2",
@@ -70,7 +70,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
         result.errorKeys);
   }
 
-  Future<ZegoPluginResult> deleteRoomAttributes({
+  Future<ZegoPluginResult> deleteRoomProperties({
     required List<String> keys,
     required ZIMRoomAttributesDeleteConfig config,
   }) async {
@@ -88,13 +88,13 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
           await _zim!.deleteRoomAttributes(keys, _roomInfo!.roomID, config);
     } on PlatformException catch (error) {
       debugPrint(
-          '[zim] delete in-room attributes error, ${error.code} ${error.message}');
+          '[zim] delete in-room properties error, ${error.code} ${error.message}');
 
       return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
     }
 
     debugPrint(
-        '[zim] delete in-room attributes result, room id:${result.roomID}, '
+        '[zim] delete in-room properties result, room id:${result.roomID}, '
         'error user ids:${result.errorKeys}');
 
     return ZegoPluginResult(
@@ -105,28 +105,28 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
         result.errorKeys);
   }
 
-  Future<ZegoPluginResult> endRoomAttributesBatchOperation() async {
+  Future<ZegoPluginResult> endRoomPropertiesBatchOperation() async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] end room attributes batch operation, room id is empty");
+      debugPrint("[zim] end room properties batch operation, room id is empty");
       return ZegoPluginResult("-1", "room id is empty", "");
     }
 
-    debugPrint('[zim] try end in-room attributes batch operation..');
+    debugPrint('[zim] try end in-room properties batch operation..');
     try {
       await _zim!.endRoomAttributesBatchOperation(_roomInfo!.roomID);
     } on PlatformException catch (error) {
       debugPrint(
-          '[zim] end in-room attributes batch operation error, ${error.code} ${error.message}');
+          '[zim] end in-room properties batch operation error, ${error.code} ${error.message}');
 
       return ZegoPluginResult(error.code, error.message ?? "", "");
     }
 
-    debugPrint('[zim] end in-room attributes batch operation finished');
+    debugPrint('[zim] end in-room properties batch operation finished');
 
     return ZegoPluginResult.empty();
   }
 
-  Future<ZegoPluginResult> queryRoomAllAttributes() async {
+  Future<ZegoPluginResult> queryRoomProperties() async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
       debugPrint("[zim] query in-room attribute, room id is empty");
       return ZegoPluginResult("-1", "room id is empty", <String, String>{});
@@ -139,14 +139,14 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
       result = await _zim!.queryRoomAllAttributes(_roomInfo!.roomID);
     } on PlatformException catch (error) {
       debugPrint(
-          '[zim] query in-room attributes error, ${error.code} ${error.message}');
+          '[zim] query in-room properties error, ${error.code} ${error.message}');
 
       return ZegoPluginResult(
           error.code, error.message ?? "", <String, String>{});
     }
 
     debugPrint(
-        '[zim] query in-room attributes result, room id:${result.roomID}, attributes:${result.roomAttributes}');
+        '[zim] query in-room properties result, room id:${result.roomID}, properties:${result.roomAttributes}');
 
     return ZegoPluginResult("", "", result.roomAttributes);
   }
@@ -161,7 +161,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
 
     Map<ZIMRoomAttributesUpdateAction, Map<String, String>> roomAttributes = {};
     roomAttributes[updateInfo.action] = updateInfo.roomAttributes;
-    streamCtrlRoomAttributes.add(roomAttributes);
+    streamCtrlRoomProperties.add(roomAttributes);
   }
 
   void onRoomAttributesBatchUpdated(
@@ -183,7 +183,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
         batchRoomAttributes[updateInfo.action] = [updateInfo.roomAttributes];
       }
     }
-    streamCtrlRoomBatchAttributes.add(batchRoomAttributes);
+    streamCtrlRoomBatchProperties.add(batchRoomAttributes);
   }
 
   void onGroupAttributesUpdated(

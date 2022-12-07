@@ -207,7 +207,7 @@ class ZegoSignalingPluginCoreData
       logout();
     }
 
-    streamCtrlInvitationConnectionState.add({
+    streamCtrlConnectionState.add({
       'state': connectionState.index,
     });
   }
@@ -220,5 +220,10 @@ class ZegoSignalingPluginCoreData
     streamCtrlRoomState.add({
       'state': state.index,
     });
+
+    if (ZIMRoomState.disconnected == state) {
+      debugPrint("[zim] room has been disconnect.");
+      roomInfo = null;
+    }
   }
 }

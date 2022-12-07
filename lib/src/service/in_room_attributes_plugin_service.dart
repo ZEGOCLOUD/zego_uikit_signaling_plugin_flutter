@@ -6,46 +6,45 @@ import 'package:zego_uikit_signaling_plugin/src/core/core.dart';
 import 'package:zego_uikit_signaling_plugin/src/core/defines.dart';
 
 mixin ZegoPluginInRoomAttributesService {
-  ZegoPluginResult beginRoomAttributesBatchOperation({
+  ZegoPluginResult beginRoomPropertiesBatchOperation({
     required ZIMRoomAttributesBatchOperationConfig config,
   }) {
     return ZegoSignalingPluginCore.shared.coreData
-        .beginRoomAttributesBatchOperation(config: config);
+        .beginRoomPropertiesBatchOperation(config: config);
   }
 
-  Future<ZegoPluginResult> setRoomAttributes({
+  Future<ZegoPluginResult> updateRoomProperties({
     required Map<String, String> roomAttributes,
     required ZIMRoomAttributesSetConfig config,
   }) async {
     return await ZegoSignalingPluginCore.shared.coreData
-        .setRoomAttributes(roomAttributes: roomAttributes, config: config);
+        .updateRoomProperties(roomAttributes: roomAttributes, config: config);
   }
 
-  Future<ZegoPluginResult> deleteRoomAttributes({
+  Future<ZegoPluginResult> deleteRoomProperties({
     required List<String> keys,
     required ZIMRoomAttributesDeleteConfig config,
   }) async {
     return await ZegoSignalingPluginCore.shared.coreData
-        .deleteRoomAttributes(keys: keys, config: config);
+        .deleteRoomProperties(keys: keys, config: config);
   }
 
-  Future<ZegoPluginResult> endRoomAttributesBatchOperation() async {
+  Future<ZegoPluginResult> endRoomPropertiesBatchOperation() async {
     return await ZegoSignalingPluginCore.shared.coreData
-        .endRoomAttributesBatchOperation();
+        .endRoomPropertiesBatchOperation();
   }
 
-  Future<ZegoPluginResult> queryRoomAllAttributes() async {
-    return await ZegoSignalingPluginCore.shared.coreData
-        .queryRoomAllAttributes();
+  Future<ZegoPluginResult> queryRoomProperties() async {
+    return await ZegoSignalingPluginCore.shared.coreData.queryRoomProperties();
   }
 
-  Stream<Map> getRoomAttributesStream() {
+  Stream<Map> getRoomPropertiesStream() {
     return ZegoSignalingPluginCore
-        .shared.coreData.streamCtrlRoomAttributes.stream;
+        .shared.coreData.streamCtrlRoomProperties.stream;
   }
 
-  Stream<Map> getRoomBatchAttributesStream() {
+  Stream<Map> getRoomBatchPropertiesStream() {
     return ZegoSignalingPluginCore
-        .shared.coreData.streamCtrlRoomBatchAttributes.stream;
+        .shared.coreData.streamCtrlRoomBatchProperties.stream;
   }
 }

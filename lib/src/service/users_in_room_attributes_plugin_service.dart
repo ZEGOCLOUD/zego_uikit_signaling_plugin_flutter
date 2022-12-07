@@ -2,16 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-// Package imports:
-import 'package:zego_zim/zego_zim.dart';
-
 // Project imports:
 import 'package:zego_uikit_signaling_plugin/src/core/core.dart';
 import 'package:zego_uikit_signaling_plugin/src/core/defines.dart';
 
 mixin ZegoPluginUsersInRoomAttributesService {
   Future<ZegoPluginResult> setUsersInRoomAttributes({
-    required Map<String, String> attributes,
+    required String key,
+    required String value,
     required List<String> userIDs,
   }) async {
     userIDs.removeWhere((item) => ["", null].contains(item));
@@ -21,14 +19,18 @@ mixin ZegoPluginUsersInRoomAttributesService {
     }
 
     return await ZegoSignalingPluginCore.shared.coreData
-        .setUsersInRoomAttributes(attributes: attributes, userIDs: userIDs);
+        .setUsersInRoomAttributes(key: key, value: value, userIDs: userIDs);
   }
 
-  Future<ZegoPluginResult> queryUsersInRoomAttributesList({
-    required ZIMRoomMemberAttributesQueryConfig queryConfig,
+  Future<ZegoPluginResult> queryUsersInRoomAttributes({
+    String nextFlag = '',
+    int count = 100,
   }) async {
     return await ZegoSignalingPluginCore.shared.coreData
-        .queryUsersInRoomAttributesList(queryConfig: queryConfig);
+        .queryUsersInRoomAttributes(
+      nextFlag: nextFlag,
+      count: count,
+    );
   }
 
   Stream<Map> getUsersInRoomAttributesStream() {

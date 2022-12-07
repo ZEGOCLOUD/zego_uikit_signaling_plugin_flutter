@@ -41,3 +41,11 @@
 ## 1.0.16
 
 * fix some bugs
+
+## 1.0.17
+
+* fix some bugs
+
+## 1.0.18
+
+* update a dependency to the latest release..

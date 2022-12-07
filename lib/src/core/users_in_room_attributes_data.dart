@@ -22,7 +22,8 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
   var streamCtrlUsersInRoomAttributes = StreamController<Map>.broadcast();
 
   Future<ZegoPluginResult> setUsersInRoomAttributes({
-    required Map<String, String> attributes,
+    required String key,
+    required String value,
     required List<String> userIDs,
   }) async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
@@ -32,12 +33,12 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
 
     debugPrint(
         '[zim] set users in-room attributes, room id:${_roomInfo?.roomID}, '
-        'user id:$userIDs, attributes:$attributes');
+        'user id:$userIDs, key:$key, value:$value');
 
     late ZIMRoomMembersAttributesOperatedResult result;
     try {
       result = await _zim!.setRoomMembersAttributes(
-        attributes,
+        {key: value},
         userIDs,
         _roomInfo!.roomID,
         ZIMRoomMemberAttributesSetConfig(),
@@ -61,8 +62,9 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
         result.errorUserList);
   }
 
-  Future<ZegoPluginResult> queryUsersInRoomAttributesList({
-    required ZIMRoomMemberAttributesQueryConfig queryConfig,
+  Future<ZegoPluginResult> queryUsersInRoomAttributes({
+    String nextFlag = '',
+    int count = 100,
   }) async {
     Map<String, Map<String, String>> infos = {};
     if (_roomInfo?.roomID.isEmpty ?? false) {
@@ -72,12 +74,15 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
 
     debugPrint(
         "[zim] query users in-room attribute, room id:${_roomInfo?.roomID}, "
-        "config: ${queryConfig.nextFlag} ${queryConfig.count}");
+        "nextFlag: $nextFlag, count:$count");
 
     late ZIMRoomMemberAttributesListQueriedResult result;
     try {
-      result = await _zim!
-          .queryRoomMemberAttributesList(_roomInfo!.roomID, queryConfig);
+      var config = ZIMRoomMemberAttributesQueryConfig();
+      config.nextFlag = nextFlag;
+      config.count = count;
+      result =
+          await _zim!.queryRoomMemberAttributesList(_roomInfo!.roomID, config);
     } on PlatformException catch (error) {
       debugPrint(
           '[zim] query users in-room attributes error, ${error.code} ${error.message}');

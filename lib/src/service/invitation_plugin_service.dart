@@ -116,9 +116,9 @@ mixin ZegoPluginInvitationService {
   }
 
   /// stream callback, notify connection state
-  Stream<Map> getInvitationConnectionStateStream() {
+  Stream<Map> getConnectionStateStream() {
     return ZegoSignalingPluginCore
-        .shared.coreData.streamCtrlInvitationConnectionState.stream;
+        .shared.coreData.streamCtrlConnectionState.stream;
   }
 
   /// stream callback, notify room state

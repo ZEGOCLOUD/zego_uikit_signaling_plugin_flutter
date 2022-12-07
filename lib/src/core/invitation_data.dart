@@ -20,7 +20,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
 
   Map<String, String> _userCallIDs = {}; //  <user id, zim call id>
 
-  var streamCtrlInvitationConnectionState = StreamController<Map>.broadcast();
+  var streamCtrlConnectionState = StreamController<Map>.broadcast();
   var streamCtrlRoomState = StreamController<Map>.broadcast();
   var streamCtrlInvitationReceived = StreamController<Map>.broadcast();
   var streamCtrlInvitationTimeout = StreamController<Map>.broadcast();
