@@ -12,13 +12,15 @@ import 'package:zego_zim/zego_zim.dart';
 import 'defines.dart';
 import 'in_room_attributes_data.dart';
 import 'invitation_data.dart';
+import 'message_data.dart';
 import 'users_in_room_attributes_data.dart';
 
 class ZegoSignalingPluginCoreData
     with
         ZegoSignalingPluginCoreInvitationData,
         ZegoSignalingPluginCoreInRoomAttributesData,
-        ZegoSignalingPluginCoreUsersInRoomAttributesData {
+        ZegoSignalingPluginCoreUsersInRoomAttributesData,
+        ZegoSignalingPluginCoreMessageData {
   ZIM? zim;
   ZIMUserInfo? loginUser;
   ZIMRoomInfo? roomInfo;
@@ -26,10 +28,12 @@ class ZegoSignalingPluginCoreData
   Completer? connectionStateWaiter;
   var connectionState = ZIMConnectionState.disconnected;
 
+  /// get version
   Future<String> getVersion() async {
     return await ZIM.getVersion();
   }
 
+  /// create engine
   Future<void> create({required int appID, String appSign = ''}) async {
     if (null != zim) {
       debugPrint("[zim] has created.");
@@ -44,6 +48,7 @@ class ZegoSignalingPluginCoreData
     debugPrint('[zim] create, appID:$appID, instance:$zim');
   }
 
+  /// destory engine
   Future<void> destroy() async {
     if (null == zim) {
       debugPrint("[zim] is not created.");
@@ -58,6 +63,7 @@ class ZegoSignalingPluginCoreData
     clear();
   }
 
+  /// login
   Future<void> login(String id, String name) async {
     if (null == zim) {
       debugPrint("[zim] is not created.");
@@ -88,6 +94,7 @@ class ZegoSignalingPluginCoreData
     });
   }
 
+  /// logout
   Future<void> logout() async {
     debugPrint("user logout");
 
@@ -100,6 +107,7 @@ class ZegoSignalingPluginCoreData
     debugPrint("[zim] logout.");
   }
 
+  /// join room
   Future<ZegoPluginResult> joinRoom(String roomID, String roomName) async {
     if (null == zim) {
       debugPrint("[zim] is not created.");
@@ -139,6 +147,7 @@ class ZegoSignalingPluginCoreData
     return ZegoPluginResult.empty();
   }
 
+  /// leave room
   Future<void> leaveRoom() async {
     if (null == zim) {
       debugPrint("[zim] is not created.");
@@ -159,6 +168,7 @@ class ZegoSignalingPluginCoreData
     });
   }
 
+  /// clear
   void clear() {
     debugPrint("[zim] clear");
 
@@ -171,6 +181,7 @@ class ZegoSignalingPluginCoreData
     connectionState = ZIMConnectionState.disconnected;
   }
 
+  /// wait connection state
   Future<void> waitConnectionState(ZIMConnectionState state,
       {Duration duration = const Duration(milliseconds: 100)}) async {
     debugPrint(
@@ -190,11 +201,13 @@ class ZegoSignalingPluginCoreData
     return connectionStateWaiter?.future;
   }
 
+  ///  on error
   void onError(ZIM zim, ZIMError errorInfo) {
     debugPrint(
         "[zim] zim error, code:${errorInfo.code}, message:${errorInfo.message}");
   }
 
+  /// on connection state changed
   void onConnectionStateChanged(ZIM zim, ZIMConnectionState state,
       ZIMConnectionEvent event, Map extendedData) {
     debugPrint(
@@ -212,6 +225,7 @@ class ZegoSignalingPluginCoreData
     });
   }
 
+  /// on room state changed
   void onRoomStateChanged(ZIM zim, ZIMRoomState state, ZIMRoomEvent event,
       Map extendedData, String roomID) {
     debugPrint(

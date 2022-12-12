@@ -8,8 +8,9 @@ import 'package:zego_zim/zego_zim.dart';
 import 'core.dart';
 
 mixin ZegoSignalingPluginCoreEvent {
+  /// init core event handler
   void initCoreEventHandler() {
-    debugPrint("[zim] register event handle.");
+    debugPrint("[zim] register core event handle.");
 
     ZIMEventHandler.onConnectionStateChanged =
         ZegoSignalingPluginCore.shared.coreData.onConnectionStateChanged;
@@ -19,8 +20,9 @@ mixin ZegoSignalingPluginCoreEvent {
     ZIMEventHandler.onError = ZegoSignalingPluginCore.shared.coreData.onError;
   }
 
+  /// uninit core event handler
   void uninitCoreEventHandler() {
-    debugPrint("[zim] unregister event handle.");
+    debugPrint("[zim] unregister core event handle.");
 
     ZIMEventHandler.onConnectionStateChanged = null;
     ZIMEventHandler.onError = null;
@@ -28,6 +30,7 @@ mixin ZegoSignalingPluginCoreEvent {
 }
 
 mixin ZegoSignalingPluginInvitationEvent {
+  /// init invitation event handler
   void initInvitationEventHandler() {
     debugPrint("[zim] register invitation event handle.");
 
@@ -45,8 +48,9 @@ mixin ZegoSignalingPluginInvitationEvent {
         ZegoSignalingPluginCore.shared.coreData.onCallInviteesAnsweredTimeout;
   }
 
+  /// uninit invitation event handler
   void uninitInvitationEventHandler() {
-    debugPrint("[zim] unregister event handle.");
+    debugPrint("[zim] unregister invitation event handle.");
 
     ZIMEventHandler.onCallInvitationReceived = null;
     ZIMEventHandler.onCallInvitationCancelled = null;
@@ -58,8 +62,9 @@ mixin ZegoSignalingPluginInvitationEvent {
 }
 
 mixin ZegoSignalingPluginAttributeEvent {
+  /// init attribute event handler
   void initAttributeEventHandler() {
-    debugPrint("[zim] register event handle.");
+    debugPrint("[zim] register attribute event handle.");
 
     ZIMEventHandler.onRoomAttributesUpdated =
         ZegoSignalingPluginCore.shared.coreData.onRoomAttributesUpdated;
@@ -71,12 +76,30 @@ mixin ZegoSignalingPluginAttributeEvent {
         ZegoSignalingPluginCore.shared.coreData.onRoomMemberAttributesUpdated;
   }
 
+  /// uninit attribute event handler
   void uninitAttributeEventHandler() {
-    debugPrint("[zim] unregister event handle.");
+    debugPrint("[zim] unregister attribute event handle.");
 
     ZIMEventHandler.onRoomAttributesUpdated = null;
     ZIMEventHandler.onGroupAttributesUpdated = null;
     ZIMEventHandler.onRoomAttributesBatchUpdated = null;
     ZIMEventHandler.onRoomMemberAttributesUpdated = null;
+  }
+}
+
+mixin ZegoSignalingPluginMessageEvent {
+  /// init message event handler
+  void initMessageEventHandler() {
+    debugPrint("[zim] register message event handle.");
+
+    ZIMEventHandler.onReceiveRoomMessage =
+        ZegoSignalingPluginCore.shared.coreData.onReceiveRoomMessage;
+  }
+
+  /// uninit message event handler
+  void uninitMessageEventHandler() {
+    debugPrint("[zim] unregister message event handle.");
+
+    ZIMEventHandler.onReceiveRoomMessage = null;
   }
 }

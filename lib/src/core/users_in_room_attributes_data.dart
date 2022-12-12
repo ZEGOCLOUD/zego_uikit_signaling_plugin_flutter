@@ -21,6 +21,7 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
 
   var streamCtrlUsersInRoomAttributes = StreamController<Map>.broadcast();
 
+  /// send users in-room attributes
   Future<ZegoPluginResult> setUsersInRoomAttributes({
     required String key,
     required String value,
@@ -62,6 +63,7 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
         result.errorUserList);
   }
 
+  /// query users in-room attributes
   Future<ZegoPluginResult> queryUsersInRoomAttributes({
     String nextFlag = '',
     int count = 100,
@@ -98,6 +100,7 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
     return ZegoPluginResult("", "", infos);
   }
 
+  ///  on room member attributes updated
   void onRoomMemberAttributesUpdated(
     ZIM zim,
     List<ZIMRoomMemberAttributesUpdateInfo> updateInfoList,

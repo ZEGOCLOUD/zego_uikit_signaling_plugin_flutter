@@ -49,3 +49,7 @@
 ## 1.0.18
 
 * update a dependency to the latest release..
+
+## 1.1.0
+
+* support custom command and room message

@@ -29,10 +29,12 @@ mixin ZegoSignalingPluginCoreInvitationData {
   var streamCtrlInvitationRefused = StreamController<Map>.broadcast();
   var streamCtrlInvitationCanceled = StreamController<Map>.broadcast();
 
+  /// query call id
   String queryCallID(String userID) {
     return _userCallIDs[userID] ?? "";
   }
 
+  /// invite
   Future<ZegoPluginResult> invite(
       List<String> invitees, ZIMCallInviteConfig config) async {
     late ZIMCallInvitationSentResult result;
@@ -61,6 +63,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
             (index) => result.info.errorInvitees[index].userID));
   }
 
+  /// cancel
   Future<ZegoPluginResult> cancel(
       List<String> invitees, String callID, ZIMCallCancelConfig config) async {
     late ZIMCallCancelSentResult result;
@@ -84,6 +87,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
     return ZegoPluginResult("", "", result.errorInvitees);
   }
 
+  /// accept
   Future<ZegoPluginResult> accept(
       String callID, ZIMCallAcceptConfig config) async {
     late ZIMCallAcceptanceSentResult result;
@@ -98,6 +102,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
     return ZegoPluginResult.empty();
   }
 
+  /// reject
   Future<ZegoPluginResult> reject(
       String callID, ZIMCallRejectConfig config) async {
     String inviteUserID = getInviteUserIDByCallID(callID);
@@ -114,6 +119,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
     return ZegoPluginResult.empty();
   }
 
+  /// get invite user id by call id
   String getInviteUserIDByCallID(String callID) {
     String inviteUserID = "";
     _userCallIDs.forEach((userID, userCallID) {
@@ -124,12 +130,14 @@ mixin ZegoSignalingPluginCoreInvitationData {
     return inviteUserID;
   }
 
+  /// clear invitation data
   void clearInvitationData() {
     _userCallIDs = {};
   }
 
   // ------- events ------
 
+  /// on call invitation received
   void onCallInvitationReceived(
       ZIM zim, ZIMCallInvitationReceivedInfo info, String callID) {
     debugPrint(
@@ -145,6 +153,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
     });
   }
 
+  /// on call invitation cancelled
   void onCallInvitationCancelled(
       ZIM zim, ZIMCallInvitationCancelledInfo info, String callID) {
     //  inviter extendedData
@@ -157,6 +166,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
     });
   }
 
+  /// on call invitation accepted
   void onCallInvitationAccepted(
       ZIM zim, ZIMCallInvitationAcceptedInfo info, String callID) {
     //  inviter extendedData
@@ -169,6 +179,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
     });
   }
 
+  /// on call invitation rejected
   void onCallInvitationRejected(
       ZIM zim, ZIMCallInvitationRejectedInfo info, String callID) {
     //  inviter extendedData
@@ -181,6 +192,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
     });
   }
 
+  /// on call invitation timeout
   void onCallInvitationTimeout(ZIM zim, String callID) {
     debugPrint('[zim] onCallInvitationTimeout $callID');
 
@@ -192,6 +204,7 @@ mixin ZegoSignalingPluginCoreInvitationData {
     });
   }
 
+  /// on call invitation answered timeout
   void onCallInviteesAnsweredTimeout(
       ZIM zim, List<String> invitees, String callID) {
     debugPrint(

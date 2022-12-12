@@ -21,6 +21,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
   var streamCtrlRoomProperties = StreamController<Map>.broadcast();
   var streamCtrlRoomBatchProperties = StreamController<Map>.broadcast();
 
+  /// begin room properties batch operation
   ZegoPluginResult beginRoomPropertiesBatchOperation({
     required ZIMRoomAttributesBatchOperationConfig config,
   }) {
@@ -36,6 +37,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     return ZegoPluginResult.empty();
   }
 
+  /// update room properties
   Future<ZegoPluginResult> updateRoomProperties({
     required Map<String, String> roomAttributes,
     required ZIMRoomAttributesSetConfig config,
@@ -70,6 +72,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
         result.errorKeys);
   }
 
+  /// delete room properties
   Future<ZegoPluginResult> deleteRoomProperties({
     required List<String> keys,
     required ZIMRoomAttributesDeleteConfig config,
@@ -105,6 +108,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
         result.errorKeys);
   }
 
+  /// end room properties batch operation
   Future<ZegoPluginResult> endRoomPropertiesBatchOperation() async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
       debugPrint("[zim] end room properties batch operation, room id is empty");
@@ -126,6 +130,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     return ZegoPluginResult.empty();
   }
 
+  /// query room properties
   Future<ZegoPluginResult> queryRoomProperties() async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
       debugPrint("[zim] query in-room attribute, room id is empty");
@@ -151,6 +156,7 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     return ZegoPluginResult("", "", result.roomAttributes);
   }
 
+  /// on room attributes updated
   void onRoomAttributesUpdated(
     ZIM zim,
     ZIMRoomAttributesUpdateInfo updateInfo,
@@ -159,11 +165,12 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     debugPrint(
         '[zim] onRoomAttributesUpdated, action:${updateInfo.action}, roomAttributes:${updateInfo.roomAttributes}, $roomID');
 
-    Map<ZIMRoomAttributesUpdateAction, Map<String, String>> roomAttributes = {};
-    roomAttributes[updateInfo.action] = updateInfo.roomAttributes;
+    Map<int, Map<String, String>> roomAttributes = {};
+    roomAttributes[updateInfo.action.index] = updateInfo.roomAttributes;
     streamCtrlRoomProperties.add(roomAttributes);
   }
 
+  /// on room attributes batch updated
   void onRoomAttributesBatchUpdated(
     ZIM zim,
     List<ZIMRoomAttributesUpdateInfo> updateInfoList,
@@ -174,18 +181,21 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
       return "action:${updateInfo.action}, roomAttributes:${updateInfo.roomAttributes}";
     })}, $roomID');
 
-    Map<ZIMRoomAttributesUpdateAction, List<Map<String, String>>>
-        batchRoomAttributes = {};
+    Map<int, List<Map<String, String>>> batchRoomAttributes = {};
     for (var updateInfo in updateInfoList) {
       if (batchRoomAttributes.containsKey(updateInfo.action)) {
-        batchRoomAttributes[updateInfo.action]!.add(updateInfo.roomAttributes);
+        batchRoomAttributes[updateInfo.action.index]!
+            .add(updateInfo.roomAttributes);
       } else {
-        batchRoomAttributes[updateInfo.action] = [updateInfo.roomAttributes];
+        batchRoomAttributes[updateInfo.action.index] = [
+          updateInfo.roomAttributes
+        ];
       }
     }
     streamCtrlRoomBatchProperties.add(batchRoomAttributes);
   }
 
+  /// on group attributes updated
   void onGroupAttributesUpdated(
     ZIM zim,
     List<ZIMGroupAttributesUpdateInfo> updateInfoList,

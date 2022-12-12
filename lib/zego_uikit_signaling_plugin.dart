@@ -13,15 +13,19 @@ import 'src/service/service.dart';
 export 'package:zego_zim/zego_zim.dart';
 
 class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
+  /// single instance
   static final ZegoUIKitSignalingPlugin instance =
       ZegoUIKitSignalingPlugin._internal();
 
+  /// single instance
   factory ZegoUIKitSignalingPlugin() => instance;
 
+  /// single instance
   ZegoUIKitSignalingPlugin._internal() {
     WidgetsFlutterBinding.ensureInitialized();
   }
 
+  /// single instance
   ZegoPluginSignalingImpl impl = ZegoPluginSignalingImpl();
 
   @override
@@ -184,6 +188,13 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
           "errorMessage": pluginResult.message,
           'roomAttributes': pluginResult.result as Map<String, String>,
         };
+      // case 'sendInRoomTextMessage':
+      //   var pluginResult =
+      //       await impl.sendInRoomTextMessage(params['text']! as String);
+      //   return {
+      //     "errorCode": pluginResult.code,
+      //     "errorMessage": pluginResult.message,
+      //   };
       default:
         throw UnimplementedError();
     }
@@ -214,6 +225,8 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
         return impl.getRoomPropertiesStream();
       case 'roomBatchPropertiesStream':
         return impl.getRoomBatchPropertiesStream();
+      case 'inRoomTextMessageStream':
+        return impl.getInRoomTextMessageStream();
       default:
         throw UnimplementedError();
     }

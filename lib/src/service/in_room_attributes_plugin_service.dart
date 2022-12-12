@@ -6,6 +6,7 @@ import 'package:zego_uikit_signaling_plugin/src/core/core.dart';
 import 'package:zego_uikit_signaling_plugin/src/core/defines.dart';
 
 mixin ZegoPluginInRoomAttributesService {
+  /// begin room properties batch operation
   ZegoPluginResult beginRoomPropertiesBatchOperation({
     required ZIMRoomAttributesBatchOperationConfig config,
   }) {
@@ -13,6 +14,7 @@ mixin ZegoPluginInRoomAttributesService {
         .beginRoomPropertiesBatchOperation(config: config);
   }
 
+  /// update room properties
   Future<ZegoPluginResult> updateRoomProperties({
     required Map<String, String> roomAttributes,
     required ZIMRoomAttributesSetConfig config,
@@ -21,6 +23,7 @@ mixin ZegoPluginInRoomAttributesService {
         .updateRoomProperties(roomAttributes: roomAttributes, config: config);
   }
 
+  /// delete room properties
   Future<ZegoPluginResult> deleteRoomProperties({
     required List<String> keys,
     required ZIMRoomAttributesDeleteConfig config,
@@ -29,20 +32,24 @@ mixin ZegoPluginInRoomAttributesService {
         .deleteRoomProperties(keys: keys, config: config);
   }
 
+  /// end room properties batch operation
   Future<ZegoPluginResult> endRoomPropertiesBatchOperation() async {
     return await ZegoSignalingPluginCore.shared.coreData
         .endRoomPropertiesBatchOperation();
   }
 
+  /// query room properties
   Future<ZegoPluginResult> queryRoomProperties() async {
     return await ZegoSignalingPluginCore.shared.coreData.queryRoomProperties();
   }
 
+  /// Map<int(ZIMRoomAttributesUpdateAction), Map<String, String>>
   Stream<Map> getRoomPropertiesStream() {
     return ZegoSignalingPluginCore
         .shared.coreData.streamCtrlRoomProperties.stream;
   }
 
+  /// Map<int(ZIMRoomAttributesUpdateAction), List<Map<String, String>>>
   Stream<Map> getRoomBatchPropertiesStream() {
     return ZegoSignalingPluginCore
         .shared.coreData.streamCtrlRoomBatchProperties.stream;
