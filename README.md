@@ -1,27 +1,19 @@
 # Quick start
 
----
 
-### Call With Invitation
+Run the following code in your project root directory: 
 
-#### Add as dependencies
-
-1. Edit your project's pubspec.yaml and add local project dependencies
-
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  zego_uikit_signaling_plugin: ^1.0.18 # Add this line
+```dart
+flutter pub add zego_uikit_signaling_plugin
 ```
 
-2. Execute the command as shown below under your project's root folder to install all dependencies
+Execute the command as shown below under your project's root folder to install all dependencies
 
 ```dart
 flutter pub get
 ```
 
-#### Import SDK
+### Import SDK
 
 Now in your Dart code, you can import prebuilt.
 
