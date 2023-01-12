@@ -2,10 +2,10 @@
 import 'dart:async';
 
 // Flutter imports:
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 // Package imports:
+import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
@@ -23,7 +23,11 @@ mixin ZegoSignalingPluginCoreMessageData {
   /// send in-room text message
   Future<ZegoPluginResult> sendInRoomTextMessage(String text) async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] send in-room text message, room id is empty");
+      ZegoLoggerService.logInfo(
+        "send in-room text message, room id is empty",
+        tag: "signal",
+        subTag: "message data",
+      );
       return ZegoPluginResult("-1", "room id is empty", "");
     }
 
@@ -59,22 +63,25 @@ mixin ZegoSignalingPluginCoreMessageData {
     List<ZIMMessage> messageList,
     String fromRoomID,
   ) {
-    debugPrint(
-        '[zim] onReceiveRoomMessage, messageList:${messageList.map((message) {
-      return "type:${message.type}, "
-          "messageID:${message.messageID}, "
-          "localMessageID:${message.localMessageID}, "
-          "senderUserID:${message.senderUserID}, "
-          "conversationID:${message.conversationID}, "
-          "direction:${message.direction}, "
-          "sentStatus:${message.sentStatus}, "
-          "conversationType:${message.conversationType}, "
-          "timestamp:${message.timestamp}, "
-          "conversationSeq:${message.conversationSeq}, "
-          "orderKey:${message.orderKey}, "
-          "isUserInserted:${message.isUserInserted}, "
-          "receiptStatus:${message.receiptStatus}, ";
-    })}, room id: $fromRoomID');
+    ZegoLoggerService.logInfo(
+      "onReceiveRoomMessage, messageList:${messageList.map((message) {
+        return "type:${message.type}, "
+            "messageID:${message.messageID}, "
+            "localMessageID:${message.localMessageID}, "
+            "senderUserID:${message.senderUserID}, "
+            "conversationID:${message.conversationID}, "
+            "direction:${message.direction}, "
+            "sentStatus:${message.sentStatus}, "
+            "conversationType:${message.conversationType}, "
+            "timestamp:${message.timestamp}, "
+            "conversationSeq:${message.conversationSeq}, "
+            "orderKey:${message.orderKey}, "
+            "isUserInserted:${message.isUserInserted}, "
+            "receiptStatus:${message.receiptStatus}, ";
+      })}, room id: \"$fromRoomID\"",
+      tag: "signal",
+      subTag: "message data",
+    );
 
     messageList.removeWhere((message) => ZIMMessageType.text != message.type);
     List<Map<String, dynamic>> attributesInfoMap = [];

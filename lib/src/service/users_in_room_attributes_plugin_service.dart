@@ -1,6 +1,7 @@
 // Flutter imports:
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
+// Package imports:
+import 'package:zego_uikit/zego_uikit.dart';
 
 // Project imports:
 import 'package:zego_uikit_signaling_plugin/src/core/core.dart';
@@ -15,7 +16,11 @@ mixin ZegoPluginUsersInRoomAttributesService {
   }) async {
     userIDs.removeWhere((item) => ["", null].contains(item));
     if (userIDs.isEmpty) {
-      debugPrint('[Error] users is empty');
+      ZegoLoggerService.logInfo(
+        '[Error] users is empty',
+        tag: "signal",
+        subTag: "user in-room property service",
+      );
       return ZegoPluginResult("", "", <String>[]);
     }
 

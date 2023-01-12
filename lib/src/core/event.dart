@@ -1,7 +1,5 @@
-// Flutter imports:
-import 'package:flutter/material.dart';
-
 // Package imports:
+import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
@@ -10,7 +8,11 @@ import 'core.dart';
 mixin ZegoSignalingPluginCoreEvent {
   /// init core event handler
   void initCoreEventHandler() {
-    debugPrint("[zim] register core event handle.");
+    ZegoLoggerService.logInfo(
+      "register core event handle.",
+      tag: "signal",
+      subTag: "core event",
+    );
 
     ZIMEventHandler.onConnectionStateChanged =
         ZegoSignalingPluginCore.shared.coreData.onConnectionStateChanged;
@@ -22,7 +24,11 @@ mixin ZegoSignalingPluginCoreEvent {
 
   /// uninit core event handler
   void uninitCoreEventHandler() {
-    debugPrint("[zim] unregister core event handle.");
+    ZegoLoggerService.logInfo(
+      "unregister core event handle.",
+      tag: "signal",
+      subTag: "core event",
+    );
 
     ZIMEventHandler.onConnectionStateChanged = null;
     ZIMEventHandler.onError = null;
@@ -32,7 +38,11 @@ mixin ZegoSignalingPluginCoreEvent {
 mixin ZegoSignalingPluginInvitationEvent {
   /// init invitation event handler
   void initInvitationEventHandler() {
-    debugPrint("[zim] register invitation event handle.");
+    ZegoLoggerService.logInfo(
+      "register invitation event handle.",
+      tag: "signal",
+      subTag: "core event",
+    );
 
     ZIMEventHandler.onCallInvitationReceived =
         ZegoSignalingPluginCore.shared.coreData.onCallInvitationReceived;
@@ -50,7 +60,11 @@ mixin ZegoSignalingPluginInvitationEvent {
 
   /// uninit invitation event handler
   void uninitInvitationEventHandler() {
-    debugPrint("[zim] unregister invitation event handle.");
+    ZegoLoggerService.logInfo(
+      "unregister invitation event handle.",
+      tag: "signal",
+      subTag: "core event",
+    );
 
     ZIMEventHandler.onCallInvitationReceived = null;
     ZIMEventHandler.onCallInvitationCancelled = null;
@@ -64,7 +78,11 @@ mixin ZegoSignalingPluginInvitationEvent {
 mixin ZegoSignalingPluginAttributeEvent {
   /// init attribute event handler
   void initAttributeEventHandler() {
-    debugPrint("[zim] register attribute event handle.");
+    ZegoLoggerService.logInfo(
+      "register attribute event handle.",
+      tag: "signal",
+      subTag: "core event",
+    );
 
     ZIMEventHandler.onRoomAttributesUpdated =
         ZegoSignalingPluginCore.shared.coreData.onRoomAttributesUpdated;
@@ -78,7 +96,11 @@ mixin ZegoSignalingPluginAttributeEvent {
 
   /// uninit attribute event handler
   void uninitAttributeEventHandler() {
-    debugPrint("[zim] unregister attribute event handle.");
+    ZegoLoggerService.logInfo(
+      "unregister attribute event handle.",
+      tag: "signal",
+      subTag: "core event",
+    );
 
     ZIMEventHandler.onRoomAttributesUpdated = null;
     ZIMEventHandler.onGroupAttributesUpdated = null;
@@ -90,7 +112,11 @@ mixin ZegoSignalingPluginAttributeEvent {
 mixin ZegoSignalingPluginMessageEvent {
   /// init message event handler
   void initMessageEventHandler() {
-    debugPrint("[zim] register message event handle.");
+    ZegoLoggerService.logInfo(
+      "register message event handle.",
+      tag: "signal",
+      subTag: "core event",
+    );
 
     ZIMEventHandler.onReceiveRoomMessage =
         ZegoSignalingPluginCore.shared.coreData.onReceiveRoomMessage;
@@ -98,7 +124,11 @@ mixin ZegoSignalingPluginMessageEvent {
 
   /// uninit message event handler
   void uninitMessageEventHandler() {
-    debugPrint("[zim] unregister message event handle.");
+    ZegoLoggerService.logInfo(
+      "unregister message event handle.",
+      tag: "signal",
+      subTag: "core event",
+    );
 
     ZIMEventHandler.onReceiveRoomMessage = null;
   }

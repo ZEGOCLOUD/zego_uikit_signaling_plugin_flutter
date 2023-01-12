@@ -2,10 +2,10 @@
 import 'dart:async';
 
 // Flutter imports:
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 // Package imports:
+import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
@@ -13,6 +13,7 @@ import 'defines.dart';
 import 'in_room_attributes_data.dart';
 import 'invitation_data.dart';
 import 'message_data.dart';
+import 'notification_data.dart';
 import 'users_in_room_attributes_data.dart';
 
 class ZegoSignalingPluginCoreData
@@ -20,7 +21,8 @@ class ZegoSignalingPluginCoreData
         ZegoSignalingPluginCoreInvitationData,
         ZegoSignalingPluginCoreInRoomAttributesData,
         ZegoSignalingPluginCoreUsersInRoomAttributesData,
-        ZegoSignalingPluginCoreMessageData {
+        ZegoSignalingPluginCoreMessageData,
+        ZegoSignalingPluginCoreNotificationData {
   ZIM? zim;
   ZIMUserInfo? loginUser;
   ZIMRoomInfo? roomInfo;
@@ -29,14 +31,18 @@ class ZegoSignalingPluginCoreData
   var connectionState = ZIMConnectionState.disconnected;
 
   /// get version
-  Future<String> getVersion() async {
+  Future<String> getZIMVersion() async {
     return await ZIM.getVersion();
   }
 
   /// create engine
   Future<void> create({required int appID, String appSign = ''}) async {
     if (null != zim) {
-      debugPrint("[zim] has created.");
+      ZegoLoggerService.logInfo(
+        "has created.",
+        tag: "signal",
+        subTag: "core data",
+      );
       return;
     }
 
@@ -45,17 +51,33 @@ class ZegoSignalingPluginCoreData
     appConfig.appSign = appSign;
     zim = ZIM.create(appConfig);
 
-    debugPrint('[zim] create, appID:$appID, instance:$zim');
+    initNotification();
+
+    ZegoLoggerService.logInfo(
+      'create, appID:$appID, instance:$zim',
+      tag: "signal",
+      subTag: "core data",
+    );
   }
 
-  /// destory engine
+  /// destroy engine
   Future<void> destroy() async {
     if (null == zim) {
-      debugPrint("[zim] is not created.");
+      ZegoLoggerService.logInfo(
+        "is not created.",
+        tag: "signal",
+        subTag: "core data",
+      );
       return;
     }
 
-    debugPrint("[zim] destroy.");
+    ZegoLoggerService.logInfo(
+      "destroy.",
+      tag: "signal",
+      subTag: "core data",
+    );
+
+    uninitNotification();
 
     zim!.destroy();
     zim = null;
@@ -66,12 +88,20 @@ class ZegoSignalingPluginCoreData
   /// login
   Future<void> login(String id, String name) async {
     if (null == zim) {
-      debugPrint("[zim] is not created.");
+      ZegoLoggerService.logInfo(
+        "is not created.",
+        tag: "signal",
+        subTag: "core data",
+      );
       return;
     }
 
     if (loginUser != null) {
-      debugPrint("[zim] user has login.");
+      ZegoLoggerService.logInfo(
+        "user has login.",
+        tag: "signal",
+        subTag: "core data",
+      );
       return;
     }
 
@@ -81,22 +111,42 @@ class ZegoSignalingPluginCoreData
     }
     await waitConnectionState(ZIMConnectionState.disconnected);
 
-    debugPrint("[zim] login request, user id:$id, user name:$name");
+    ZegoLoggerService.logInfo(
+      "login request, user id:$id, user name:$name",
+      tag: "signal",
+      subTag: "core data",
+    );
     loginUser = ZIMUserInfo();
     loginUser?.userID = id;
     loginUser?.userName = name;
 
-    debugPrint("[zim] ready to login..");
+    ZegoLoggerService.logInfo(
+      "ready to login..",
+      tag: "signal",
+      subTag: "core data",
+    );
     await zim!.login(loginUser!).then((value) {
-      debugPrint('[zim] login success');
+      ZegoLoggerService.logInfo(
+        'login success',
+        tag: "signal",
+        subTag: "core data",
+      );
     }).onError((error, stackTrace) {
-      debugPrint('[zim] login error, $error');
+      ZegoLoggerService.logInfo(
+        'login error, $error',
+        tag: "signal",
+        subTag: "core data",
+      );
     });
   }
 
   /// logout
   Future<void> logout() async {
-    debugPrint("user logout");
+    ZegoLoggerService.logInfo(
+      "user logout",
+      tag: "signal",
+      subTag: "core data",
+    );
 
     loginUser = null;
 
@@ -104,22 +154,38 @@ class ZegoSignalingPluginCoreData
 
     clear();
 
-    debugPrint("[zim] logout.");
+    ZegoLoggerService.logInfo(
+      "logout.",
+      tag: "signal",
+      subTag: "core data",
+    );
   }
 
   /// join room
   Future<ZegoPluginResult> joinRoom(String roomID, String roomName) async {
     if (null == zim) {
-      debugPrint("[zim] is not created.");
+      ZegoLoggerService.logInfo(
+        "is not created.",
+        tag: "signal",
+        subTag: "core data",
+      );
       return ZegoPluginResult("-1", "zim is not created.", "");
     }
 
     if (roomInfo != null) {
-      debugPrint("[zim] room has login.");
+      ZegoLoggerService.logInfo(
+        "room has login.",
+        tag: "signal",
+        subTag: "core data",
+      );
       return ZegoPluginResult("-2", "room has login.", "");
     }
 
-    debugPrint("[zim] join room, room id:$roomID, room name:$roomName");
+    ZegoLoggerService.logInfo(
+      "join room, room id:\"$roomID\", room name:$roomName",
+      tag: "signal",
+      subTag: "core data",
+    );
 
     roomInfo = ZIMRoomInfo();
     roomInfo!.roomID = roomID;
@@ -129,48 +195,79 @@ class ZegoSignalingPluginCoreData
     try {
       result = await zim!.enterRoom(roomInfo!, ZIMRoomAdvancedConfig());
     } on PlatformException catch (error) {
-      debugPrint(
-          "[zim] exception on join room, ${error.code} ${error.message}");
+      ZegoLoggerService.logInfo(
+        "exception on join room, ${error.code} ${error.message}",
+        tag: "signal",
+        subTag: "core data",
+      );
       roomInfo = null;
 
       return ZegoPluginResult(error.code, error.message ?? "", "");
     }
 
     if (result.roomInfo.baseInfo.roomID.isEmpty) {
-      debugPrint("[zim] join room failed");
+      ZegoLoggerService.logInfo(
+        "join room failed",
+        tag: "signal",
+        subTag: "core data",
+      );
       roomInfo = null;
 
       return ZegoPluginResult("-3", "room login failed.", "");
     }
 
-    debugPrint("[zim] join room success");
+    ZegoLoggerService.logInfo(
+      "join room success",
+      tag: "signal",
+      subTag: "core data",
+    );
     return ZegoPluginResult.empty();
   }
 
   /// leave room
   Future<void> leaveRoom() async {
     if (null == zim) {
-      debugPrint("[zim] is not created.");
+      ZegoLoggerService.logInfo(
+        "is not created.",
+        tag: "signal",
+        subTag: "core data",
+      );
       return;
     }
 
     if (roomInfo == null) {
-      debugPrint("[zim] room has not login.");
+      ZegoLoggerService.logInfo(
+        "room has not login.",
+        tag: "signal",
+        subTag: "core data",
+      );
       return;
     }
 
     var roomID = roomInfo!.roomID;
     roomInfo = null;
 
-    debugPrint("[zim] ready to leave room $roomID");
+    ZegoLoggerService.logInfo(
+      "ready to leave room $roomID",
+      tag: "signal",
+      subTag: "core data",
+    );
     await zim!.leaveRoom(roomID).then((result) {
-      debugPrint("[zim] leave room result: ${result.roomID}");
+      ZegoLoggerService.logInfo(
+        "leave room result: ${result.roomID}",
+        tag: "signal",
+        subTag: "core data",
+      );
     });
   }
 
   /// clear
   void clear() {
-    debugPrint("[zim] clear");
+    ZegoLoggerService.logInfo(
+      "clear",
+      tag: "signal",
+      subTag: "core data",
+    );
 
     clearInvitationData();
 
@@ -184,17 +281,27 @@ class ZegoSignalingPluginCoreData
   /// wait connection state
   Future<void> waitConnectionState(ZIMConnectionState state,
       {Duration duration = const Duration(milliseconds: 100)}) async {
-    debugPrint(
-        "[zim] waitConnectionState, target state:$state, current state: $connectionState, duration:$duration");
+    ZegoLoggerService.logInfo(
+      "waitConnectionState, target state:$state, current state: $connectionState, duration:$duration",
+      tag: "signal",
+      subTag: "core data",
+    );
 
     connectionStateWaiter = Completer();
     if (state != connectionState) {
-      debugPrint(
-          "[zim] waitConnectionState wait, target state:$state, current state: $connectionState");
+      ZegoLoggerService.logInfo(
+        "waitConnectionState wait, target state:$state, current state: $connectionState",
+        tag: "signal",
+        subTag: "core data",
+      );
       await Future.delayed(duration);
       return waitConnectionState(state, duration: duration);
     } else {
-      debugPrint("[zim] waitConnectionState complete");
+      ZegoLoggerService.logInfo(
+        "waitConnectionState complete",
+        tag: "signal",
+        subTag: "core data",
+      );
       connectionStateWaiter?.complete();
     }
 
@@ -203,20 +310,30 @@ class ZegoSignalingPluginCoreData
 
   ///  on error
   void onError(ZIM zim, ZIMError errorInfo) {
-    debugPrint(
-        "[zim] zim error, code:${errorInfo.code}, message:${errorInfo.message}");
+    ZegoLoggerService.logInfo(
+      "zim error, code:${errorInfo.code}, message:${errorInfo.message}",
+      tag: "signal",
+      subTag: "core data",
+    );
   }
 
   /// on connection state changed
   void onConnectionStateChanged(ZIM zim, ZIMConnectionState state,
       ZIMConnectionEvent event, Map extendedData) {
-    debugPrint(
-        "[zim] connection state changed, state:$state, event:$event, extended data:$extendedData");
+    ZegoLoggerService.logInfo(
+      "connection state changed, state:$state, event:$event, extended data:$extendedData",
+      tag: "signal",
+      subTag: "core data",
+    );
 
     connectionState = state;
 
     if (connectionState == ZIMConnectionState.disconnected) {
-      debugPrint("[zim] disconnected, auto logout");
+      ZegoLoggerService.logInfo(
+        "disconnected, auto logout",
+        tag: "signal",
+        subTag: "core data",
+      );
       logout();
     }
 
@@ -228,15 +345,22 @@ class ZegoSignalingPluginCoreData
   /// on room state changed
   void onRoomStateChanged(ZIM zim, ZIMRoomState state, ZIMRoomEvent event,
       Map extendedData, String roomID) {
-    debugPrint(
-        "[zim] room state changed, state:$state, event:$event, extended data:$extendedData, roomID:$roomID");
+    ZegoLoggerService.logInfo(
+      "room state changed, state:$state, event:$event, extended data:$extendedData, roomID:$roomID",
+      tag: "signal",
+      subTag: "core data",
+    );
 
     streamCtrlRoomState.add({
       'state': state.index,
     });
 
     if (ZIMRoomState.disconnected == state) {
-      debugPrint("[zim] room has been disconnect.");
+      ZegoLoggerService.logInfo(
+        "room has been disconnect.",
+        tag: "signal",
+        subTag: "core data",
+      );
       roomInfo = null;
     }
   }

@@ -12,3 +12,22 @@ class ZegoPluginResult {
 
   ZegoPluginResult.empty({this.code = "", this.message = "", this.result = ""});
 }
+
+class ZegoNotificationConfig {
+  bool notifyWhenAppIsInTheBackgroundOrQuit;
+  String resourceID;
+  String title;
+  String message;
+
+  ZegoNotificationConfig({
+    this.notifyWhenAppIsInTheBackgroundOrQuit = true,
+    this.resourceID = "",
+    this.title = "",
+    this.message = "",
+  });
+
+  @override
+  String toString() {
+    return "title:$title, message:$message, resource id:$resourceID, notify:$notifyWhenAppIsInTheBackgroundOrQuit";
+  }
+}

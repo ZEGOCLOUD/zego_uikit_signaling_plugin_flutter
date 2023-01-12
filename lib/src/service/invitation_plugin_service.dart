@@ -1,11 +1,8 @@
 // Dart imports:
 import 'dart:convert';
 
-// Flutter imports:
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
 // Package imports:
+import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
@@ -24,11 +21,17 @@ mixin ZegoPluginInvitationService {
     required int timeout,
     required int type,
     required String data,
+    ZegoNotificationConfig? notificationConfig,
   }) async {
     invitees.removeWhere((item) => ["", null].contains(item));
     if (invitees.isEmpty) {
-      debugPrint('[Error] invitees is empty');
-      return ZegoPluginResult("", "", <String>[]);
+      ZegoLoggerService.logInfo(
+        '[Error] invitees is empty',
+        tag: "signal",
+        subTag: "invitation service",
+      );
+      return ZegoPluginResult(
+          "", "", {"invitation_id": "", "error_invitees": <String>[]});
     }
 
     var config = ZIMCallInviteConfig();
@@ -39,11 +42,24 @@ mixin ZegoPluginInvitationService {
       'data': data,
     });
 
-    debugPrint(
-        'send invitation: invitees:$invitees, timeout:$timeout, type:$type, data:$data');
+    if (null != notificationConfig &&
+        notificationConfig.notifyWhenAppIsInTheBackgroundOrQuit) {
+      var pushConfig = ZIMPushConfig();
+      pushConfig.title = notificationConfig.title;
+      pushConfig.content = notificationConfig.message;
+      pushConfig.resourcesID = notificationConfig.resourceID;
+      pushConfig.payload = data;
+      config.pushConfig = pushConfig;
+    }
+
+    ZegoLoggerService.logInfo(
+      'send invitation: invitees:$invitees, timeout:$timeout, type:$type, data:$data, notification config:${notificationConfig?.toString()}',
+      tag: "signal",
+      subTag: "invitation service",
+    );
 
     return await ZegoSignalingPluginCore.shared.coreData
-        .invite(invitees, config);
+        .invite(invitees, type, config);
   }
 
   /// cancel invitation to one or more specified users
@@ -55,17 +71,24 @@ mixin ZegoPluginInvitationService {
   }) async {
     invitees.removeWhere((item) => ["", null].contains(item));
     if (invitees.isEmpty) {
-      debugPrint('[Error] invitees is empty');
+      ZegoLoggerService.logInfo(
+        '[Error] invitees is empty',
+        tag: "signal",
+        subTag: "invitation service",
+      );
       return ZegoPluginResult("", "", <String>[]);
     }
 
     var config = ZIMCallCancelConfig();
     config.extendedData = data;
 
-    var callID = ZegoSignalingPluginCore.shared.coreData
-        .queryCallID(ZegoSignalingPluginCore.shared.coreData.loginUser!.userID);
-    debugPrint(
-        'cancel invitation: callID:$callID, invitees:$invitees, data:$data');
+    var callID = ZegoSignalingPluginCore.shared.coreData.queryCallIDByInviterID(
+        ZegoSignalingPluginCore.shared.coreData.loginUser!.userID);
+    ZegoLoggerService.logInfo(
+      'cancel invitation: callID:$callID, invitees:$invitees, data:$data',
+      tag: "signal",
+      subTag: "invitation service",
+    );
 
     return await ZegoSignalingPluginCore.shared.coreData
         .cancel(invitees, callID, config);
@@ -81,12 +104,35 @@ mixin ZegoPluginInvitationService {
     var config = ZIMCallRejectConfig();
     config.extendedData = data;
 
-    var callID = ZegoSignalingPluginCore.shared.coreData.queryCallID(inviterID);
-    debugPrint(
-        'refuse invitation: callID:$callID, inviter id:$inviterID, data:$data');
+    String callID = "";
+    Map<String, dynamic>? extendedDataMap;
+    try {
+      extendedDataMap = jsonDecode(data) as Map<String, dynamic>?;
+    } catch (e) {
+      ZegoLoggerService.logInfo(
+        "refuse data is not a json, ${e.toString()}",
+        tag: "signal",
+        subTag: "invitation service",
+      );
+    }
+    if (extendedDataMap?.containsKey("invitation_id") ?? false) {
+      callID = extendedDataMap!["invitation_id"]! as String;
+    } else {
+      callID = ZegoSignalingPluginCore.shared.coreData
+          .queryCallIDByInviterID(inviterID);
+    }
+    ZegoLoggerService.logInfo(
+      'refuse invitation: callID:$callID, inviter id:$inviterID, data:$data',
+      tag: "signal",
+      subTag: "invitation service",
+    );
 
     if (callID.isEmpty) {
-      debugPrint('[Error] call id is empty');
+      ZegoLoggerService.logInfo(
+        '[Error] call id is empty',
+        tag: "signal",
+        subTag: "invitation service",
+      );
       return ZegoPluginResult.empty();
     }
 
@@ -103,12 +149,20 @@ mixin ZegoPluginInvitationService {
     var config = ZIMCallAcceptConfig();
     config.extendedData = data;
 
-    var callID = ZegoSignalingPluginCore.shared.coreData.queryCallID(inviterID);
-    debugPrint(
-        'accept invitation: callID:$callID, inviter id:$inviterID, data:$data');
+    var callID = ZegoSignalingPluginCore.shared.coreData
+        .queryCallIDByInviterID(inviterID);
+    ZegoLoggerService.logInfo(
+      'accept invitation: callID:$callID, inviter id:$inviterID, data:$data',
+      tag: "signal",
+      subTag: "invitation service",
+    );
 
     if (callID.isEmpty) {
-      debugPrint('[Error] call id is empty');
+      ZegoLoggerService.logInfo(
+        '[Error] call id is empty',
+        tag: "signal",
+        subTag: "invitation service",
+      );
       return ZegoPluginResult.empty();
     }
 

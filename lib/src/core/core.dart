@@ -25,8 +25,9 @@ class ZegoSignalingPluginCore
 
   /// get version
   Future<String> getVersion() async {
-    var version = await coreData.getVersion();
-    return "zego_zim:$version; zego_uikit_signaling_plugin:1.1.0";
+    var zimVersion = await coreData.getZIMVersion();
+    var zpnsVersion = await coreData.getZpnsVersion();
+    return "zego_zim:$zimVersion; zego_zpns:$zpnsVersion; zego_uikit_signaling_plugin:1.4.0";
   }
 
   /// init
@@ -36,7 +37,7 @@ class ZegoSignalingPluginCore
     initAttributeEventHandler();
     initMessageEventHandler();
 
-    coreData.create(appID: appID, appSign: appSign);
+    await coreData.create(appID: appID, appSign: appSign);
   }
 
   /// uninit

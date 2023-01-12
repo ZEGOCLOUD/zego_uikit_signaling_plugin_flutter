@@ -8,6 +8,7 @@ import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
 import 'src/core/core.dart';
+import 'src/core/defines.dart';
 import 'src/service/service.dart';
 
 export 'package:zego_zim/zego_zim.dart';
@@ -36,11 +37,17 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
   @override
   Future<String> getVersion() async {
     var zimVersion = await ZegoSignalingPluginCore.shared.getVersion();
-    return "version: zim:$zimVersion";
+    return "version: signal:$zimVersion";
   }
 
   @override
   Future<Map> invoke(String method, Map params) async {
+    ZegoLoggerService.logInfo(
+      "invoke, method:$method, params:$params",
+      tag: "signal",
+      subTag: "invoke",
+    );
+
     switch (method) {
       case 'init':
         await impl.init(
@@ -73,17 +80,30 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
         await impl.leaveRoom();
         return {};
       case 'sendInvitation':
+        var notificationConfigMap =
+            params['notificationConfig'] as Map<String, dynamic>? ?? {};
+        ZegoNotificationConfig? notificationConfig;
+        if (ZegoSignalingPluginCore
+            .shared.coreData.notifyWhenAppIsInTheBackgroundOrQuit) {
+          notificationConfig = ZegoNotificationConfig(
+            notifyWhenAppIsInTheBackgroundOrQuit: true,
+            resourceID: notificationConfigMap['resourceID'] as String? ?? "",
+            title: notificationConfigMap['title'] as String? ?? "",
+            message: notificationConfigMap['message'] as String? ?? "",
+          );
+        }
         var pluginResult = await impl.sendInvitation(
           inviterName: params['inviterName']! as String,
           invitees: params['invitees']! as List<String>,
           timeout: params['timeout']! as int,
           type: params['type']! as int,
           data: params['data']! as String,
+          notificationConfig: notificationConfig,
         );
         return {
           "errorCode": pluginResult.code,
           "errorMessage": pluginResult.message,
-          'errorInvitees': pluginResult.result as List<String>,
+          'result': pluginResult.result as Map<String, dynamic>,
         };
       case 'cancelInvitation':
         var pluginResult = await impl.cancelInvitation(
@@ -195,6 +215,16 @@ class ZegoUIKitSignalingPlugin implements IZegoUIKitPlugin {
       //     "errorCode": pluginResult.code,
       //     "errorMessage": pluginResult.message,
       //   };
+      case 'enableNotifyWhenAppRunningInBackgroundOrQuit':
+        var pluginResult =
+            await impl.enableNotifyWhenAppRunningInBackgroundOrQuit(
+          params['enabled']! as bool,
+          params['isIOSSandboxEnvironment']! as bool,
+        );
+        return {
+          "errorCode": pluginResult.code,
+          "errorMessage": pluginResult.message,
+        };
       default:
         throw UnimplementedError();
     }

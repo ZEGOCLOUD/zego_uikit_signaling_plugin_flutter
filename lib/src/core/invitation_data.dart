@@ -14,11 +14,46 @@ import 'package:zego_zim/zego_zim.dart';
 import 'package:zego_uikit_signaling_plugin/src/core/core.dart';
 import 'defines.dart';
 
+typedef InvitationID = String;
+
+enum InvitationState { error, waiting, accept, refuse, cancel, timeout }
+
+class InvitationUser {
+  String userID;
+  InvitationState state;
+
+  InvitationUser({required this.userID, required this.state});
+
+  @override
+  String toString() {
+    return "userid :$userID, state:$state";
+  }
+}
+
+class InvitationData {
+  String id; // invitation ID
+  String inviterID;
+  List<InvitationUser> invitees;
+  int type;
+
+  InvitationData({
+    required this.id,
+    required this.inviterID,
+    required this.invitees,
+    required this.type,
+  });
+
+  @override
+  String toString() {
+    return "id:$id, type:$type, inviter id:$inviterID, invitees:${invitees.map((e) => e.toString())}";
+  }
+}
+
 mixin ZegoSignalingPluginCoreInvitationData {
   ZIMUserInfo? get _loginUser =>
       ZegoSignalingPluginCore.shared.coreData.loginUser;
 
-  Map<String, String> _userCallIDs = {}; //  <user id, zim call id>
+  Map<InvitationID, InvitationData> invitationMap = {};
 
   var streamCtrlConnectionState = StreamController<Map>.broadcast();
   var streamCtrlRoomState = StreamController<Map>.broadcast();
@@ -29,38 +64,125 @@ mixin ZegoSignalingPluginCoreInvitationData {
   var streamCtrlInvitationRefused = StreamController<Map>.broadcast();
   var streamCtrlInvitationCanceled = StreamController<Map>.broadcast();
 
-  /// query call id
-  String queryCallID(String userID) {
-    return _userCallIDs[userID] ?? "";
+  void addInvitationData(InvitationData invitationData) {
+    ZegoLoggerService.logInfo(
+      "add invitation data ${invitationData.toString()}",
+      tag: "signal",
+      subTag: "invitation data",
+    );
+    invitationMap[invitationData.id] = invitationData;
+  }
+
+  InvitationData? removeInvitationData(String callID) {
+    ZegoLoggerService.logInfo(
+      "remove invitation data, call id: $callID",
+      tag: "signal",
+      subTag: "invitation data",
+    );
+    return invitationMap.remove(callID);
+  }
+
+  InvitationUser? getInvitee(String callID, String userID) {
+    for (var invitee in invitationMap[callID]?.invitees ?? <InvitationUser>[]) {
+      if (invitee.userID == userID) {
+        return invitee;
+      }
+    }
+
+    return null;
+  }
+
+  String queryCallIDByInviterID(String inviterID) {
+    for (var invitationData in invitationMap.values) {
+      if (invitationData.inviterID == inviterID) {
+        return invitationData.id;
+      }
+    }
+
+    return "";
+  }
+
+  void removeIfAllInviteesDone(String callID) {
+    var isDone = true;
+    for (var invitee in invitationMap[callID]?.invitees ?? <InvitationUser>[]) {
+      if (invitee.state == InvitationState.waiting) {
+        isDone = false;
+        break;
+      }
+    }
+
+    if (isDone) {
+      removeInvitationData(callID);
+    }
+  }
+
+  void clearInvitationData() {
+    invitationMap = {};
   }
 
   /// invite
   Future<ZegoPluginResult> invite(
-      List<String> invitees, ZIMCallInviteConfig config) async {
+      List<String> invitees, int type, ZIMCallInviteConfig config) async {
     late ZIMCallInvitationSentResult result;
     try {
       result = await ZIM.getInstance()!.callInvite(invitees, config);
     } on PlatformException catch (error) {
-      return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
+      ZegoLoggerService.logInfo(
+        'invite error, code:${error.code}, message:${error.message ?? ""}',
+        tag: "signal",
+        subTag: "invitation data",
+      );
+
+      return ZegoPluginResult(error.code, error.message ?? "",
+          {"invitation_id": "", "error_invitees": <String>[]});
     }
 
-    String errorMessage = "";
-    _userCallIDs[_loginUser!.userID] = result.callID;
+    var invitationData = InvitationData(
+      id: result.callID,
+      inviterID: _loginUser!.userID,
+      invitees: invitees
+          .map((inviteeID) => InvitationUser(
+                userID: inviteeID,
+                state: InvitationState.waiting,
+              ))
+          .toList(),
+      type: type,
+    );
+    addInvitationData(invitationData);
+
+    ZegoLoggerService.logInfo(
+      'invite done, call id:${result.callID}',
+      tag: "signal",
+      subTag: "invitation data",
+    );
     if (result.info.errorInvitees.isNotEmpty) {
       for (var invitee in result.info.errorInvitees) {
-        errorMessage += invitee.state.toString() + ";";
-        debugPrint(
-            '[zim] invite error, invitee state: ${invitee.state.toString()}');
+        ZegoLoggerService.logInfo(
+          'error invitee, user id: ${invitee.userID}, state:${invitee.state.toString()}',
+          tag: "signal",
+          subTag: "invitation data",
+        );
       }
-    } else {
-      debugPrint('[zim] invite done, call id:${result.callID}');
+
+      var errorUserIDs =
+          result.info.errorInvitees.map((e) => e.userID).toList();
+      for (var invitee in invitationData.invitees) {
+        if (errorUserIDs.contains(invitee.userID)) {
+          invitee.state = InvitationState.error;
+        }
+      }
+      removeIfAllInviteesDone(result.callID);
     }
 
     return ZegoPluginResult(
-        errorMessage.isEmpty ? "" : "-1",
-        errorMessage,
-        List<String>.generate(result.info.errorInvitees.length,
-            (index) => result.info.errorInvitees[index].userID));
+      "",
+      "",
+      {
+        "invitation_id": result.callID,
+        "error_invitees":
+            result.info.errorInvitees.map((e) => e.userID).toList()
+      },
+    );
   }
 
   /// cancel
@@ -70,18 +192,40 @@ mixin ZegoSignalingPluginCoreInvitationData {
     try {
       result = await ZIM.getInstance()!.callCancel(invitees, callID, config);
     } on PlatformException catch (error) {
+      ZegoLoggerService.logInfo(
+        'cancel invitation error, code:${error.code}, message:${error.message ?? ""}',
+        tag: "signal",
+        subTag: "invitation data",
+      );
+
       return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
     }
 
-    _userCallIDs.remove(_loginUser!.userID);
+    for (var invitee in invitationMap[callID]?.invitees ?? <InvitationUser>[]) {
+      var isCancelUser = invitees.contains(invitee.userID);
+      var isCancelError = result.errorInvitees.contains(invitee.userID);
+      if (isCancelUser && !isCancelError) {
+        invitee.state = InvitationState.cancel;
+      } else {
+        invitee.state = InvitationState.error;
+      }
+    }
+    removeIfAllInviteesDone(callID);
 
     if (result.errorInvitees.isNotEmpty) {
       for (var element in result.errorInvitees) {
-        debugPrint(
-            '[zim] cancel invitation error, call id:${result.callID}, invitee id:${element.toString()}');
+        ZegoLoggerService.logInfo(
+          'cancel invitation error, call id:${result.callID}, invitee id:${element.toString()}',
+          tag: "signal",
+          subTag: "invitation data",
+        );
       }
     } else {
-      debugPrint('[zim] cancel invitation done, call id:${result.callID}');
+      ZegoLoggerService.logInfo(
+        'cancel invitation done, call id:${result.callID}',
+        tag: "signal",
+        subTag: "invitation data",
+      );
     }
 
     return ZegoPluginResult("", "", result.errorInvitees);
@@ -90,14 +234,26 @@ mixin ZegoSignalingPluginCoreInvitationData {
   /// accept
   Future<ZegoPluginResult> accept(
       String callID, ZIMCallAcceptConfig config) async {
+    removeInvitationData(callID);
+
     late ZIMCallAcceptanceSentResult result;
     try {
       result = await ZIM.getInstance()!.callAccept(callID, config);
     } on PlatformException catch (error) {
+      ZegoLoggerService.logInfo(
+        'accept invitation error, code:${error.code}, message:${error.message ?? ""}',
+        tag: "signal",
+        subTag: "invitation data",
+      );
+
       return ZegoPluginResult(error.code, error.message ?? "", "");
     }
 
-    debugPrint('[zim] accept invitation done, call id:${result.callID}');
+    ZegoLoggerService.logInfo(
+      'accept invitation done, call id:${result.callID}',
+      tag: "signal",
+      subTag: "invitation data",
+    );
 
     return ZegoPluginResult.empty();
   }
@@ -105,34 +261,28 @@ mixin ZegoSignalingPluginCoreInvitationData {
   /// reject
   Future<ZegoPluginResult> reject(
       String callID, ZIMCallRejectConfig config) async {
-    String inviteUserID = getInviteUserIDByCallID(callID);
-    _userCallIDs.remove(inviteUserID);
+    removeInvitationData(callID);
 
     late ZIMCallRejectionSentResult result;
     try {
       result = await ZIM.getInstance()!.callReject(callID, config);
     } on PlatformException catch (error) {
+      ZegoLoggerService.logInfo(
+        'reject invitation error, code:${error.code}, message:${error.message ?? ""}',
+        tag: "signal",
+        subTag: "invitation data",
+      );
+
       return ZegoPluginResult(error.code, error.message ?? "", "");
     }
-    debugPrint('[zim] reject invitation done, call id:${result.callID}');
+
+    ZegoLoggerService.logInfo(
+      'reject invitation done, call id:${result.callID}',
+      tag: "signal",
+      subTag: "invitation data",
+    );
 
     return ZegoPluginResult.empty();
-  }
-
-  /// get invite user id by call id
-  String getInviteUserIDByCallID(String callID) {
-    String inviteUserID = "";
-    _userCallIDs.forEach((userID, userCallID) {
-      if (callID == userCallID) {
-        inviteUserID = userID;
-      }
-    });
-    return inviteUserID;
-  }
-
-  /// clear invitation data
-  void clearInvitationData() {
-    _userCallIDs = {};
   }
 
   // ------- events ------
@@ -140,16 +290,41 @@ mixin ZegoSignalingPluginCoreInvitationData {
   /// on call invitation received
   void onCallInvitationReceived(
       ZIM zim, ZIMCallInvitationReceivedInfo info, String callID) {
-    debugPrint(
-        '[zim] onCallInvitationReceived, timeout:${info.timeout}, inviter:${info.inviter}, extended data:${info.extendedData}, callID:$callID');
-    _userCallIDs[info.inviter] = callID;
+    ZegoLoggerService.logInfo(
+      'onCallInvitationReceived, timeout:${info.timeout}, inviter:${info.inviter}, extended data:${info.extendedData}, call id:$callID',
+      tag: "signal",
+      subTag: "invitation data",
+    );
 
     var extendedMap = jsonDecode(info.extendedData) as Map<String, dynamic>;
+    var invitationData = InvitationData(
+      id: callID,
+      inviterID: info.inviter,
+      invitees: [
+        InvitationUser(
+          userID: _loginUser!.userID,
+          state: InvitationState.waiting,
+        )
+      ],
+      type: extendedMap['type'] as int,
+    );
+    if (invitationMap.containsKey(invitationData.id)) {
+      ZegoLoggerService.logInfo(
+        'call id ${invitationData.id} is exist before',
+        tag: "signal",
+        subTag: "invitation data",
+      );
+
+      return;
+    }
+    addInvitationData(invitationData);
+
     streamCtrlInvitationReceived.add({
       'inviter': ZegoUIKitUser(
           id: info.inviter, name: extendedMap['inviter_name'] as String),
       'type': extendedMap['type'] as int,
       'data': extendedMap['data'] as String,
+      'invitation_id': callID,
     });
   }
 
@@ -157,8 +332,13 @@ mixin ZegoSignalingPluginCoreInvitationData {
   void onCallInvitationCancelled(
       ZIM zim, ZIMCallInvitationCancelledInfo info, String callID) {
     //  inviter extendedData
-    debugPrint(
-        '[zim] onCallInvitationCancelled, inviter:${info.inviter}, extended data:${info.extendedData}, call id: $callID');
+    ZegoLoggerService.logInfo(
+      'onCallInvitationCancelled, inviter:${info.inviter}, extended data:${info.extendedData}, call id: $callID',
+      tag: "signal",
+      subTag: "invitation data",
+    );
+
+    removeInvitationData(callID);
 
     streamCtrlInvitationCanceled.add({
       'inviter': ZegoUIKitUser(id: info.inviter, name: ''),
@@ -170,8 +350,14 @@ mixin ZegoSignalingPluginCoreInvitationData {
   void onCallInvitationAccepted(
       ZIM zim, ZIMCallInvitationAcceptedInfo info, String callID) {
     //  inviter extendedData
-    debugPrint(
-        '[zim] onCallInvitationAccepted, invitee:${info.invitee}, extended data:${info.extendedData}, $callID');
+    ZegoLoggerService.logInfo(
+      'onCallInvitationAccepted, invitee:${info.invitee}, extended data:${info.extendedData}, call id:$callID',
+      tag: "signal",
+      subTag: "invitation data",
+    );
+
+    getInvitee(callID, info.invitee)?.state = InvitationState.accept;
+    removeInvitationData(callID);
 
     streamCtrlInvitationAccepted.add({
       'invitee': ZegoUIKitUser(id: info.invitee, name: ''),
@@ -183,8 +369,14 @@ mixin ZegoSignalingPluginCoreInvitationData {
   void onCallInvitationRejected(
       ZIM zim, ZIMCallInvitationRejectedInfo info, String callID) {
     //  inviter extendedData
-    debugPrint(
-        '[zim] onCallInvitationRejected, invitee:${info.invitee}, extended data:${info.extendedData}, $callID');
+    ZegoLoggerService.logInfo(
+      'onCallInvitationRejected, invitee:${info.invitee}, extended data:${info.extendedData}, call id:$callID',
+      tag: "signal",
+      subTag: "invitation data",
+    );
+
+    getInvitee(callID, info.invitee)?.state = InvitationState.refuse;
+    removeIfAllInviteesDone(callID);
 
     streamCtrlInvitationRefused.add({
       'invitee': ZegoUIKitUser(id: info.invitee, name: ''),
@@ -194,12 +386,16 @@ mixin ZegoSignalingPluginCoreInvitationData {
 
   /// on call invitation timeout
   void onCallInvitationTimeout(ZIM zim, String callID) {
-    debugPrint('[zim] onCallInvitationTimeout $callID');
+    ZegoLoggerService.logInfo(
+      'onCallInvitationTimeout, call id:$callID',
+      tag: "signal",
+      subTag: "invitation data",
+    );
 
-    String inviteUserID = getInviteUserIDByCallID(callID);
+    var invitationData = removeInvitationData(callID);
 
     streamCtrlInvitationTimeout.add({
-      'inviter': ZegoUIKitUser(id: inviteUserID, name: ''),
+      'inviter': ZegoUIKitUser(id: invitationData?.inviterID ?? "", name: ''),
       'data': '',
     });
   }
@@ -207,8 +403,18 @@ mixin ZegoSignalingPluginCoreInvitationData {
   /// on call invitation answered timeout
   void onCallInviteesAnsweredTimeout(
       ZIM zim, List<String> invitees, String callID) {
-    debugPrint(
-        '[zim] onCallInviteesAnsweredTimeout, invitees:$invitees, call id:$callID');
+    ZegoLoggerService.logInfo(
+      'onCallInviteesAnsweredTimeout, invitees:$invitees, call id:$callID',
+      tag: "signal",
+      subTag: "invitation data",
+    );
+
+    for (var invitee in invitationMap[callID]?.invitees ?? <InvitationUser>[]) {
+      if (invitees.contains(invitee.userID)) {
+        invitee.state = InvitationState.timeout;
+      }
+    }
+    removeIfAllInviteesDone(callID);
 
     streamCtrlInvitationResponseTimeout.add({
       'invitees': invitees

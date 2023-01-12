@@ -2,10 +2,10 @@
 import 'dart:async';
 
 // Flutter imports:
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 // Package imports:
+import 'package:zego_uikit/zego_uikit.dart';
 import 'package:zego_zim/zego_zim.dart';
 
 // Project imports:
@@ -26,13 +26,21 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     required ZIMRoomAttributesBatchOperationConfig config,
   }) {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] begin in-room properties batch, room id is empty");
+      ZegoLoggerService.logInfo(
+        "begin in-room properties batch, room id is empty",
+        tag: "signal",
+        subTag: "in-room properties",
+      );
       return ZegoPluginResult("-1", "room id is empty", "");
     }
 
     _zim!.beginRoomAttributesBatchOperation(_roomInfo!.roomID, config);
 
-    debugPrint('[zim] begin in-room properties batch operation');
+    ZegoLoggerService.logInfo(
+      'begin in-room properties batch operation',
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     return ZegoPluginResult.empty();
   }
@@ -43,26 +51,39 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     required ZIMRoomAttributesSetConfig config,
   }) async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] set in-room attribute, room id is empty");
+      ZegoLoggerService.logInfo(
+        "set in-room attribute, room id is empty",
+        tag: "signal",
+        subTag: "in-room properties",
+      );
       return ZegoPluginResult("-1", "room id is empty", <String>[]);
     }
 
-    debugPrint(
-        "[zim] set in-room attribute: $roomAttributes, is force:${config.isForce}, is delete after owner left:${config.isDeleteAfterOwnerLeft}, is update owner:${config.isUpdateOwner}");
+    ZegoLoggerService.logInfo(
+      "set in-room attribute: $roomAttributes, is force:${config.isForce}, is delete after owner left:${config.isDeleteAfterOwnerLeft}, is update owner:${config.isUpdateOwner}",
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     late ZIMRoomAttributesOperatedCallResult result;
     try {
       result = await _zim!
           .setRoomAttributes(roomAttributes, _roomInfo!.roomID, config);
     } on PlatformException catch (error) {
-      debugPrint(
-          '[zim] set in-room properties $roomAttributes error, ${error.code} ${error.message}');
+      ZegoLoggerService.logInfo(
+        'set in-room properties $roomAttributes error, ${error.code} ${error.message}',
+        tag: "signal",
+        subTag: "in-room properties",
+      );
 
       return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
     }
 
-    debugPrint(
-        '[zim] set in-room properties $roomAttributes result, room id:${result.roomID}, error user ids:${result.errorKeys}');
+    ZegoLoggerService.logInfo(
+      "set in-room properties $roomAttributes result, room id:\"${result.roomID}\", error user ids:${result.errorKeys}",
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     return ZegoPluginResult(
         result.errorKeys.isEmpty ? "" : "-2",
@@ -78,27 +99,39 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     required ZIMRoomAttributesDeleteConfig config,
   }) async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] delete in-room attribute, room id is empty");
+      ZegoLoggerService.logInfo(
+        "delete in-room attribute, room id is empty",
+        tag: "signal",
+        subTag: "in-room properties",
+      );
       return ZegoPluginResult("-1", "room id is empty", <String>[]);
     }
 
-    debugPrint(
-        "[zim] delete in-room attribute, keys:$keys, is force:${config.isForce}");
+    ZegoLoggerService.logInfo(
+      "delete in-room attribute, keys:$keys, is force:${config.isForce}",
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     late ZIMRoomAttributesOperatedCallResult result;
     try {
       result =
           await _zim!.deleteRoomAttributes(keys, _roomInfo!.roomID, config);
     } on PlatformException catch (error) {
-      debugPrint(
-          '[zim] delete in-room properties error, ${error.code} ${error.message}');
+      ZegoLoggerService.logInfo(
+        'delete in-room properties error, ${error.code} ${error.message}',
+        tag: "signal",
+        subTag: "in-room properties",
+      );
 
       return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
     }
 
-    debugPrint(
-        '[zim] delete in-room properties result, room id:${result.roomID}, '
-        'error user ids:${result.errorKeys}');
+    ZegoLoggerService.logInfo(
+      "delete in-room properties result, room id:\"${result.roomID}\", error user ids:${result.errorKeys}",
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     return ZegoPluginResult(
         result.errorKeys.isEmpty ? "" : "-2",
@@ -111,21 +144,36 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
   /// end room properties batch operation
   Future<ZegoPluginResult> endRoomPropertiesBatchOperation() async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] end room properties batch operation, room id is empty");
+      ZegoLoggerService.logInfo(
+        "end room properties batch operation, room id is empty",
+        tag: "signal",
+        subTag: "in-room properties",
+      );
       return ZegoPluginResult("-1", "room id is empty", "");
     }
 
-    debugPrint('[zim] try end in-room properties batch operation..');
+    ZegoLoggerService.logInfo(
+      'try end in-room properties batch operation..',
+      tag: "signal",
+      subTag: "in-room properties",
+    );
     try {
       await _zim!.endRoomAttributesBatchOperation(_roomInfo!.roomID);
     } on PlatformException catch (error) {
-      debugPrint(
-          '[zim] end in-room properties batch operation error, ${error.code} ${error.message}');
+      ZegoLoggerService.logInfo(
+        'end in-room properties batch operation error, ${error.code} ${error.message}',
+        tag: "signal",
+        subTag: "in-room properties",
+      );
 
       return ZegoPluginResult(error.code, error.message ?? "", "");
     }
 
-    debugPrint('[zim] end in-room properties batch operation finished');
+    ZegoLoggerService.logInfo(
+      'end in-room properties batch operation finished',
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     return ZegoPluginResult.empty();
   }
@@ -133,25 +181,39 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
   /// query room properties
   Future<ZegoPluginResult> queryRoomProperties() async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] query in-room attribute, room id is empty");
+      ZegoLoggerService.logInfo(
+        "query in-room attribute, room id is empty",
+        tag: "signal",
+        subTag: "in-room properties",
+      );
       return ZegoPluginResult("-1", "room id is empty", <String, String>{});
     }
 
-    debugPrint("[zim] query in-room attribute, room id:${_roomInfo?.roomID}");
+    ZegoLoggerService.logInfo(
+      "query in-room attribute, room id:\"${_roomInfo?.roomID}\"",
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     late ZIMRoomAttributesQueriedResult result;
     try {
       result = await _zim!.queryRoomAllAttributes(_roomInfo!.roomID);
     } on PlatformException catch (error) {
-      debugPrint(
-          '[zim] query in-room properties error, ${error.code} ${error.message}');
+      ZegoLoggerService.logInfo(
+        'query in-room properties error, ${error.code} ${error.message}',
+        tag: "signal",
+        subTag: "in-room properties",
+      );
 
       return ZegoPluginResult(
           error.code, error.message ?? "", <String, String>{});
     }
 
-    debugPrint(
-        '[zim] query in-room properties result, room id:${result.roomID}, properties:${result.roomAttributes}');
+    ZegoLoggerService.logInfo(
+      "query in-room properties result, room id:\"${result.roomID}\", properties:${result.roomAttributes}",
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     return ZegoPluginResult("", "", result.roomAttributes);
   }
@@ -162,8 +224,11 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     ZIMRoomAttributesUpdateInfo updateInfo,
     String roomID,
   ) {
-    debugPrint(
-        '[zim] onRoomAttributesUpdated, action:${updateInfo.action}, roomAttributes:${updateInfo.roomAttributes}, $roomID');
+    ZegoLoggerService.logInfo(
+      'onRoomAttributesUpdated, action:${updateInfo.action}, roomAttributes:${updateInfo.roomAttributes}, $roomID',
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     Map<int, Map<String, String>> roomAttributes = {};
     roomAttributes[updateInfo.action.index] = updateInfo.roomAttributes;
@@ -176,10 +241,13 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     List<ZIMRoomAttributesUpdateInfo> updateInfoList,
     String roomID,
   ) {
-    debugPrint(
-        '[zim] onRoomAttributesBatchUpdated, updateInfo:${updateInfoList.map((updateInfo) {
-      return "action:${updateInfo.action}, roomAttributes:${updateInfo.roomAttributes}";
-    })}, $roomID');
+    ZegoLoggerService.logInfo(
+      'onRoomAttributesBatchUpdated, updateInfo:${updateInfoList.map((updateInfo) {
+        return "action:${updateInfo.action}, roomAttributes:${updateInfo.roomAttributes}";
+      })}, $roomID',
+      tag: "signal",
+      subTag: "in-room properties",
+    );
 
     Map<int, List<Map<String, String>>> batchRoomAttributes = {};
     for (var updateInfo in updateInfoList) {
@@ -202,10 +270,12 @@ mixin ZegoSignalingPluginCoreInRoomAttributesData {
     ZIMGroupOperatedInfo operatedInfo,
     String groupID,
   ) {
-    debugPrint(
-        '[zim] onGroupAttributesUpdated, updateInfo:${updateInfoList.map((updateInfo) {
-      return "action:${updateInfo.action}, groupAttributes:${updateInfo.groupAttributes}";
-    })}, '
-        'operatedInfo:$operatedInfo, $groupID');
+    ZegoLoggerService.logInfo(
+      'onGroupAttributesUpdated, updateInfo:${updateInfoList.map((updateInfo) {
+        return "action:${updateInfo.action}, groupAttributes:${updateInfo.groupAttributes}";
+      })}, operatedInfo:$operatedInfo, $groupID',
+      tag: "signal",
+      subTag: "in-room properties",
+    );
   }
 }

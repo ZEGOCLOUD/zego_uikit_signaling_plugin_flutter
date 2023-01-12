@@ -10,6 +10,7 @@ import 'package:zego_uikit_signaling_plugin/src/core/defines.dart';
 import 'in_room_attributes_plugin_service.dart';
 import 'invitation_plugin_service.dart';
 import 'message_service.dart';
+import 'notification_service.dart';
 import 'users_in_room_attributes_plugin_service.dart';
 
 class ZegoPluginSignalingImpl
@@ -17,7 +18,8 @@ class ZegoPluginSignalingImpl
         ZegoPluginInvitationService,
         ZegoPluginInRoomAttributesService,
         ZegoPluginUsersInRoomAttributesService,
-        ZegoPluginMessageService {
+        ZegoPluginMessageService,
+        ZegoPluginNotificationService {
   /// single instance
   static final ZegoPluginSignalingImpl shared =
       ZegoPluginSignalingImpl._internal();

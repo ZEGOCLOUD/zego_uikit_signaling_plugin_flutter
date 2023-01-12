@@ -28,13 +28,19 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
     required List<String> userIDs,
   }) async {
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] query in-room attribute, room id is empty");
-      return ZegoPluginResult("-1", "room id is empty", "");
+      ZegoLoggerService.logInfo(
+        "query in-room attribute, room id is empty",
+        tag: "signal",
+        subTag: "user in-room properties",
+      );
+      return ZegoPluginResult("-1", "room id is empty", <String>[]);
     }
 
-    debugPrint(
-        '[zim] set users in-room attributes, room id:${_roomInfo?.roomID}, '
-        'user id:$userIDs, key:$key, value:$value');
+    ZegoLoggerService.logInfo(
+      "set users in-room attributes, room id:\"${_roomInfo?.roomID}\", user id:$userIDs, key:$key, value:$value",
+      tag: "signal",
+      subTag: "user in-room properties",
+    );
 
     late ZIMRoomMembersAttributesOperatedResult result;
     try {
@@ -45,15 +51,20 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
         ZIMRoomMemberAttributesSetConfig(),
       );
     } on PlatformException catch (error) {
-      debugPrint(
-          '[zim] set users in-room attributes error, ${error.code} ${error.message}');
+      ZegoLoggerService.logInfo(
+        'set users in-room attributes error, ${error.code} ${error.message}',
+        tag: "signal",
+        subTag: "user in-room properties",
+      );
 
       return ZegoPluginResult(error.code, error.message ?? "", <String>[]);
     }
 
-    debugPrint(
-        '[zim] set users in-room attributes result, room id:${result.roomID}, '
-        'error user ids:${result.errorUserList}');
+    ZegoLoggerService.logInfo(
+      "set users in-room attributes result, room id:\"${result.roomID},\" error user ids:${result.errorUserList}",
+      tag: "signal",
+      subTag: "user in-room properties",
+    );
 
     return ZegoPluginResult(
         result.errorUserList.isEmpty ? "" : "-2",
@@ -70,13 +81,20 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
   }) async {
     Map<String, Map<String, String>> infos = {};
     if (_roomInfo?.roomID.isEmpty ?? false) {
-      debugPrint("[zim] query users in-room attribute, room id is empty");
+      ZegoLoggerService.logInfo(
+        "query users in-room attribute, room id is empty",
+        tag: "signal",
+        subTag: "user in-room properties",
+      );
       return ZegoPluginResult("-1", "room id is empty", infos);
     }
 
-    debugPrint(
-        "[zim] query users in-room attribute, room id:${_roomInfo?.roomID}, "
-        "nextFlag: $nextFlag, count:$count");
+    ZegoLoggerService.logInfo(
+      "query users in-room attribute, room id:\"${_roomInfo?.roomID}\", "
+      "nextFlag: $nextFlag, count:$count",
+      tag: "signal",
+      subTag: "user in-room properties",
+    );
 
     late ZIMRoomMemberAttributesListQueriedResult result;
     try {
@@ -86,8 +104,11 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
       result =
           await _zim!.queryRoomMemberAttributesList(_roomInfo!.roomID, config);
     } on PlatformException catch (error) {
-      debugPrint(
-          '[zim] query users in-room attributes error, ${error.code} ${error.message}');
+      ZegoLoggerService.logInfo(
+        'query users in-room attributes error, ${error.code} ${error.message}',
+        tag: "signal",
+        subTag: "user in-room properties",
+      );
 
       return ZegoPluginResult(error.code, error.message ?? "", infos);
     }
@@ -95,7 +116,11 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
     for (var info in result.infos) {
       infos[info.userID] = info.attributes;
     }
-    debugPrint('[zim] query users in-room attributes finished, info:$infos');
+    ZegoLoggerService.logInfo(
+      'query users in-room attributes finished, info:$infos',
+      tag: "signal",
+      subTag: "user in-room properties",
+    );
 
     return ZegoPluginResult("", "", infos);
   }
@@ -107,10 +132,13 @@ mixin ZegoSignalingPluginCoreUsersInRoomAttributesData {
     ZIMRoomOperatedInfo operatedInfo,
     String roomID,
   ) {
-    debugPrint(
-        '[zim] onRoomMemberAttributesUpdated, updateInfo:${updateInfoList.map((updateInfo) {
-      return "user id:${updateInfo.attributesInfo.userID}, attributes:${updateInfo.attributesInfo.attributes}";
-    })}, editor: ${operatedInfo.userID}, room id: $roomID');
+    ZegoLoggerService.logInfo(
+      "onRoomMemberAttributesUpdated, updateInfo:${updateInfoList.map((updateInfo) {
+        return "user id:${updateInfo.attributesInfo.userID}, attributes:${updateInfo.attributesInfo.attributes}";
+      })}, editor: ${operatedInfo.userID}, room id: \"$roomID\"",
+      tag: "signal",
+      subTag: "user in-room properties",
+    );
 
     Map<String, Map<String, String>> attributesInfoMap = {};
     for (var updateInfo in updateInfoList) {
