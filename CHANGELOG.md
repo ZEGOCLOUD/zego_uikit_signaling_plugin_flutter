@@ -1,3 +1,7 @@
+## 2.0.0
+
+ - Architecture upgrade based on adapter.
+
 ## 0.0.1
 
 * old version's pub url is: https://pub.dev/packages/zego_uikit_signal_plugin
@@ -53,3 +57,7 @@
 ## 1.1.0
 
 * support custom command and room message
+
+## 1.4.1
+
+* update a dependency to the latest release..
