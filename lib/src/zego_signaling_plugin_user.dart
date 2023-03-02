@@ -6,15 +6,12 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
   Future<ZegoSignalingPluginConnectUserResult> connectUser({
     required String id,
     String name = '',
-    String? token,
   }) async {
     return ZIM
         .getInstance()!
-        .login(
-            ZIMUserInfo()
-              ..userID = id
-              ..userName = name.isNotEmpty ? name : id,
-            token)
+        .login(ZIMUserInfo()
+          ..userID = id
+          ..userName = name.isNotEmpty ? name : id)
         .then((value) {
       return const ZegoSignalingPluginConnectUserResult();
     }).catchError((error) {
@@ -30,12 +27,22 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
       [Duration timeout = const Duration(seconds: 2)]) async {
     ZIM.getInstance()!.logout();
 
-    // waitForDisconnect
-    const frequence = Duration(milliseconds: 100);
+    if (ZegoSignalingPluginEventCenter().connectionState ==
+        ZIMConnectionState.reconnecting) {
+      /// if current state is network break(reconnecting),
+      /// sdk will not call onConnectionStateChanged callback,
+      /// that mean the following Completer code will wait forever,
+      /// so here return result directly
+      return Future.value(
+          const ZegoSignalingPluginDisconnectUserResult(timeout: false));
+    }
+
+    /// wait for disconnect, make sure state is disconnected before next connect
+    debugPrint('waitForDisconnect...');
     if (ZegoSignalingPluginEventCenter().connectionState !=
         ZIMConnectionState.disconnected) {
       final completer = Completer<ZegoSignalingPluginDisconnectUserResult>();
-      final timer = Timer.periodic(frequence, (timer) {
+      final timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
         if (ZegoSignalingPluginEventCenter().connectionState ==
             ZIMConnectionState.disconnected) {
           if (timer.isActive) timer.cancel();
@@ -46,6 +53,8 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
           debugPrint('waitForDisconnect success');
         }
       });
+
+      /// if not complete in timeout seconds, not wait the disconnect anymore
       Future.delayed(timeout, () {
         if (timer.isActive) timer.cancel();
         if (!completer.isCompleted) {

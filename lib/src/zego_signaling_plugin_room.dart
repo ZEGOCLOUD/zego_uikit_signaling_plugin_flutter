@@ -86,7 +86,7 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
     required String roomID,
     required List<String> keys,
     required bool isForce,
-  }) {
+  }) async {
     return ZIM
         .getInstance()!
         .deleteRoomAttributes(
@@ -178,7 +178,10 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
         .then((zimResult) {
       return ZegoSignalingPluginQueryUsersInRoomAttributesResult(
         nextFlag: zimResult.nextFlag,
-        attributes: { for (var element in zimResult.infos) element.userID : element.attributes },
+        attributes: {
+          for (var element in zimResult.infos)
+            element.userID: element.attributes
+        },
       );
     }).catchError((error) {
       return ZegoSignalingPluginQueryUsersInRoomAttributesResult(
@@ -209,14 +212,14 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
         .then((ZIMRoomMembersAttributesOperatedResult zimResult) {
       return ZegoSignalingPluginSetUsersInRoomAttributesResult(
         errorUserList: zimResult.errorUserList,
-        errorKeys: { for (var element in zimResult.infos) element
-              .attributesInfo
-              .userID : element.errorKeys },
-        attributes: { for (var element in zimResult.infos) element
-              .attributesInfo
-              .userID : element
-              .attributesInfo
-              .attributes },
+        errorKeys: {
+          for (var element in zimResult.infos)
+            element.attributesInfo.userID: element.errorKeys
+        },
+        attributes: {
+          for (var element in zimResult.infos)
+            element.attributesInfo.userID: element.attributesInfo.attributes
+        },
       );
     }).catchError((error) {
       return ZegoSignalingPluginSetUsersInRoomAttributesResult(

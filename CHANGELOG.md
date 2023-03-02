@@ -1,3 +1,10 @@
+## 2.0.2
+* remove login token
+
+## 2.0.1
+
+ - upload again, fix pubspec.yaml error
+
 ## 2.0.0
 
  - Architecture upgrade based on adapter.

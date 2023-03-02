@@ -392,11 +392,10 @@ class ZegoSignalingPluginEventCenter {
         ZegoSignalingPluginUsersInRoomAttributesUpdatedEvent(
           roomID: roomID,
           editorID: operatedInfo.userID,
-          attributes: { for (var element in infos) element
-                .attributesInfo
-                .userID : element
-                .attributesInfo
-                .attributes },
+          attributes: {
+            for (var element in infos)
+              element.attributesInfo.userID: element.attributesInfo.attributes
+          },
         ),
       );
       passthrougnEvent.onRoomMemberAttributesUpdated?.call(

@@ -7,7 +7,7 @@ class ZegoSignalingPluginNotificationAPIImpl
       enableNotifyWhenAppRunningInBackgroundOrQuit({
     bool isIOSSandboxEnvironment = false,
   }) async {
-    if (kIsWeb || ((!Platform.isAndroid) && (!Platform.isIOS))) {
+    if ((!Platform.isAndroid) && (!Platform.isIOS)) {
       return ZegoSignalingPluginEnableNotifyResult(
         error: PlatformException(
           code: '-1',
