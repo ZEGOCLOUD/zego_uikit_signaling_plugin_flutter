@@ -1,6 +1,11 @@
-## 2.0.3
+## 2.1.0
+- For the offline calling feature, Android supports a silent push mode, while iOS supports VoIP mode.
+
+## 2.0.4
 * Update dependency
 
+## 2.0.3
+* Update dependency
 
 ## 2.0.2
 * remove login token

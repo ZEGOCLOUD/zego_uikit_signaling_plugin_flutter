@@ -6,8 +6,25 @@ class ZegoSignalingPluginNotificationAPIImpl
   Future<ZegoSignalingPluginEnableNotifyResult>
       enableNotifyWhenAppRunningInBackgroundOrQuit({
     bool isIOSSandboxEnvironment = false,
+    bool enableIOSVoIP = true,
+    String appName = '',
   }) async {
+    ZegoSignalingLoggerService.logInfo(
+      'enable Notify When App Running In Background Or Quit, '
+      'is iOS Sandbox Environment:$isIOSSandboxEnvironment, '
+      'enable iOS VoIP:$enableIOSVoIP, '
+      'appName: $appName',
+      tag: 'signaling',
+      subTag: 'notification',
+    );
+
     if ((!Platform.isAndroid) && (!Platform.isIOS)) {
+      ZegoSignalingLoggerService.logInfo(
+        'Only Support Android And iOS Platform.',
+        tag: 'signaling',
+        subTag: 'notification',
+      );
+
       return ZegoSignalingPluginEnableNotifyResult(
         error: PlatformException(
           code: '-1',
@@ -15,20 +32,39 @@ class ZegoSignalingPluginNotificationAPIImpl
         ),
       );
     }
+
     try {
       if (Platform.isAndroid) {
         await ZPNs.setPushConfig(ZPNsConfig()..enableFCMPush = true);
       } else if (Platform.isIOS) {
         await ZPNs.getInstance().applyNotificationPermission();
+
+        if (enableIOSVoIP) {
+          CallKit.setInitConfiguration(
+            CXProviderConfiguration(localizedName: appName),
+          );
+        }
       }
 
       await ZPNs.getInstance().registerPush(
-          iOSEnvironment: isIOSSandboxEnvironment
-              ? ZPNsIOSEnvironment.Development
-              : ZPNsIOSEnvironment.Production);
-      debugPrint('register push done');
+        iOSEnvironment: isIOSSandboxEnvironment
+            ? ZPNsIOSEnvironment.Development
+            : ZPNsIOSEnvironment.Production,
+        enableIOSVoIP: enableIOSVoIP,
+      );
+      ZegoSignalingLoggerService.logInfo(
+        'register push done',
+        tag: 'signaling',
+        subTag: 'notification',
+      );
       return const ZegoSignalingPluginEnableNotifyResult();
     } catch (e) {
+      ZegoSignalingLoggerService.logInfo(
+        'register push failed, $e',
+        tag: 'signaling',
+        subTag: 'notification',
+      );
+
       if (e is PlatformException) {
         return ZegoSignalingPluginEnableNotifyResult(
           error: PlatformException(
