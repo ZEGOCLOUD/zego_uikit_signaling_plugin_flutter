@@ -845,15 +845,16 @@ class ZegoSignalingPluginEventCenter {
       callkitPerformSetHeldCallActionEvent
           .add(ZegoSignalingPluginCallKitActionEvent(action: action));
     };
-    CallKitEventHandler.performSetMutedCallAction = (CXAction action) {
+    CallKitEventHandler.performSetMutedCallAction =
+        (CXSetMutedCallAction action) {
       ZegoSignalingLoggerService.logInfo(
         'performSetMutedCallAction',
         tag: 'signaling',
         subTag: 'event center',
       );
 
-      callkitPerformSetMutedCallActionEvent
-          .add(ZegoSignalingPluginCallKitActionEvent(action: action));
+      callkitPerformSetMutedCallActionEvent.add(
+          ZegoSignalingPluginCallKitSetMutedCallActionEvent(action: action));
     };
     CallKitEventHandler.performSetGroupCallAction = (CXAction action) {
       ZegoSignalingLoggerService.logInfo(
@@ -956,8 +957,8 @@ class ZegoSignalingPluginEventCenter {
       StreamController<ZegoSignalingPluginCallKitActionEvent>.broadcast();
   final callkitPerformSetHeldCallActionEvent =
       StreamController<ZegoSignalingPluginCallKitActionEvent>.broadcast();
-  final callkitPerformSetMutedCallActionEvent =
-      StreamController<ZegoSignalingPluginCallKitActionEvent>.broadcast();
+  final callkitPerformSetMutedCallActionEvent = StreamController<
+      ZegoSignalingPluginCallKitSetMutedCallActionEvent>.broadcast();
   final callkitPerformSetGroupCallActionEvent =
       StreamController<ZegoSignalingPluginCallKitActionEvent>.broadcast();
   final callkitPerformPlayDTMFCallActionEvent =

@@ -82,7 +82,7 @@ class ZegoSignalingPluginCallKitEventImpl
   }
 
   @override
-  Stream<ZegoSignalingPluginCallKitActionEvent>
+  Stream<ZegoSignalingPluginCallKitSetMutedCallActionEvent>
       getCallkitPerformSetMutedCallActionEventStream() {
     return ZegoSignalingPluginEventCenter()
         .callkitPerformSetMutedCallActionEvent

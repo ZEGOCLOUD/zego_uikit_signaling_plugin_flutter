@@ -1,3 +1,6 @@
+## 2.1.1
+- Fix some issues about iOS supports VoIP mode.
+
 ## 2.1.0
 - For the offline calling feature, Android supports a silent push mode, while iOS supports VoIP mode.
 

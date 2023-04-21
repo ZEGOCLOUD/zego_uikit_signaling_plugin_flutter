@@ -1,6 +1,6 @@
 name: zego_uikit_signaling_plugin
 description: ZegoUIKitSignalingPlugin is a low-code plugin collection that provides the signal related function extensions for ZegoUIKit, which helps you to integarte features easier and faster.
-version: 2.1.0
+version: 2.1.1
 homepage: https://www.zegocloud.com/
 repository: https://github.com/ZEGOCLOUD/zego_uikit_signaling_plugin_flutter
 
@@ -17,6 +17,7 @@ dependencies:
   zego_zpns: 2.3.1+2
 
   flutter_logs: ^2.1.10
+  plugin_platform_interface: ^2.0.2
 
 dev_dependencies:
   flutter_test:
@@ -24,3 +25,12 @@ dev_dependencies:
   flutter_lints: ^1.0.0
   import_sorter: ^4.6.0  # run 'flutter pub run import_sorter:main'
   dart_code_metrics: any
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.zegocloud.uikit.flutter.signal_plugin.zego_uikit_signaling_plugin
+        pluginClass: ZegoUikitSignalingPlugin
+      ios:
+        pluginClass: ZegoUikitSignalingPlugin
