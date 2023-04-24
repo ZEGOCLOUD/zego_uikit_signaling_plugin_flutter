@@ -60,7 +60,7 @@ class ZegoSignalingPluginNotificationAPIImpl
       return const ZegoSignalingPluginEnableNotifyResult();
     } catch (e) {
       ZegoSignalingLoggerService.logInfo(
-        'register push failed, $e',
+        'register push, error:${e.toString()}',
         tag: 'signaling',
         subTag: 'notification',
       );
@@ -89,18 +89,27 @@ class ZegoSignalingPluginNotificationEventImpl
   @override
   Stream<ZegoSignalingPluginNotificationArrivedEvent>
       getNotificationArrivedEventStream() {
-    return ZegoSignalingPluginEventCenter().notificationArrivedEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .notificationArrivedEvent
+        .stream;
   }
 
   @override
   Stream<ZegoSignalingPluginNotificationClickedEvent>
       getNotificationClickedEventStream() {
-    return ZegoSignalingPluginEventCenter().notificationClickedEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .notificationClickedEvent
+        .stream;
   }
 
   @override
   Stream<ZegoSignalingPluginNotificationRegisteredEvent>
       getNotificationRegisteredEventStream() {
-    return ZegoSignalingPluginEventCenter().notificationRegisteredEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .notificationRegisteredEvent
+        .stream;
   }
 }

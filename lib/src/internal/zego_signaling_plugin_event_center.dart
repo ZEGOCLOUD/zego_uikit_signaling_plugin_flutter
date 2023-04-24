@@ -3,18 +3,18 @@ import 'dart:async';
 
 // Package imports:
 import 'package:zego_plugin_adapter/zego_plugin_adapter.dart';
+import 'package:zego_uikit_signaling_plugin/src/internal/zego_signaling_plugin_core.dart';
 import 'package:zego_zim/zego_zim.dart';
 import 'package:zego_zpns/zego_zpns.dart';
 
 // Project imports:
-import 'log/logger_service.dart';
+import 'package:zego_uikit_signaling_plugin/src/channel/zego_signaling_plugin_platform_interface.dart';
+import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
 
 part 'zego_signaling_plugin_event_native_style.dart';
 
 class ZegoSignalingPluginEventCenter {
-  factory ZegoSignalingPluginEventCenter() => instance;
-
-  ZegoSignalingPluginEventCenter._() {
+  void init() {
     _passthroughEvent();
     _baseEvent();
     _invitationEvent();
@@ -626,6 +626,16 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
+      if (state == ZIMConnectionState.disconnected) {
+        ZegoSignalingLoggerService.logInfo(
+          'onConnectionStateChanged, disconnected, clear current user',
+          tag: 'signaling',
+          subTag: 'event center',
+        );
+
+        ZegoSignalingPluginCore().currentUser = null;
+      }
+
       connectionState = state;
       connectionStateChangedEvent.add(
         ZegoSignalingPluginConnectionStateChangedEvent(
@@ -966,7 +976,6 @@ class ZegoSignalingPluginEventCenter {
 
   ///  zpns background message  ----------------------------------end
 
-  static final instance = ZegoSignalingPluginEventCenter._();
   final ZegoSignalingPluginEventCenterPassthroughEvent passThroughEvent =
       ZegoSignalingPluginEventCenterPassthroughEvent();
 }

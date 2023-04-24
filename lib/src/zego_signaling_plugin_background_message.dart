@@ -40,6 +40,9 @@ class ZegoSignalingPluginBackgroundMessageEventImpl
   @override
   Stream<ZegoSignalingPluginThroughMessageReceivedEvent>
       getBackgroundThroughMessageReceivedEventStream() {
-    return ZegoSignalingPluginEventCenter().throughMessageReceivedEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .throughMessageReceivedEvent
+        .stream;
   }
 }

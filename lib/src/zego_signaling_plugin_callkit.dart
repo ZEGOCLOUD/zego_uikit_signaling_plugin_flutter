@@ -6,7 +6,24 @@ class ZegoSignalingPluginCallKitAPIImpl
   Future<void> setIncomingPushReceivedHandler(
     ZegoSignalingIncomingPushReceivedHandler handler,
   ) async {
+    ZegoSignalingLoggerService.logInfo(
+      'set incoming push received handler',
+      tag: 'signaling',
+      subTag: 'callkit',
+    );
+
     CallKitEventHandler.didReceiveIncomingPush = handler;
+  }
+
+  @override
+  void activeAudioByCallKit() {
+    ZegoSignalingLoggerService.logInfo(
+      'active audio by callKit',
+      tag: 'signaling',
+      subTag: 'callkit',
+    );
+
+    ZegoSignalingPluginPlatform.instance.activeAudioByCallKit();
   }
 }
 
@@ -16,34 +33,47 @@ class ZegoSignalingPluginCallKitEventImpl
   @override
   Stream<ZegoSignalingPluginCallKitVoidEvent>
       getCallkitProviderDidResetEventStream() {
-    return ZegoSignalingPluginEventCenter().callkitProviderDidResetEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .callkitProviderDidResetEvent
+        .stream;
   }
 
   /// Called when the provider has been fully created and is ready to send actions and receive updates
   @override
   Stream<ZegoSignalingPluginCallKitVoidEvent>
       getCallkitProviderDidBeginEventStream() {
-    return ZegoSignalingPluginEventCenter().callkitProviderDidBeginEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .callkitProviderDidBeginEvent
+        .stream;
   }
 
   /// Called when the provider's audio session activation state changes.
   @override
   Stream<ZegoSignalingPluginCallKitVoidEvent>
       getCallkitActivateAudioEventStream() {
-    return ZegoSignalingPluginEventCenter().callkitActivateAudioEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .callkitActivateAudioEvent
+        .stream;
   }
 
   @override
   Stream<ZegoSignalingPluginCallKitVoidEvent>
       getCallkitDeactivateAudioEventStream() {
-    return ZegoSignalingPluginEventCenter().callkitDeactivateAudioEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .callkitDeactivateAudioEvent
+        .stream;
   }
 
   /// Called when an action was not performed in time and has been inherently failed. Depending on the action, this timeout may also force the call to end. An action that has already timed out should not be fulfilled or failed by the provider delegate
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
       getCallkitTimedOutPerformingActionEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .callkitTimedOutPerformingActionEvent
         .stream;
   }
@@ -52,7 +82,8 @@ class ZegoSignalingPluginCallKitEventImpl
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
       getCallkitPerformStartCallActionEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .callkitPerformStartCallActionEvent
         .stream;
   }
@@ -60,7 +91,8 @@ class ZegoSignalingPluginCallKitEventImpl
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
       getCallkitPerformAnswerCallActionEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .callkitPerformAnswerCallActionEvent
         .stream;
   }
@@ -68,7 +100,8 @@ class ZegoSignalingPluginCallKitEventImpl
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
       getCallkitPerformEndCallActionEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .callkitPerformEndCallActionEvent
         .stream;
   }
@@ -76,7 +109,8 @@ class ZegoSignalingPluginCallKitEventImpl
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
       getCallkitPerformSetHeldCallActionEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .callkitPerformSetHeldCallActionEvent
         .stream;
   }
@@ -84,7 +118,8 @@ class ZegoSignalingPluginCallKitEventImpl
   @override
   Stream<ZegoSignalingPluginCallKitSetMutedCallActionEvent>
       getCallkitPerformSetMutedCallActionEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .callkitPerformSetMutedCallActionEvent
         .stream;
   }
@@ -92,7 +127,8 @@ class ZegoSignalingPluginCallKitEventImpl
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
       getCallkitPerformSetGroupCallActionEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .callkitPerformSetGroupCallActionEvent
         .stream;
   }
@@ -100,7 +136,8 @@ class ZegoSignalingPluginCallKitEventImpl
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
       getCallkitPerformPlayDTMFCallActionEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .callkitPerformPlayDTMFCallActionEvent
         .stream;
   }

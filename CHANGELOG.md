@@ -1,3 +1,6 @@
+## 2.1.2
+* Update dependency
+
 ## 2.1.1
 - Fix some issues about iOS supports VoIP mode.
 

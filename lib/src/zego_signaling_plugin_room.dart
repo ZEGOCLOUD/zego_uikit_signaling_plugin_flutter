@@ -9,6 +9,12 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
     Map<String, String> roomAttributes = const {},
     int roomDestroyDelayTime = 0,
   }) async {
+    ZegoSignalingLoggerService.logInfo(
+      'join room, room id:$roomID, room name:$roomName',
+      tag: 'signaling',
+      subTag: 'room',
+    );
+
     return ZIM
         .getInstance()!
         .enterRoom(
@@ -20,11 +26,23 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
             ..roomDestroyDelayTime = roomDestroyDelayTime,
         )
         .then((zimResult) {
+      ZegoSignalingLoggerService.logInfo(
+        'join room finish',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       assert(zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
           'zimResult.roomInfo.baseInfo.roomID.isNotEmpty');
 
       return const ZegoSignalingPluginJoinRoomResult();
     }).catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'join room, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginJoinRoomResult(
         error: error,
       );
@@ -36,11 +54,23 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
   Future<ZegoSignalingPluginLeaveRoomResult> leaveRoom({
     required String roomID,
   }) async {
+    ZegoSignalingLoggerService.logInfo(
+      'leave room, room id:$roomID',
+      tag: 'signaling',
+      subTag: 'room',
+    );
+
     return ZIM
         .getInstance()!
         .leaveRoom(roomID)
         .then((value) => const ZegoSignalingPluginLeaveRoomResult())
         .catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'leave room, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginLeaveRoomResult(
         error: error,
       );
@@ -72,6 +102,12 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
         errorKeys: zimResult.errorKeys,
       );
     }).catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'update room properties, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginRoomPropertiesOperationResult(
         error: error,
         errorKeys: roomProperties.keys.toList(),
@@ -99,6 +135,12 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
         errorKeys: zimResult.errorKeys,
       );
     }).catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'delete room properties, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginRoomPropertiesOperationResult(
         error: error,
         errorKeys: keys.toList(),
@@ -134,6 +176,12 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
         .endRoomAttributesBatchOperation(roomID)
         .then((value) => const ZegoSignalingPluginEndRoomBatchOperationResult())
         .catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'end room properties batch operation, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginEndRoomBatchOperationResult(
         error: error,
       );
@@ -152,6 +200,12 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
               properties: zimResult.roomAttributes,
             ))
         .catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'query room properties, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginQueryRoomPropertiesResult(
         error: error,
         properties: const {},
@@ -184,6 +238,12 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
         },
       );
     }).catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'query user in-room attributes, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginQueryUsersInRoomAttributesResult(
         error: error,
         nextFlag: '',
@@ -222,6 +282,12 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
         },
       );
     }).catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'set user in-room attributes, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginSetUsersInRoomAttributesResult(
         error: error,
         errorUserList: userIDs,
@@ -236,13 +302,17 @@ class ZegoSignalingPluginRoomEventImpl implements ZegoSignalingPluginRoomEvent {
   @override
   Stream<ZegoSignalingPluginRoomPropertiesUpdatedEvent>
       getRoomPropertiesUpdatedEventStream() {
-    return ZegoSignalingPluginEventCenter().roomPropertiesUpdatedEvent.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .roomPropertiesUpdatedEvent
+        .stream;
   }
 
   @override
   Stream<ZegoSignalingPluginRoomPropertiesBatchUpdatedEvent>
       getRoomPropertiesBatchUpdatedEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .roomPropertiesBatchUpdatedEvent
         .stream;
   }
@@ -250,13 +320,14 @@ class ZegoSignalingPluginRoomEventImpl implements ZegoSignalingPluginRoomEvent {
   @override
   Stream<ZegoSignalingPluginRoomStateChangedEvent>
       getRoomStateChangedEventStream() {
-    return ZegoSignalingPluginEventCenter().roomStateChangedEvent.stream;
+    return ZegoSignalingPluginCore().eventCenter.roomStateChangedEvent.stream;
   }
 
   @override
   Stream<ZegoSignalingPluginUsersInRoomAttributesUpdatedEvent>
       getUsersInRoomAttributesUpdatedEventStream() {
-    return ZegoSignalingPluginEventCenter()
+    return ZegoSignalingPluginCore()
+        .eventCenter
         .usersInRoomAttributesUpdatedEvent
         .stream;
   }
@@ -264,12 +335,12 @@ class ZegoSignalingPluginRoomEventImpl implements ZegoSignalingPluginRoomEvent {
   @override
   Stream<ZegoSignalingPluginRoomMemberJoinedEvent>
       getRoomMemberJoinedEventStream() {
-    return ZegoSignalingPluginEventCenter().roomMemberJoinedEvent.stream;
+    return ZegoSignalingPluginCore().eventCenter.roomMemberJoinedEvent.stream;
   }
 
   @override
   Stream<ZegoSignalingPluginRoomMemberLeftEvent>
       getRoomMemberLeftEventStream() {
-    return ZegoSignalingPluginEventCenter().roomMemberLeftEvent.stream;
+    return ZegoSignalingPluginCore().eventCenter.roomMemberLeftEvent.stream;
   }
 }

@@ -24,8 +24,8 @@ abstract class ZegoSignalingPluginPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<void> configureAudioSession() {
+  Future<void> activeAudioByCallKit() {
     throw UnimplementedError(
-        'configureAudioSession() has not been implemented.');
+        'activeAudioByCallKit() has not been implemented.');
   }
 }

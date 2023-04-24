@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'dart:io' show Platform;
 
-import 'package:zego_uikit_signaling_plugin/src/internal/log/logger_service.dart';
+import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
 import 'zego_signaling_plugin_platform_interface.dart';
 
 /// An implementation of [ZegoSignalingPluginPlatform] that uses method channels.
@@ -12,15 +12,15 @@ class MethodChannelZegoSignalingPlugin extends ZegoSignalingPluginPlatform {
   final methodChannel = const MethodChannel('zego_uikit_signaling_plugin');
 
   @override
-  Future<void> configureAudioSession() async {
+  Future<void> activeAudioByCallKit() async {
     if (Platform.isIOS) {
       ZegoSignalingLoggerService.logInfo(
-        'configureAudioSession',
+        'activeAudioByCallKit',
         tag: 'signaling',
         subTag: '',
       );
 
-      await methodChannel.invokeMethod<String>('configureAudioSession');
+      await methodChannel.invokeMethod<String>('activeAudioByCallKit');
     }
   }
 }

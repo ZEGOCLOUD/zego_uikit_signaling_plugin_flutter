@@ -8,12 +8,13 @@ import 'dart:io' show Platform;
 
 // Package imports:
 import 'package:zego_plugin_adapter/zego_plugin_adapter.dart';
+import 'package:zego_uikit_signaling_plugin/src/internal/zego_signaling_plugin_core.dart';
+import 'package:zego_uikit_signaling_plugin/src/internal/zego_signaling_plugin_event_center.dart';
 import 'package:zego_zim/zego_zim.dart';
 import 'package:zego_zpns/zego_zpns.dart';
 
 // Project imports:
-import 'package:zego_uikit_signaling_plugin/src/internal/log/logger_service.dart';
-import 'package:zego_uikit_signaling_plugin/src/internal/zego_signaling_plugin_event_center.dart';
+import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
 import 'package:zego_uikit_signaling_plugin/src/channel/zego_signaling_plugin_platform_interface.dart';
 
 import 'dart:io'
@@ -54,6 +55,9 @@ class ZegoUIKitSignalingPlugin
         ZegoSignalingPluginCallKitEventImpl,
         IZegoUIKitPlugin
     implements ZegoSignalingPluginInterface {
+  ZegoSignalingPluginEventCenter get eventCenter =>
+      ZegoSignalingPluginCore().eventCenter;
+
   factory ZegoUIKitSignalingPlugin() => instance;
 
   ZegoUIKitSignalingPlugin._();
@@ -68,9 +72,9 @@ class ZegoUIKitSignalingPlugin
     final zimVersion = await ZIM.getVersion();
     if (Platform.isAndroid || Platform.isIOS) {
       final zpnsVersion = await ZPNs.getVersion();
-      return 'zego_uikit_signaling_plugin: 2.1.1; zim:$zimVersion; zpns:$zpnsVersion;';
+      return 'zego_uikit_signaling_plugin: 2.1.2; zim:$zimVersion; zpns:$zpnsVersion;';
     } else {
-      return 'zego_uikit_signaling_plugin: 2.1.1; zim:$zimVersion;';
+      return 'zego_uikit_signaling_plugin: 2.1.2; zim:$zimVersion;';
     }
   }
 
@@ -102,13 +106,6 @@ class ZegoUIKitSignalingPlugin
 
   @override
   Stream<ZegoSignalingPluginErrorEvent> getErrorEventStream() {
-    return eventCenter.errorEvent.stream;
+    return ZegoSignalingPluginCore().eventCenter.errorEvent.stream;
   }
-
-  @override
-  Future<void> configureAudioSession() async {
-    ZegoSignalingPluginPlatform.instance.configureAudioSession();
-  }
-
-  final eventCenter = ZegoSignalingPluginEventCenter();
 }

@@ -16,6 +16,12 @@ class ZegoSignalingPluginMessageAPIImpl
         .then((ZIMMessageSentResult zimResult) {
       return const ZegoSignalingPluginInRoomTextMessageResult();
     }).catchError((error) {
+      ZegoSignalingLoggerService.logInfo(
+        'send in-room text message, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
       return ZegoSignalingPluginInRoomTextMessageResult(
         error: error,
       );
@@ -28,6 +34,9 @@ class ZegoSignalingPluginMessageEventImpl
   @override
   Stream<ZegoSignalingPluginInRoomTextMessageReceivedEvent>
       getInRoomTextMessageReceivedEventStream() {
-    return ZegoSignalingPluginEventCenter().inRoomTextMessageReceived.stream;
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .inRoomTextMessageReceived
+        .stream;
   }
 }
