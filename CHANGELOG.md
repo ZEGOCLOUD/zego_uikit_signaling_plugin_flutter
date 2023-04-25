@@ -1,3 +1,6 @@
+## 2.1.3
+* Fix the issue of reporting login failure error when signaling repeatedly logs in the same user.
+
 ## 2.1.2
 * Update dependency
 

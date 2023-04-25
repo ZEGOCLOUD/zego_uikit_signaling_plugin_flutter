@@ -24,7 +24,7 @@ public class ZegoUikitSignalingPlugin implements FlutterPlugin, MethodCallHandle
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    if (call.method.equals("configureAudioSession")) {
+    if (call.method.equals("activeAudioByCallKit")) {
       result.success(null);
     } else {
       result.notImplemented();
