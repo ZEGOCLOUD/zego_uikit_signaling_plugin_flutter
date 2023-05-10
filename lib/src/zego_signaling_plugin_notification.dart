@@ -38,12 +38,6 @@ class ZegoSignalingPluginNotificationAPIImpl
         await ZPNs.setPushConfig(ZPNsConfig()..enableFCMPush = true);
       } else if (Platform.isIOS) {
         await ZPNs.getInstance().applyNotificationPermission();
-
-        if (enableIOSVoIP) {
-          CallKit.setInitConfiguration(
-            CXProviderConfiguration(localizedName: appName),
-          );
-        }
       }
 
       await ZPNs.getInstance().registerPush(

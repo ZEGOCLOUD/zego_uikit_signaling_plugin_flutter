@@ -16,6 +16,20 @@ class ZegoSignalingPluginCallKitAPIImpl
   }
 
   @override
+  Future<void> setInitConfiguration(
+    ZegoSignalingPluginProviderConfiguration _configuration,
+  ) async {
+    var configuration = CXProviderConfiguration(
+      localizedName: _configuration.localizedName,
+      iconTemplateImageName: _configuration.iconTemplateImageName,
+      supportsVideo: _configuration.supportsVideo,
+      maximumCallGroups: _configuration.maximumCallGroups,
+      maximumCallsPerCallGroup: _configuration.maximumCallsPerCallGroup,
+    );
+    CallKit.setInitConfiguration(configuration);
+  }
+
+  @override
   void activeAudioByCallKit() {
     ZegoSignalingLoggerService.logInfo(
       'active audio by callKit',

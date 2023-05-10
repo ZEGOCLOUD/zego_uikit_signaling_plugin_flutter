@@ -72,9 +72,9 @@ class ZegoUIKitSignalingPlugin
     final zimVersion = await ZIM.getVersion();
     if (Platform.isAndroid || Platform.isIOS) {
       final zpnsVersion = await ZPNs.getVersion();
-      return 'zego_uikit_signaling_plugin: 2.1.3; zim:$zimVersion; zpns:$zpnsVersion;';
+      return 'zego_uikit_signaling_plugin: 2.1.4; zim:$zimVersion; zpns:$zpnsVersion;';
     } else {
-      return 'zego_uikit_signaling_plugin: 2.1.3; zim:$zimVersion;';
+      return 'zego_uikit_signaling_plugin: 2.1.4; zim:$zimVersion;';
     }
   }
 
