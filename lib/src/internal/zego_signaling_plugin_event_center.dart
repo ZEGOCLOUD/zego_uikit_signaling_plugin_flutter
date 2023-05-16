@@ -7,12 +7,12 @@ import 'package:zego_zim/zego_zim.dart';
 import 'package:zego_zpns/zego_zpns.dart';
 
 // Project imports:
-import 'package:zego_uikit_signaling_plugin/src/channel/zego_signaling_plugin_platform_interface.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/zego_signaling_plugin_core.dart';
 import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
 
 part 'zego_signaling_plugin_event_native_style.dart';
 
+/// @nodoc
 class ZegoSignalingPluginEventCenter {
   void init() {
     _passthroughEvent();

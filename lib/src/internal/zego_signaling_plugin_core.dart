@@ -4,6 +4,7 @@ import 'package:zego_zim/zego_zim.dart';
 // Project imports:
 import 'package:zego_uikit_signaling_plugin/src/internal/zego_signaling_plugin_event_center.dart';
 
+/// @nodoc
 class ZegoSignalingPluginCore {
   factory ZegoSignalingPluginCore() => _instance;
 

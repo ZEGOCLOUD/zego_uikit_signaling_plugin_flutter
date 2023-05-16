@@ -4,6 +4,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 // Project imports:
 import 'zego_signaling_plugin_method_channel.dart';
 
+/// @nodoc
 abstract class ZegoSignalingPluginPlatform extends PlatformInterface {
   /// Constructs a ZegoSignalingPluginPlatform.
   ZegoSignalingPluginPlatform() : super(token: _token);

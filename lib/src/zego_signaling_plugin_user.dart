@@ -1,5 +1,6 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
+/// @nodoc
 class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
   /// login
   @override
@@ -150,6 +151,7 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
   }
 }
 
+/// @nodoc
 class ZegoSignalingPluginUserEventImpl implements ZegoSignalingPluginUserEvent {
   @override
   Stream<ZegoSignalingPluginConnectionStateChangedEvent>

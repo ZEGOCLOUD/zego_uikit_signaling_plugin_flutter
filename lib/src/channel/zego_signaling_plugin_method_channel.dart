@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
 import 'zego_signaling_plugin_platform_interface.dart';
 
+/// @nodoc
 /// An implementation of [ZegoSignalingPluginPlatform] that uses method channels.
 class MethodChannelZegoSignalingPlugin extends ZegoSignalingPluginPlatform {
   /// The method channel used to interact with the native platform.

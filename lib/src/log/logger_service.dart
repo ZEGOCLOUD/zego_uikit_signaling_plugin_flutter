@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show debugPrint;
 // Package imports:
 import 'package:flutter_logs/flutter_logs.dart';
 
+/// @nodoc
 class ZegoSignalingLoggerService {
   static bool isZegoLoggerInit = false;
 

@@ -1,5 +1,6 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
+/// @nodoc
 class ZegoSignalingPluginInvitationAPIImpl
     implements ZegoSignalingPluginInvitationAPI {
   @override
@@ -177,6 +178,7 @@ class ZegoSignalingPluginInvitationAPIImpl
   }
 }
 
+/// @nodoc
 class ZegoSignalingPluginInvitationEventImpl
     implements ZegoSignalingPluginInvitationEvent {
   @override

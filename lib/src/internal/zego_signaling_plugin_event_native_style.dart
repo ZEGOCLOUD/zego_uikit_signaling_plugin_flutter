@@ -1,5 +1,6 @@
 part of 'zego_signaling_plugin_event_center.dart';
 
+/// @nodoc
 class ZegoSignalingPluginEventCenterPassthroughEvent {
   void Function(
     ZIM zim,

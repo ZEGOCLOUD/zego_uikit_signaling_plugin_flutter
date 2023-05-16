@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 // Flutter imports:
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/services.dart';
 
 // Package imports:
@@ -37,6 +36,7 @@ part 'src/zego_signaling_plugin_background_message.dart';
 
 part 'src/zego_signaling_plugin_callkit.dart';
 
+/// @nodoc
 class ZegoUIKitSignalingPlugin
     with
         ZegoSignalingPluginRoomAPIImpl,
@@ -72,9 +72,9 @@ class ZegoUIKitSignalingPlugin
     final zimVersion = await ZIM.getVersion();
     if (Platform.isAndroid || Platform.isIOS) {
       final zpnsVersion = await ZPNs.getVersion();
-      return 'zego_uikit_signaling_plugin: 2.1.4; zim:$zimVersion; zpns:$zpnsVersion;';
+      return 'zego_uikit_signaling_plugin: 2.1.5; zim:$zimVersion; zpns:$zpnsVersion;';
     } else {
-      return 'zego_uikit_signaling_plugin: 2.1.4; zim:$zimVersion;';
+      return 'zego_uikit_signaling_plugin: 2.1.5; zim:$zimVersion;';
     }
   }
 

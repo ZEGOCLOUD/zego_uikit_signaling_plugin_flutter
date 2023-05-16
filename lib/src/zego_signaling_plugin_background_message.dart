@@ -1,5 +1,6 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
+/// @nodoc
 class ZegoSignalingPluginBackgroundMessageAPIImpl
     implements ZegoSignalingPluginBackgroundMessageAPI {
   /// only for Android
@@ -35,6 +36,7 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
   }
 }
 
+/// @nodoc
 class ZegoSignalingPluginBackgroundMessageEventImpl
     implements ZegoSignalingPluginBackgroundMessageEvent {
   @override

@@ -1,5 +1,6 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
+/// @nodoc
 class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
   /// join room
   @override
@@ -298,6 +299,7 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
   }
 }
 
+/// @nodoc
 class ZegoSignalingPluginRoomEventImpl implements ZegoSignalingPluginRoomEvent {
   @override
   Stream<ZegoSignalingPluginRoomPropertiesUpdatedEvent>
