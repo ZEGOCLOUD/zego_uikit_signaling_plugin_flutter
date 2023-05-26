@@ -454,6 +454,7 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
+      roomState = state;
       roomStateChangedEvent.add(
         ZegoSignalingPluginRoomStateChangedEvent(
           roomID: roomID,
@@ -913,6 +914,7 @@ class ZegoSignalingPluginEventCenter {
       ZegoSignalingPluginOutgoingInvitationTimeoutEvent>.broadcast();
 
   // room
+  ZIMRoomState roomState = ZIMRoomState.disconnected;
   final roomMemberJoinedEvent =
       StreamController<ZegoSignalingPluginRoomMemberJoinedEvent>.broadcast();
   final roomMemberLeftEvent =

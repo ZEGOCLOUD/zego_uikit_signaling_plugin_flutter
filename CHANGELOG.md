@@ -1,4 +1,7 @@
-## 2.1.5 
+## 2.1.6
+* Add two APIs, `getConnectionState` and `getRoomState`
+
+## 2.1.5
 * Update API Reference
 
 ## 2.1.4

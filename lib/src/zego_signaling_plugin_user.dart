@@ -154,8 +154,16 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
 /// @nodoc
 class ZegoSignalingPluginUserEventImpl implements ZegoSignalingPluginUserEvent {
   @override
+  ZegoSignalingPluginConnectionState
+      getConnectionState() {
+    return ZegoSignalingPluginConnectionState.values[ZegoSignalingPluginCore()
+        .eventCenter
+        .connectionState.index] ;
+  }
+
+  @override
   Stream<ZegoSignalingPluginConnectionStateChangedEvent>
-      getConnectionStateChangedEventStream() {
+  getConnectionStateChangedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .connectionStateChangedEvent

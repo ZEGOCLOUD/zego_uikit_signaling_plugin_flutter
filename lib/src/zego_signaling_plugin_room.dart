@@ -320,6 +320,12 @@ class ZegoSignalingPluginRoomEventImpl implements ZegoSignalingPluginRoomEvent {
   }
 
   @override
+  ZegoSignalingPluginRoomState getRoomState() {
+    return ZegoSignalingPluginRoomState
+        .values[ZegoSignalingPluginCore().eventCenter.roomState.index];
+  }
+
+  @override
   Stream<ZegoSignalingPluginRoomStateChangedEvent>
       getRoomStateChangedEventStream() {
     return ZegoSignalingPluginCore().eventCenter.roomStateChangedEvent.stream;
