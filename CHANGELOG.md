@@ -1,3 +1,12 @@
+## 2.1.9
+- update dependency
+
+## 2.1.8
+* support for receiving command messages.
+
+## 2.1.7
+* support compile on web(not run)
+
 ## 2.1.6
 * Add two APIs, `getConnectionState` and `getRoomState`
 

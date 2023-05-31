@@ -15,7 +15,7 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
       subTag: 'background message',
     );
 
-    if (!Platform.isAndroid) {
+    if ((!kIsWeb) && (!io.Platform.isAndroid)) {
       ZegoSignalingLoggerService.logInfo(
         'Only Support Android Platform.',
         tag: 'signaling',

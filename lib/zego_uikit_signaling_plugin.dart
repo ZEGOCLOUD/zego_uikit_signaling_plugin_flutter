@@ -1,6 +1,8 @@
 // Dart imports:
 import 'dart:async';
-import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' as io;
 
 // Flutter imports:
 import 'package:flutter/services.dart';
@@ -15,10 +17,6 @@ import 'package:zego_uikit_signaling_plugin/src/channel/zego_signaling_plugin_pl
 import 'package:zego_uikit_signaling_plugin/src/internal/zego_signaling_plugin_core.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/zego_signaling_plugin_event_center.dart';
 import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
-
-import 'dart:io'
-    if (dart.library.html) 'dart:html'
-    if (dart.library.io) 'dart:io';
 
 export 'package:zego_zim/zego_zim.dart' hide ZIMEventHandler;
 
@@ -70,11 +68,12 @@ class ZegoUIKitSignalingPlugin
   @override
   Future<String> getVersion() async {
     final zimVersion = await ZIM.getVersion();
-    if (Platform.isAndroid || Platform.isIOS) {
+    final signalingVersion = 'zego_uikit_signaling_plugin: 2.1.9;';
+    if (!kIsWeb && (io.Platform.isAndroid || io.Platform.isIOS)) {
       final zpnsVersion = await ZPNs.getVersion();
-      return 'zego_uikit_signaling_plugin: 2.1.6; zim:$zimVersion; zpns:$zpnsVersion;';
+      return '$signalingVersion zim:$zimVersion; zpns:$zpnsVersion;';
     } else {
-      return 'zego_uikit_signaling_plugin: 2.1.6; zim:$zimVersion;';
+      return '$signalingVersion zim:$zimVersion;';
     }
   }
 

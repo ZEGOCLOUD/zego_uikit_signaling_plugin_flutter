@@ -41,4 +41,13 @@ class ZegoSignalingPluginMessageEventImpl
         .inRoomTextMessageReceived
         .stream;
   }
+
+  @override
+  Stream<ZegoSignalingPluginInRoomCommandMessageReceivedEvent>
+      getInRoomCommandMessageReceivedEventStream() {
+    return ZegoSignalingPluginCore()
+        .eventCenter
+        .inRoomCommandMessageReceived
+        .stream;
+  }
 }

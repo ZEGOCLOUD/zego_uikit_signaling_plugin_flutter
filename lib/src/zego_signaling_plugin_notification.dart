@@ -1,5 +1,6 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
+
 /// @nodoc
 class ZegoSignalingPluginNotificationAPIImpl
     implements ZegoSignalingPluginNotificationAPI {
@@ -19,7 +20,7 @@ class ZegoSignalingPluginNotificationAPIImpl
       subTag: 'notification',
     );
 
-    if ((!Platform.isAndroid) && (!Platform.isIOS)) {
+    if ((!io.Platform.isAndroid) && (!io.Platform.isIOS)) {
       ZegoSignalingLoggerService.logInfo(
         'Only Support Android And iOS Platform.',
         tag: 'signaling',
@@ -35,9 +36,9 @@ class ZegoSignalingPluginNotificationAPIImpl
     }
 
     try {
-      if (Platform.isAndroid) {
+      if (!kIsWeb && io.Platform.isAndroid) {
         await ZPNs.setPushConfig(ZPNsConfig()..enableFCMPush = true);
-      } else if (Platform.isIOS) {
+      } else if (!kIsWeb && io.Platform.isIOS) {
         await ZPNs.getInstance().applyNotificationPermission();
       }
 

@@ -572,19 +572,48 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      inRoomTextMessageReceived.add(
-        ZegoSignalingPluginInRoomTextMessageReceivedEvent(
-          messages: messageList
-              .map((e) => ZegoSignalingPluginInRoomTextMessage(
-                    orderKey: e.orderKey,
-                    senderUserID: e.senderUserID,
-                    text: (e as ZIMTextMessage).message,
-                    timestamp: e.timestamp,
-                  ))
-              .toList(),
-          roomID: fromRoomID,
-        ),
-      );
+      List<ZegoSignalingPluginInRoomTextMessage> textMessages = [];
+      List<ZegoSignalingPluginInRoomCommandMessage> commandMessages = [];
+      for (var message in messageList) {
+        if (message is ZIMTextMessage) {
+          textMessages.add(ZegoSignalingPluginInRoomTextMessage(
+            orderKey: message.orderKey,
+            senderUserID: message.senderUserID,
+            text: message.message,
+            timestamp: message.timestamp,
+          ));
+        } else if (message is ZIMCommandMessage) {
+          commandMessages.add(ZegoSignalingPluginInRoomCommandMessage(
+            orderKey: message.orderKey,
+            senderUserID: message.senderUserID,
+            message: message.message,
+            timestamp: message.timestamp,
+          ));
+        } else {
+          ZegoSignalingLoggerService.logError(
+            'onReceiveRoomMessage, message type(${message.type}) is not support',
+            tag: 'signaling',
+            subTag: 'event center',
+          );
+        }
+      }
+      if (textMessages.isNotEmpty) {
+        inRoomTextMessageReceived.add(
+          ZegoSignalingPluginInRoomTextMessageReceivedEvent(
+            messages: textMessages,
+            roomID: fromRoomID,
+          ),
+        );
+      }
+      if (commandMessages.isNotEmpty) {
+        inRoomCommandMessageReceived.add(
+          ZegoSignalingPluginInRoomCommandMessageReceivedEvent(
+            messages: commandMessages,
+            roomID: fromRoomID,
+          ),
+        );
+      }
+
       passThroughEvent.onReceiveRoomMessage?.call(
         zim,
         messageList,
@@ -927,8 +956,11 @@ class ZegoSignalingPluginEventCenter {
       ZegoSignalingPluginRoomPropertiesBatchUpdatedEvent>.broadcast();
   final usersInRoomAttributesUpdatedEvent = StreamController<
       ZegoSignalingPluginUsersInRoomAttributesUpdatedEvent>.broadcast();
+
   final inRoomTextMessageReceived = StreamController<
       ZegoSignalingPluginInRoomTextMessageReceivedEvent>.broadcast();
+  final inRoomCommandMessageReceived = StreamController<
+      ZegoSignalingPluginInRoomCommandMessageReceivedEvent>.broadcast();
 
   /// zpns notification
   final notificationRegisteredEvent = StreamController<

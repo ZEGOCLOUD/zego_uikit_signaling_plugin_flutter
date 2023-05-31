@@ -1,5 +1,5 @@
 // Flutter imports:
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 
 // Package imports:
 import 'package:flutter_logs/flutter_logs.dart';
@@ -9,6 +9,10 @@ class ZegoSignalingLoggerService {
   static bool isZegoLoggerInit = false;
 
   Future<void> initLog({String folderName = 'zego_prebuilt'}) async {
+    if (kIsWeb) {
+      return;
+    }
+
     return FlutterLogs.initLogs(
             logLevelsEnabled: [
               LogLevel.INFO,
