@@ -1,3 +1,6 @@
+## 2.1.10
+- Fix the issue of custom sound not working for offline push notifications.
+
 ## 2.1.9
 - update dependency
 

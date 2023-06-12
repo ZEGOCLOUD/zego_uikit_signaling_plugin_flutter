@@ -1,6 +1,5 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
-
 /// @nodoc
 class ZegoSignalingPluginNotificationAPIImpl
     implements ZegoSignalingPluginNotificationAPI {
@@ -10,12 +9,18 @@ class ZegoSignalingPluginNotificationAPIImpl
     bool isIOSSandboxEnvironment = false,
     bool enableIOSVoIP = true,
     String appName = '',
+    String androidChannelID = "",
+    String androidChannelName = "",
+    String androidSound = "",
   }) async {
     ZegoSignalingLoggerService.logInfo(
       'enable Notify When App Running In Background Or Quit, '
       'is iOS Sandbox Environment:$isIOSSandboxEnvironment, '
       'enable iOS VoIP:$enableIOSVoIP, '
-      'appName: $appName',
+      'appName: $appName, '
+      'androidChannelID: $androidChannelID, '
+      'androidChannelName: $androidChannelName, '
+      'androidSound: $androidSound',
       tag: 'signaling',
       subTag: 'notification',
     );
@@ -37,6 +42,12 @@ class ZegoSignalingPluginNotificationAPIImpl
 
     try {
       if (!kIsWeb && io.Platform.isAndroid) {
+        final notificationChannel = ZPNsNotificationChannel();
+        notificationChannel.channelID = androidChannelID;
+        notificationChannel.channelName = androidChannelName;
+        notificationChannel.androidSound = androidSound;
+        await ZPNs.getInstance().createNotificationChannel(notificationChannel);
+
         await ZPNs.setPushConfig(ZPNsConfig()..enableFCMPush = true);
       } else if (!kIsWeb && io.Platform.isIOS) {
         await ZPNs.getInstance().applyNotificationPermission();
