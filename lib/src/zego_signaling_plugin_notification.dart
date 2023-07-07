@@ -8,6 +8,8 @@ class ZegoSignalingPluginNotificationAPIImpl
       enableNotifyWhenAppRunningInBackgroundOrQuit({
     bool isIOSSandboxEnvironment = false,
     bool enableIOSVoIP = true,
+    ZegoSignalingPluginMultiCertificate certificateIndex =
+        ZegoSignalingPluginMultiCertificate.firstCertificate,
     String appName = '',
     String androidChannelID = "",
     String androidChannelName = "",
@@ -17,6 +19,7 @@ class ZegoSignalingPluginNotificationAPIImpl
       'enable Notify When App Running In Background Or Quit, '
       'is iOS Sandbox Environment:$isIOSSandboxEnvironment, '
       'enable iOS VoIP:$enableIOSVoIP, '
+      'certificate index:$certificateIndex, '
       'appName: $appName, '
       'androidChannelID: $androidChannelID, '
       'androidChannelName: $androidChannelName, '
@@ -41,6 +44,7 @@ class ZegoSignalingPluginNotificationAPIImpl
     }
 
     try {
+      var zpnsConfig = ZPNsConfig();
       if (!kIsWeb && io.Platform.isAndroid) {
         final notificationChannel = ZPNsNotificationChannel();
         notificationChannel.channelID = androidChannelID;
@@ -48,10 +52,12 @@ class ZegoSignalingPluginNotificationAPIImpl
         notificationChannel.androidSound = androidSound;
         await ZPNs.getInstance().createNotificationChannel(notificationChannel);
 
-        await ZPNs.setPushConfig(ZPNsConfig()..enableFCMPush = true);
+        zpnsConfig.enableFCMPush = true;
       } else if (!kIsWeb && io.Platform.isIOS) {
         await ZPNs.getInstance().applyNotificationPermission();
       }
+      zpnsConfig.appType = certificateIndex.index;
+      await ZPNs.setPushConfig(zpnsConfig);
 
       await ZPNs.getInstance().registerPush(
         iOSEnvironment: isIOSSandboxEnvironment

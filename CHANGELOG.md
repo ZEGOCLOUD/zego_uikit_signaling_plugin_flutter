@@ -1,3 +1,6 @@
+## 2.2.0
+- Supports offline push between two apps
+
 ## 2.1.10
 - Fix the issue of custom sound not working for offline push notifications.
 

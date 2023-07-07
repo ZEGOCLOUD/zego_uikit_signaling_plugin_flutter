@@ -68,7 +68,7 @@ class ZegoUIKitSignalingPlugin
   @override
   Future<String> getVersion() async {
     final zimVersion = await ZIM.getVersion();
-    final signalingVersion = 'zego_uikit_signaling_plugin: 2.1.10;';
+    final signalingVersion = 'zego_uikit_signaling_plugin: 2.2.0;';
     if (!kIsWeb && (io.Platform.isAndroid || io.Platform.isIOS)) {
       final zpnsVersion = await ZPNs.getVersion();
       return '$signalingVersion zim:$zimVersion; zpns:$zpnsVersion;';
