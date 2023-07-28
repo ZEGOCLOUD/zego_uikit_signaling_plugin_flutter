@@ -18,6 +18,17 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
       ..userID = id
       ..userName = name.isNotEmpty ? name : id;
 
+    if (null != ZegoSignalingPluginCore().currentUser &&
+        (ZegoSignalingPluginCore().currentUser!.userID.isNotEmpty &&
+            ZegoSignalingPluginCore().currentUser!.userID != id)) {
+      ZegoSignalingLoggerService.logInfo(
+        'login exist before, and not same, auto logout....',
+        tag: 'signaling',
+        subTag: 'user',
+      );
+      await disconnectUser();
+    }
+
     return ZIM.getInstance()!.login(targetUser).then((value) {
       ZegoSignalingLoggerService.logInfo(
         'connectUser success.',
@@ -154,16 +165,14 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
 /// @nodoc
 class ZegoSignalingPluginUserEventImpl implements ZegoSignalingPluginUserEvent {
   @override
-  ZegoSignalingPluginConnectionState
-      getConnectionState() {
-    return ZegoSignalingPluginConnectionState.values[ZegoSignalingPluginCore()
-        .eventCenter
-        .connectionState.index] ;
+  ZegoSignalingPluginConnectionState getConnectionState() {
+    return ZegoSignalingPluginConnectionState
+        .values[ZegoSignalingPluginCore().eventCenter.connectionState.index];
   }
 
   @override
   Stream<ZegoSignalingPluginConnectionStateChangedEvent>
-  getConnectionStateChangedEventStream() {
+      getConnectionStateChangedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .connectionStateChangedEvent

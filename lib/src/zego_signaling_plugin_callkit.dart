@@ -20,6 +20,12 @@ class ZegoSignalingPluginCallKitAPIImpl
   Future<void> setInitConfiguration(
     ZegoSignalingPluginProviderConfiguration _configuration,
   ) async {
+    ZegoSignalingLoggerService.logInfo(
+      'set init configuration:$_configuration',
+      tag: 'signaling',
+      subTag: 'callkit',
+    );
+
     var configuration = CXProviderConfiguration(
       localizedName: _configuration.localizedName,
       iconTemplateImageName: _configuration.iconTemplateImageName,

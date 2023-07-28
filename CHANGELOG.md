@@ -1,3 +1,6 @@
+## 2.2.1
+- Supports create the singleton that has not been destroyed and logging in when the user has not logged out.
+
 ## 2.2.0
 - Supports offline push between two apps
 
