@@ -349,10 +349,11 @@ class ZegoSignalingPluginEventCenter {
     };
     ZIMEventHandler.onCallInvitationTimeout = (
       ZIM zim,
+      ZIMCallInvitationTimeoutInfo info,
       String invitationID,
     ) {
       ZegoSignalingLoggerService.logInfo(
-        'onCallInvitationTimeout, invitationID:$invitationID',
+        'onCallInvitationTimeout, mode:${info.mode}, invitationID:$invitationID',
         tag: 'signaling',
         subTag: 'event center',
       );

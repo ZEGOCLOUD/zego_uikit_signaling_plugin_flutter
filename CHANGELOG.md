@@ -1,3 +1,12 @@
+## 2.3.2
+- update dependency
+
+## 2.3.1
+- update dependency
+
+## 2.3.0
+- add signaling send command message method
+
 ## 2.2.1
 - Supports create the singleton that has not been destroyed and logging in when the user has not logged out.
 

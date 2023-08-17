@@ -28,6 +28,27 @@ class ZegoSignalingPluginMessageAPIImpl
       );
     });
   }
+
+  @override
+  Future<ZegoSignalingPluginInRoomCommandMessageResult>
+      sendInRoomCommandMessage(
+          {required String roomID, required Uint8List message}) {
+    return ZIM
+        .getInstance()!
+        .sendMessage(
+            ZIMCommandMessage(
+                message: message),
+            roomID,
+            ZIMConversationType.room,
+            ZIMMessageSendConfig())
+        .then((ZIMMessageSentResult zimResult) {
+      return const ZegoSignalingPluginInRoomCommandMessageResult();
+    }).catchError((error) {
+      return ZegoSignalingPluginInRoomCommandMessageResult(
+        error: error,
+      );
+    });
+  }
 }
 
 /// @nodoc

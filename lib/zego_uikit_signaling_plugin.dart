@@ -1,5 +1,6 @@
 // Dart imports:
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' as io;
@@ -68,7 +69,7 @@ class ZegoUIKitSignalingPlugin
   @override
   Future<String> getVersion() async {
     final zimVersion = await ZIM.getVersion();
-    const signalingVersion = 'zego_uikit_signaling_plugin: 2.2.1;';
+    const signalingVersion = 'zego_uikit_signaling_plugin: 2.3.2;';
     if (!kIsWeb && (io.Platform.isAndroid || io.Platform.isIOS)) {
       final zpnsVersion = await ZPNs.getVersion();
       return '$signalingVersion zim:$zimVersion; zpns:$zpnsVersion;';
