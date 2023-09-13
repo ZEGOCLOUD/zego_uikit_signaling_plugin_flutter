@@ -771,32 +771,6 @@ class ZegoSignalingPluginEventCenter {
         message,
       );
     };
-
-    ZPNsEventHandler.onThroughMessageReceived =
-        (ZPNsMessage message, Function? iOSOnThroughMessageReceivedCompletion) {
-      ZegoSignalingLoggerService.logInfo(
-        'onThroughMessageReceived, message:{ '
-        'title: ${message.title}'
-        'content: ${message.content}'
-        'extras: ${message.extras}'
-        'pushSourceType: ${message.pushSourceType} }',
-        tag: 'signaling',
-        subTag: 'event center',
-      );
-
-      /// Handling online silent push notifications.
-      throughMessageReceivedEvent.add(
-        ZegoSignalingPluginThroughMessageReceivedEvent(
-          title: message.title,
-          content: message.content,
-          extras: message.extras,
-        ),
-      );
-
-      passThroughEvent.onZPNsThroughMessageReceived?.call(
-        message,
-      );
-    };
   }
 
   void _zpnsCallKitEvent() {
@@ -972,8 +946,6 @@ class ZegoSignalingPluginEventCenter {
       StreamController<ZegoSignalingPluginNotificationClickedEvent>.broadcast();
 
   ///  zpns background message  ----------------------------------begin
-  final throughMessageReceivedEvent = StreamController<
-      ZegoSignalingPluginThroughMessageReceivedEvent>.broadcast();
 
   /// Called when the provider has been reset. Delegates must respond to this callback by cleaning up all internal call state (disconnecting communication channels, releasing network resources, etc.). This callback can be treated as a request to end all calls without the need to respond to any actions
   final callkitProviderDidResetEvent =

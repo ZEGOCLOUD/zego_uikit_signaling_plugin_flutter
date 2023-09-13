@@ -36,11 +36,11 @@ class ZegoSignalingPluginMessageAPIImpl
     return ZIM
         .getInstance()!
         .sendMessage(
-            ZIMCommandMessage(
-                message: message),
-            roomID,
-            ZIMConversationType.room,
-            ZIMMessageSendConfig())
+          ZIMCommandMessage(message: message),
+          roomID,
+          ZIMConversationType.room,
+          ZIMMessageSendConfig(),
+        )
         .then((ZIMMessageSentResult zimResult) {
       return const ZegoSignalingPluginInRoomCommandMessageResult();
     }).catchError((error) {

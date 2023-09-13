@@ -192,7 +192,4 @@ class ZegoSignalingPluginEventCenterPassthroughEvent {
   void Function(
     ZPNsMessage message,
   )? onZPNsNotificationClicked;
-  void Function(
-    ZPNsMessage message,
-  )? onZPNsThroughMessageReceived;
 }

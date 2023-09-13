@@ -69,17 +69,33 @@ class ZegoSignalingPluginInvitationAPIImpl
     required String invitationID,
     required List<String> invitees,
     String extendedData = '',
+    ZegoSignalingPluginIncomingInvitationCancelPushConfig? pushConfig,
   }) async {
     ZegoSignalingLoggerService.logInfo(
-      'cancel invitation, invitation id:$invitationID, invitees:$invitees, extendedData:$extendedData',
+      'cancel invitation, invitation id:$invitationID, invitees:$invitees, '
+      'extendedData:$extendedData, pushConfig:$pushConfig',
       tag: 'signaling',
       subTag: 'room',
     );
 
+    var config = ZIMCallCancelConfig();
+    config.extendedData = extendedData;
+    if (null != pushConfig) {
+      var zimPushConfig = ZIMPushConfig();
+      zimPushConfig.title = pushConfig.title;
+      zimPushConfig.content = pushConfig.content;
+      zimPushConfig.payload = pushConfig.payload;
+      zimPushConfig.resourcesID = pushConfig.resourcesID;
+
+      config.pushConfig = zimPushConfig;
+    }
     return ZIM
         .getInstance()!
-        .callCancel(invitees, invitationID,
-            ZIMCallCancelConfig()..extendedData = extendedData)
+        .callCancel(
+          invitees,
+          invitationID,
+          config,
+        )
         .then((ZIMCallCancelSentResult zimResult) {
       ZegoSignalingLoggerService.logInfo(
         'cancel invitation, done, invitation id:${zimResult.callID}, '

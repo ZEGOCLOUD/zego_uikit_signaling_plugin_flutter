@@ -5,7 +5,7 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
     implements ZegoSignalingPluginBackgroundMessageAPI {
   /// only for Android
   @override
-  Future<ZegoSignalingPluginSetBackgroundMessageHandlerResult>
+  Future<ZegoSignalingPluginSetMessageHandlerResult>
       setBackgroundMessageHandler(
     ZegoSignalingPluginZPNsBackgroundMessageHandler handler,
   ) async {
@@ -22,7 +22,7 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
         subTag: 'background message',
       );
 
-      return ZegoSignalingPluginSetBackgroundMessageHandlerResult(
+      return ZegoSignalingPluginSetMessageHandlerResult(
         error: PlatformException(
           code: '-1',
           message: 'Only Support Android Platform.',
@@ -32,19 +32,40 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
 
     ZPNs.setBackgroundMessageHandler(handler);
 
-    return const ZegoSignalingPluginSetBackgroundMessageHandlerResult();
+    return const ZegoSignalingPluginSetMessageHandlerResult();
+  }
+
+  @override
+  Future<ZegoSignalingPluginSetMessageHandlerResult> setThroughMessageHandler(
+    ZegoSignalingPluginZPNsThroughMessageHandler handler,
+  ) async {
+    ZegoSignalingLoggerService.logInfo(
+      'register through message handler',
+      tag: 'signaling',
+      subTag: 'background message',
+    );
+
+    if ((!kIsWeb) && (!io.Platform.isAndroid)) {
+      ZegoSignalingLoggerService.logInfo(
+        'Only Support Android Platform.',
+        tag: 'signaling',
+        subTag: 'background message',
+      );
+
+      return ZegoSignalingPluginSetMessageHandlerResult(
+        error: PlatformException(
+          code: '-1',
+          message: 'Only Support Android Platform.',
+        ),
+      );
+    }
+
+    ZPNsEventHandler.onThroughMessageReceived = handler;
+
+    return const ZegoSignalingPluginSetMessageHandlerResult();
   }
 }
 
 /// @nodoc
 class ZegoSignalingPluginBackgroundMessageEventImpl
-    implements ZegoSignalingPluginBackgroundMessageEvent {
-  @override
-  Stream<ZegoSignalingPluginThroughMessageReceivedEvent>
-      getBackgroundThroughMessageReceivedEventStream() {
-    return ZegoSignalingPluginCore()
-        .eventCenter
-        .throughMessageReceivedEvent
-        .stream;
-  }
-}
+    implements ZegoSignalingPluginBackgroundMessageEvent {}

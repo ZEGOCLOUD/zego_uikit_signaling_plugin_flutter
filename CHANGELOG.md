@@ -1,11 +1,18 @@
+## 2.5.0
+- Add the **inviterID** parameter to the **sendInvitation**
+- Add **setThroughMessageHandler**
+
+## 2.4.0
+- Support for canceling offline calls.
+
 ## 2.3.2
-- update dependency
+- Update dependency
 
 ## 2.3.1
-- update dependency
+- Update dependency
 
 ## 2.3.0
-- add signaling send command message method
+- Add signaling send command message method
 
 ## 2.2.1
 - Supports create the singleton that has not been destroyed and logging in when the user has not logged out.
@@ -17,7 +24,7 @@
 - Fix the issue of custom sound not working for offline push notifications.
 
 ## 2.1.9
-- update dependency
+- Update dependency
 
 ## 2.1.8
 * support for receiving command messages.
@@ -32,7 +39,7 @@
 * Update API Reference
 
 ## 2.1.4
-* update dependency
+* Update dependency
 
 ## 2.1.3
 * Fix the issue of reporting login failure error when signaling repeatedly logs in the same user.
