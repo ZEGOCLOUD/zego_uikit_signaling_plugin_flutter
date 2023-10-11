@@ -1,3 +1,21 @@
+## 2.5.5
+
+* Optimize the Android online notification style
+
+## 2.5.4
+- update dart dependency
+
+## 2.5.3
+
+* Fixed some bugs
+
+## 2.5.2
+- Add **getInvitationUserStateChangedEventStream**, which will be notified to the caller or callee of the ongoing call invitation when the other callee accepts,
+  rejects, exits, or when the response times out.
+
+## 2.5.1
+- update zim version to 2.10.0+4
+
 ## 2.5.0
 - Add the **inviterID** parameter to the **sendInvitation**
 - Add **setThroughMessageHandler**

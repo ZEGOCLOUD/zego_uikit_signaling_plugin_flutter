@@ -198,6 +198,12 @@ class ZegoSignalingPluginInvitationAPIImpl
 class ZegoSignalingPluginInvitationEventImpl
     implements ZegoSignalingPluginInvitationEvent {
   @override
+  Stream<ZegoSignalingPluginInvitationUserStateChangedEvent>
+      getInvitationUserStateChangedEventStream() {
+    return ZegoSignalingPluginCore().eventCenter.userStateChangedEvent.stream;
+  }
+
+  @override
   Stream<ZegoSignalingPluginIncomingInvitationReceivedEvent>
       getIncomingInvitationReceivedEventStream() {
     return ZegoSignalingPluginCore()

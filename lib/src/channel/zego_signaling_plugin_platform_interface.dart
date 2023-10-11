@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
+
 // Package imports:
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:zego_plugin_adapter/zego_plugin_adapter.dart';
 
 // Project imports:
 import 'zego_signaling_plugin_method_channel.dart';
@@ -28,7 +31,37 @@ abstract class ZegoSignalingPluginPlatform extends PlatformInterface {
   }
 
   Future<void> activeAudioByCallKit() {
+    throw UnimplementedError('activeAudioByCallKit has not been implemented.');
+  }
+
+  Future<bool> checkAppRunning() {
+    throw UnimplementedError('checkAppRunning has not been implemented.');
+  }
+
+  Future<void> addLocalNotification(
+    ZegoSignalingPluginOutgoingNotificationConfig config,
+  ) {
+    throw UnimplementedError('addLocalNotification has not been implemented.');
+  }
+
+  Future<void> createNotificationChannel(
+    ZegoSignalingPluginOutgoingNotificationChannelConfig config,
+  ) {
     throw UnimplementedError(
-        'activeAudioByCallKit() has not been implemented.');
+        'createNotificationChannel has not been implemented.');
+  }
+
+  Future<void> dismissAllNotifications() {
+    throw UnimplementedError(
+        'dismissAllNotifications has not been implemented.');
+  }
+
+  Future<void> activeAppToForeground() {
+    throw UnimplementedError('activeAppToForeground has not been implemented.');
+  }
+
+  Future<void> requestDismissKeyguard() {
+    throw UnimplementedError(
+        'requestDismissKeyguard has not been implemented.');
   }
 }

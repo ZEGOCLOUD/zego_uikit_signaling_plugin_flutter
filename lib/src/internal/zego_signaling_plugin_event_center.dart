@@ -347,6 +347,59 @@ class ZegoSignalingPluginEventCenter {
         invitationID,
       );
     };
+    ZIMEventHandler.onCallUserStateChanged = (
+      ZIM zim,
+      ZIMCallUserStateChangeInfo info,
+      String invitationID,
+    ) {
+      ZegoSignalingLoggerService.logInfo(
+        'onCallUserStateChanged, '
+        'callUserList:${info.callUserList.map((userInfo) => '{userID:${userInfo.userID}, state:${userInfo.state}, extendedData:${userInfo.extendedData}}')},'
+        'invitationID:$invitationID',
+        tag: 'signaling',
+        subTag: 'event center',
+      );
+
+      stateConvertFunc(ZIMCallUserState state) {
+        switch (state) {
+          case ZIMCallUserState.unknown:
+            return ZegoSignalingPluginInvitationUserState.unknown;
+          case ZIMCallUserState.inviting:
+            return ZegoSignalingPluginInvitationUserState.inviting;
+          case ZIMCallUserState.accepted:
+            return ZegoSignalingPluginInvitationUserState.accepted;
+          case ZIMCallUserState.rejected:
+            return ZegoSignalingPluginInvitationUserState.rejected;
+          case ZIMCallUserState.cancelled:
+            return ZegoSignalingPluginInvitationUserState.cancelled;
+          case ZIMCallUserState.offline:
+            return ZegoSignalingPluginInvitationUserState.offline;
+          case ZIMCallUserState.received:
+            return ZegoSignalingPluginInvitationUserState.received;
+          case ZIMCallUserState.timeout:
+            return ZegoSignalingPluginInvitationUserState.timeout;
+          case ZIMCallUserState.quited:
+            return ZegoSignalingPluginInvitationUserState.quited;
+        }
+      }
+
+      userStateChangedEvent.add(
+        ZegoSignalingPluginInvitationUserStateChangedEvent(
+          callUserList: info.callUserList
+              .map((userInfo) => ZegoSignalingPluginInvitationUserInfo(
+                    userID: userInfo.userID,
+                    state: stateConvertFunc(userInfo.state),
+                    extendedData: userInfo.extendedData,
+                  ))
+              .toList(),
+        ),
+      );
+      passThroughEvent.onCallUserStateChanged?.call(
+        zim,
+        info,
+        invitationID,
+      );
+    };
     ZIMEventHandler.onCallInvitationTimeout = (
       ZIM zim,
       ZIMCallInvitationTimeoutInfo info,
@@ -904,6 +957,8 @@ class ZegoSignalingPluginEventCenter {
       StreamController<ZegoSignalingPluginTokenWillExpireEvent>.broadcast();
 
   // invitation
+  final userStateChangedEvent = StreamController<
+      ZegoSignalingPluginInvitationUserStateChangedEvent>.broadcast();
   final incomingInvitationReceivedEvent = StreamController<
       ZegoSignalingPluginIncomingInvitationReceivedEvent>.broadcast();
   final incomingInvitationCancelledEvent = StreamController<

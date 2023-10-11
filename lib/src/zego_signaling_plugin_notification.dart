@@ -95,6 +95,37 @@ class ZegoSignalingPluginNotificationAPIImpl
       }
     }
   }
+
+  @override
+  Future<void> addLocalNotification(
+    ZegoSignalingPluginOutgoingNotificationConfig config,
+  ) async {
+    return ZegoSignalingPluginPlatform.instance.addLocalNotification(config);
+  }
+
+  @override
+  Future<void> createNotificationChannel(
+    ZegoSignalingPluginOutgoingNotificationChannelConfig config,
+  ) async {
+    return ZegoSignalingPluginPlatform.instance.createNotificationChannel(
+      config,
+    );
+  }
+
+  @override
+  Future<void> dismissAllNotifications() async {
+    return ZegoSignalingPluginPlatform.instance.dismissAllNotifications();
+  }
+
+  @override
+  Future<void> activeAppToForeground() async {
+    return ZegoSignalingPluginPlatform.instance.activeAppToForeground();
+  }
+
+  @override
+  Future<void> requestDismissKeyguard() async {
+    return ZegoSignalingPluginPlatform.instance.requestDismissKeyguard();
+  }
 }
 
 /// @nodoc

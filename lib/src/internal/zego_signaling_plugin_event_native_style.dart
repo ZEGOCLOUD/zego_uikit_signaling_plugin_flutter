@@ -160,6 +160,12 @@ class ZegoSignalingPluginEventCenterPassthroughEvent {
 
   void Function(
     ZIM zim,
+    ZIMCallUserStateChangeInfo info,
+    String invitationID,
+  )? onCallUserStateChanged;
+
+  void Function(
+    ZIM zim,
     String callID,
   )? onCallInvitationTimeout;
   void Function(

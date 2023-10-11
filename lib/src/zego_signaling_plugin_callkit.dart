@@ -37,6 +37,17 @@ class ZegoSignalingPluginCallKitAPIImpl
   }
 
   @override
+  Future<void> reportCallEnded(CXCallEndedReason endedReason, UUID uuid) async {
+    ZegoSignalingLoggerService.logInfo(
+      'report call ended, endedReason:$endedReason, uuid:$uuid',
+      tag: 'signaling',
+      subTag: 'callkit',
+    );
+
+    CallKit.getInstance().reportCallEnded(endedReason, uuid);
+  }
+
+  @override
   void activeAudioByCallKit() {
     ZegoSignalingLoggerService.logInfo(
       'active audio by callKit',
@@ -45,6 +56,11 @@ class ZegoSignalingPluginCallKitAPIImpl
     );
 
     ZegoSignalingPluginPlatform.instance.activeAudioByCallKit();
+  }
+
+  @override
+  Future<bool> checkAppRunning() {
+    return ZegoSignalingPluginPlatform.instance.checkAppRunning();
   }
 }
 

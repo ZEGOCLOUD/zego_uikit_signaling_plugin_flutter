@@ -34,3 +34,8 @@ android {
         consumerProguardFiles 'proguard-rules.pro'
     }
 }
+
+dependencies {
+    implementation "androidx.core:core:1.7.0"
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+}
