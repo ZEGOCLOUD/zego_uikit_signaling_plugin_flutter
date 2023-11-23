@@ -8,10 +8,17 @@ import 'package:flutter_logs/flutter_logs.dart';
 class ZegoSignalingLoggerService {
   static bool isZegoLoggerInit = false;
 
-  Future<void> initLog({String folderName = 'zego_prebuilt'}) async {
+  /// init log
+  Future<void> initLog({String folderName = 'uikit'}) async {
+    if (isZegoLoggerInit) {
+      return;
+    }
+
     if (kIsWeb) {
       return;
     }
+
+    isZegoLoggerInit = true;
 
     return FlutterLogs.initLogs(
             logLevelsEnabled: [
@@ -24,13 +31,11 @@ class ZegoSignalingLoggerService {
             directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
             logTypesEnabled: ['device', 'network', 'errors'],
             logFileExtension: LogFileExtension.LOG,
-            logsWriteDirectoryName: folderName,
-            logsExportDirectoryName: '$folderName/Exported',
+            logsWriteDirectoryName: 'zego_prebuilt/$folderName',
+            logsExportDirectoryName: 'zego_prebuilt/$folderName/Exported',
             debugFileOperations: true,
             isDebuggable: true)
         .then((value) {
-      isZegoLoggerInit = true;
-
       FlutterLogs.setDebugLevel(0);
       FlutterLogs.logInfo(
         'log',
@@ -40,10 +45,12 @@ class ZegoSignalingLoggerService {
     });
   }
 
+  /// clear logs
   Future<void> clearLogs() async {
     FlutterLogs.clearLogs();
   }
 
+  /// log info
   static Future<void> logInfo(
     String logMessage, {
     String tag = '',
@@ -58,6 +65,7 @@ class ZegoSignalingLoggerService {
     return FlutterLogs.logInfo(tag, subTag, logMessage);
   }
 
+  /// log warn
   static Future<void> logWarn(
     String logMessage, {
     String tag = '',
@@ -72,6 +80,7 @@ class ZegoSignalingLoggerService {
     return FlutterLogs.logWarn(tag, subTag, logMessage);
   }
 
+  /// log error
   static Future<void> logError(
     String logMessage, {
     String tag = '',
@@ -86,6 +95,7 @@ class ZegoSignalingLoggerService {
     return FlutterLogs.logError(tag, subTag, logMessage);
   }
 
+  /// log error trace
   static Future<void> logErrorTrace(
     String logMessage,
     Error e, {

@@ -1,8 +1,42 @@
+## 2.6.6
+
+- Update dependency
+
+## 2.6.5
+
+- Optimization warnings from analysis
+
+## 2.6.4
+
+- Update dependency
+
+## 2.6.3
+
+- Optimization warnings from analysis
+
+## 2.6.2
+
+- Update dependency
+- Fixed some bugs
+
+## 2.6.1
+
+- Optimization warnings from analysis
+
+## 2.6.0
+
+- Support listening for errors.
+
+## 2.5.6
+
+- About offline call on iOS, whether in sandbox or production environment, will be automatically selected internal and no longer require manual assignment
+
 ## 2.5.5
 
 * Optimize the Android online notification style
 
 ## 2.5.4
+
 - update dart dependency
 
 ## 2.5.3
@@ -10,83 +44,106 @@
 * Fixed some bugs
 
 ## 2.5.2
+
 - Add **getInvitationUserStateChangedEventStream**, which will be notified to the caller or callee of the ongoing call invitation when the other callee accepts,
   rejects, exits, or when the response times out.
 
 ## 2.5.1
+
 - update zim version to 2.10.0+4
 
 ## 2.5.0
+
 - Add the **inviterID** parameter to the **sendInvitation**
 - Add **setThroughMessageHandler**
 
 ## 2.4.0
+
 - Support for canceling offline calls.
 
 ## 2.3.2
+
 - Update dependency
 
 ## 2.3.1
+
 - Update dependency
 
 ## 2.3.0
+
 - Add signaling send command message method
 
 ## 2.2.1
+
 - Supports create the singleton that has not been destroyed and logging in when the user has not logged out.
 
 ## 2.2.0
+
 - Supports offline push between two apps
 
 ## 2.1.10
+
 - Fix the issue of custom sound not working for offline push notifications.
 
 ## 2.1.9
+
 - Update dependency
 
 ## 2.1.8
+
 * support for receiving command messages.
 
 ## 2.1.7
+
 * support compile on web(not run)
 
 ## 2.1.6
+
 * Add two APIs, `getConnectionState` and `getRoomState`
 
 ## 2.1.5
+
 * Update API Reference
 
 ## 2.1.4
+
 * Update dependency
 
 ## 2.1.3
+
 * Fix the issue of reporting login failure error when signaling repeatedly logs in the same user.
 
 ## 2.1.2
+
 * Update dependency
 
 ## 2.1.1
+
 - Fix some issues about iOS supports VoIP mode.
 
 ## 2.1.0
+
 - For the offline calling feature, Android supports a silent push mode, while iOS supports VoIP mode.
 
 ## 2.0.4
+
 * Update dependency
 
 ## 2.0.3
+
 * Update dependency
 
 ## 2.0.2
+
 * remove login token
 
 ## 2.0.1
 
- - upload again, fix pubspec.yaml error
+- upload again, fix pubspec.yaml error
 
 ## 2.0.0
 
- - Architecture upgrade based on adapter.
+- Architecture upgrade based on adapter.
 
 ## 0.0.1
 
