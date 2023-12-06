@@ -20,7 +20,7 @@ class ZegoSignalingPluginMessageAPIImpl
         .then((ZIMMessageSentResult zimResult) {
       return const ZegoSignalingPluginInRoomTextMessageResult();
     }).catchError((error) {
-      ZegoSignalingLoggerService.logInfo(
+      ZegoSignalingLoggerService.logError(
         'send in-room text message, error:${error.toString()}',
         tag: 'signaling',
         subTag: 'room',
@@ -59,7 +59,7 @@ class ZegoSignalingPluginMessageAPIImpl
         .then((ZIMMessageSentResult zimResult) {
       return const ZegoSignalingPluginInRoomCommandMessageResult();
     }).catchError((error) {
-      ZegoSignalingLoggerService.logInfo(
+      ZegoSignalingLoggerService.logError(
         'send in-room command message, error:${error.toString()}',
         tag: 'signaling',
         subTag: 'room',

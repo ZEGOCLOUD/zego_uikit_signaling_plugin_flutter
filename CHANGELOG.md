@@ -1,3 +1,11 @@
+## 2.7.0
+
+- support call invitation in advance mode
+
+## 2.6.7
+
+- Update log path
+
 ## 2.6.6
 
 - Update dependency

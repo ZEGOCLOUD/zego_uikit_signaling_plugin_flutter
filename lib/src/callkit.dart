@@ -20,22 +20,22 @@ class ZegoSignalingPluginCallKitAPIImpl
   /// set init configuration for callkit
   @override
   Future<void> setInitConfiguration(
-    ZegoSignalingPluginProviderConfiguration _configuration,
+    ZegoSignalingPluginProviderConfiguration configuration,
   ) async {
     ZegoSignalingLoggerService.logInfo(
-      'set init configuration:$_configuration',
+      'set init configuration:$configuration',
       tag: 'signaling',
       subTag: 'callkit',
     );
 
-    var configuration = CXProviderConfiguration(
-      localizedName: _configuration.localizedName,
-      iconTemplateImageName: _configuration.iconTemplateImageName,
-      supportsVideo: _configuration.supportsVideo,
-      maximumCallGroups: _configuration.maximumCallGroups,
-      maximumCallsPerCallGroup: _configuration.maximumCallsPerCallGroup,
+    var cxConfiguration = CXProviderConfiguration(
+      localizedName: configuration.localizedName,
+      iconTemplateImageName: configuration.iconTemplateImageName,
+      supportsVideo: configuration.supportsVideo,
+      maximumCallGroups: configuration.maximumCallGroups,
+      maximumCallsPerCallGroup: configuration.maximumCallsPerCallGroup,
     );
-    CallKit.setInitConfiguration(configuration);
+    CallKit.setInitConfiguration(cxConfiguration);
   }
 
   /// report call end

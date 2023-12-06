@@ -46,7 +46,7 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
           ZegoSignalingPluginCore().currentUser?.userID == targetUser.userID &&
           ZegoSignalingPluginCore().currentUser?.userName ==
               targetUser.userName) {
-        ZegoSignalingLoggerService.logInfo(
+        ZegoSignalingLoggerService.logError(
           'connectUser, user is same who current login',
           tag: 'signaling',
           subTag: 'user',
@@ -161,7 +161,7 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
         .renewToken(token)
         .then((value) => const ZegoSignalingPluginRenewTokenResult())
         .catchError((error) {
-      ZegoSignalingLoggerService.logInfo(
+      ZegoSignalingLoggerService.logError(
         'renewToken error:${error.toString()}',
         tag: 'signaling',
         subTag: 'user',
