@@ -65,7 +65,7 @@ class ZegoSignalingPluginNotificationAPIImpl
       } else if (!kIsWeb && io.Platform.isIOS) {
         await ZPNs.getInstance().applyNotificationPermission();
       }
-      zpnsConfig.appType = certificateIndex.index;
+      zpnsConfig.appType = certificateIndex.id;
       await ZPNs.setPushConfig(zpnsConfig);
 
       var iOSEnvironment = ZPNsIOSEnvironment.Automatic;

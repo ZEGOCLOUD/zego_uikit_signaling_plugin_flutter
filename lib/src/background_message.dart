@@ -47,7 +47,7 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
   /// set through message handler
   @override
   Future<ZegoSignalingPluginSetMessageHandlerResult> setThroughMessageHandler(
-    ZegoSignalingPluginZPNsThroughMessageHandler handler,
+    ZegoSignalingPluginZPNsThroughMessageHandler? handler,
   ) async {
     ZegoSignalingLoggerService.logInfo(
       'register through message handler',

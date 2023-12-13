@@ -1,3 +1,11 @@
+## 2.7.2
+
+ - fix certificateIndex bug.
+
+## 2.7.1
+
+- Update dependency
+
 ## 2.7.0
 
 - support call invitation in advance mode
