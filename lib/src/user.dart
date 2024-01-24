@@ -29,7 +29,8 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
       await disconnectUser();
     }
 
-    return ZIM.getInstance()!.login(targetUser).then((value) {
+    ZIMLoginConfig config = ZIMLoginConfig()..userName = name;
+    return ZIM.getInstance()!.login(targetUser.userID, config).then((value) {
       ZegoSignalingLoggerService.logInfo(
         'connectUser success.',
         tag: 'signaling',

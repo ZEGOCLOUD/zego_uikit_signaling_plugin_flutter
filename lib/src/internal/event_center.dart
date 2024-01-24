@@ -41,6 +41,17 @@ class ZegoSignalingPluginEventCenter {
 
       passThroughEvent.onMessageReceiptChanged?.call(zim, infos);
     };
+    ZIMEventHandler.onMessageReactionsChanged = (
+      ZIM zim, List<ZIMMessageReaction> infos,
+    ) {
+      ZegoSignalingLoggerService.logInfo(
+        'onMessageReactionsChanged, infos:$infos',
+        tag: 'signaling',
+        subTag: 'event center',
+      );
+
+      passThroughEvent.onMessageReactionsChanged?.call(zim, infos);
+    };
     ZIMEventHandler.onReceivePeerMessage = (
       ZIM zim,
       List<ZIMMessage> messageList,

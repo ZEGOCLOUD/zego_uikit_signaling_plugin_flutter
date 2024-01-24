@@ -1,3 +1,11 @@
+## 2.7.4
+
+ - Upgrade zego_zim to 2.13.1
+
+## 2.7.3
+
+- Update dependency
+
 ## 2.7.2
 
  - fix certificateIndex bug.
