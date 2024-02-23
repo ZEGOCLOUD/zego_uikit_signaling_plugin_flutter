@@ -13,6 +13,7 @@ import 'package:zego_zim/zego_zim.dart';
 import 'package:zego_zpns/zego_zpns.dart';
 
 // Project imports:
+import 'package:zego_uikit_signaling_plugin/src/internal/test_sdk.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/core.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/event_center.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/zim_extension.dart';
@@ -70,7 +71,7 @@ class ZegoUIKitSignalingPlugin
   @override
   Future<String> getVersion() async {
     final zimVersion = await ZIM.getVersion();
-    const signalingVersion = 'zego_uikit_signaling_plugin: 2.7.4;';
+    const signalingVersion = 'zego_uikit_signaling_plugin: 2.7.6;';
     if (!kIsWeb && (io.Platform.isAndroid || io.Platform.isIOS)) {
       final zpnsVersion = await ZPNs.getVersion();
       return '$signalingVersion zim:$zimVersion; zpns:$zpnsVersion;';
@@ -82,6 +83,8 @@ class ZegoUIKitSignalingPlugin
   /// init
   @override
   Future<void> init({required int appID, String appSign = ''}) async {
+    testZIMTypes();
+
     await ZegoSignalingLoggerService().initLog();
 
     ZegoSignalingLoggerService.logInfo(

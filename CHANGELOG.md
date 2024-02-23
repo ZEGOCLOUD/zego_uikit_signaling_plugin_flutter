@@ -1,3 +1,11 @@
+## 2.7.6
+
+- Update dependency
+
+## 2.7.5
+
+- Update dependency
+
 ## 2.7.4
 
  - Upgrade zego_zim to 2.13.1
