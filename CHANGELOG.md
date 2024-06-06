@@ -1,3 +1,25 @@
+
+## 2.7.11
+
+- Bugs
+  - Fix namespace error after grade v8.0
+
+## 2.7.10
+
+- Update dependency
+
+## 2.7.9
+
+- Update dependency
+
+## 2.7.8
+
+- Update dependency
+
+## 2.7.7
+
+- Update dependency
+
 ## 2.7.6
 
 - Update dependency

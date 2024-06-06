@@ -56,5 +56,9 @@ ZegoSignalingPluginInvitationUserState userStateConvertFunc(
       return ZegoSignalingPluginInvitationUserState.quited;
     case ZIMCallUserState.ended:
       return ZegoSignalingPluginInvitationUserState.ended;
+    case ZIMCallUserState.notYetReceived:
+      return ZegoSignalingPluginInvitationUserState.notYetReceived;
+    case ZIMCallUserState.beCanceled:
+      return ZegoSignalingPluginInvitationUserState.beCanceled;
   }
 }
