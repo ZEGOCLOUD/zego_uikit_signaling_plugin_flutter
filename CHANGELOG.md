@@ -1,4 +1,8 @@
 
+## 2.7.12
+
+- Update dependency
+
 ## 2.7.11
 
 - Bugs
