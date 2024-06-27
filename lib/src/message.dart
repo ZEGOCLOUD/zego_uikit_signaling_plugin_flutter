@@ -23,7 +23,7 @@ class ZegoSignalingPluginMessageAPIImpl
       ZegoSignalingLoggerService.logError(
         'send in-room text message, error:${error.toString()}',
         tag: 'signaling',
-        subTag: 'room',
+        subTag: 'message',
       );
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(
@@ -62,7 +62,7 @@ class ZegoSignalingPluginMessageAPIImpl
       ZegoSignalingLoggerService.logError(
         'send in-room command message, error:${error.toString()}',
         tag: 'signaling',
-        subTag: 'room',
+        subTag: 'message',
       );
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(

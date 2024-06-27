@@ -462,7 +462,7 @@ class ZegoSignalingPluginEventCenter {
       String invitationID,
     ) {
       ZegoSignalingLoggerService.logInfo(
-        'onRoomMemberJoined, invitees:$invitees, invitationID:$invitationID',
+        'onCallInviteesAnsweredTimeout, invitees:$invitees, invitationID:$invitationID',
         tag: 'signaling',
         subTag: 'event center',
       );
