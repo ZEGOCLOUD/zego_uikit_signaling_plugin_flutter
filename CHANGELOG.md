@@ -1,3 +1,19 @@
+## 2.8.2
+
+- Update dependency
+  
+## 2.8.1
+
+- Update dependency
+
+## 2.8.0
+
+- Features
+  - Support login by token
+
+## 2.7.15
+
+- Update log
 
 ## 2.7.1
 

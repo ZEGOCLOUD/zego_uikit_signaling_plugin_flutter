@@ -7,9 +7,12 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
   Future<ZegoSignalingPluginConnectUserResult> connectUser({
     required String id,
     String name = '',
+    String token = '',
   }) async {
     ZegoSignalingLoggerService.logInfo(
-      'connectUser, id:$id, name:$name',
+      'connectUser, '
+      'id:$id, name:$name, '
+      'has token:${token.isNotEmpty}',
       tag: 'signaling',
       subTag: 'user',
     );
@@ -29,7 +32,9 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
       await disconnectUser();
     }
 
-    ZIMLoginConfig config = ZIMLoginConfig()..userName = name;
+    ZIMLoginConfig config = ZIMLoginConfig()
+      ..userName = name
+      ..token = token;
     return ZIM.getInstance()!.login(targetUser.userID, config).then((value) {
       ZegoSignalingLoggerService.logInfo(
         'connectUser success.',
@@ -152,7 +157,7 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
   @override
   Future<ZegoSignalingPluginRenewTokenResult> renewToken(String token) async {
     ZegoSignalingLoggerService.logInfo(
-      'renewToken, token:$token',
+      'renewToken, has token:${token.isNotEmpty}',
       tag: 'signaling',
       subTag: 'user',
     );

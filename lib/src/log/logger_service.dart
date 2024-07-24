@@ -42,6 +42,8 @@ class ZegoSignalingLoggerService {
         'init',
         '==========================================$value',
       );
+    }).catchError((e) {
+      debugPrint('signaling init logger error:$e');
     });
   }
 

@@ -71,7 +71,7 @@ class ZegoUIKitSignalingPlugin
   @override
   Future<String> getVersion() async {
     final zimVersion = await ZIM.getVersion();
-    const signalingVersion = 'zego_uikit_signaling_plugin: 2.7.14;';
+    const signalingVersion = 'zego_uikit_signaling_plugin: 2.8.2;';
     if (!kIsWeb && (io.Platform.isAndroid || io.Platform.isIOS)) {
       final zpnsVersion = await ZPNs.getVersion();
       return '$signalingVersion zim:$zimVersion; zpns:$zpnsVersion;';
@@ -103,9 +103,19 @@ class ZegoUIKitSignalingPlugin
       return;
     }
 
-    ZIM.create(ZIMAppConfig()
-      ..appID = appID
-      ..appSign = appSign);
+    ZegoSignalingLoggerService.logInfo(
+      'ZIM create, '
+      'appID:$appID, '
+      'has appSign:${appSign.isNotEmpty}',
+      tag: 'signaling',
+      subTag: 'init',
+    );
+
+    ZIM.create(
+      ZIMAppConfig()
+        ..appID = appID
+        ..appSign = appSign,
+    );
   }
 
   /// uninit
