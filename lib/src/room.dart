@@ -205,6 +205,7 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
     required String roomID,
     required List<String> keys,
     required bool isForce,
+    bool showErrorLog = true,
   }) async {
     ZegoSignalingLoggerService.logInfo(
       'delete room properties, room id:$roomID, keys:$keys, isForce:$isForce',
@@ -224,20 +225,22 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
         errorKeys: zimResult.errorKeys,
       );
     }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'delete room properties, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'room',
-      );
+      if (showErrorLog) {
+        ZegoSignalingLoggerService.logError(
+          'delete room properties, error:${error.toString()}',
+          tag: 'signaling',
+          subTag: 'room',
+        );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
-            ZegoSignalingError(
-              code: ZegoSignalingErrorCode.roomPropertyDeleteError,
-              message:
-                  'room id:$roomID, keys:$keys, is force:$isForce, exception:$error, ${ZegoSignalingErrorCode.zimErrorCodeDocumentTips}',
-              method: 'deleteRoomProperties',
-            ),
-          );
+        ZegoSignalingPluginCore().errorStreamCtrl?.add(
+              ZegoSignalingError(
+                code: ZegoSignalingErrorCode.roomPropertyDeleteError,
+                message:
+                    'room id:$roomID, keys:$keys, is force:$isForce, exception:$error, ${ZegoSignalingErrorCode.zimErrorCodeDocumentTips}',
+                method: 'deleteRoomProperties',
+              ),
+            );
+      }
 
       return ZegoSignalingPluginRoomPropertiesOperationResult(
         error: error,
