@@ -1,3 +1,11 @@
+## 2.8.5
+
+- add **setAdvnacedConfig** api
+
+## 2.8.4
+
+- Update dependency
+
 ## 2.8.3
 
 - Update dependency
