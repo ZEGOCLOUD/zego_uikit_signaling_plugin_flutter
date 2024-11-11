@@ -37,9 +37,9 @@ class ZegoSignalingLoggerService {
           .then((value) {
         FlutterLogs.setDebugLevel(0);
         FlutterLogs.logInfo(
-          'log',
-          'init',
-          '==========================================$value',
+          'signaling',
+          'log init done',
+          '==========================================',
         );
       });
 

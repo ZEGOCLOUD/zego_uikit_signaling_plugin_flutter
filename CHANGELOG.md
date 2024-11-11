@@ -1,3 +1,7 @@
+## 2.8.6
+
+- Add some logs
+
 ## 2.8.5
 
 - add **setAdvnacedConfig** api
