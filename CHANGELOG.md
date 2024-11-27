@@ -1,3 +1,8 @@
+## 2.8.7
+
+- Bugs
+  - Fix test zim types crash on debug mode
+
 ## 2.8.6
 
 - Add some logs
