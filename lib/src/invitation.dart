@@ -236,6 +236,7 @@ class ZegoSignalingPluginInvitationAPIImpl
       );
 
       return ZegoSignalingPluginCancelInvitationResult(
+        invitationID: invitationID,
         errorInvitees: zimResult.errorInvitees,
       );
     }).catchError((error) {
@@ -255,6 +256,7 @@ class ZegoSignalingPluginInvitationAPIImpl
           );
 
       return ZegoSignalingPluginCancelInvitationResult(
+        invitationID: invitationID,
         errorInvitees: invitees,
         error: error,
       );
@@ -286,7 +288,9 @@ class ZegoSignalingPluginInvitationAPIImpl
         subTag: 'invitation',
       );
 
-      return const ZegoSignalingPluginResponseInvitationResult();
+      return ZegoSignalingPluginResponseInvitationResult(
+        invitationID: invitationID,
+      );
     }).catchError((error) {
       ZegoSignalingLoggerService.logError(
         'refuse invitation, error:${error.toString()}',
@@ -303,7 +307,10 @@ class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginResponseInvitationResult(error: error);
+      return ZegoSignalingPluginResponseInvitationResult(
+        invitationID: invitationID,
+        error: error,
+      );
     });
   }
 
@@ -332,7 +339,9 @@ class ZegoSignalingPluginInvitationAPIImpl
         subTag: 'invitation',
       );
 
-      return const ZegoSignalingPluginResponseInvitationResult();
+      return ZegoSignalingPluginResponseInvitationResult(
+        invitationID: invitationID,
+      );
     }).catchError((error) {
       ZegoSignalingLoggerService.logError(
         'accept invitation, error:${error.toString()}',
@@ -349,7 +358,10 @@ class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginResponseInvitationResult(error: error);
+      return ZegoSignalingPluginResponseInvitationResult(
+        invitationID: invitationID,
+        error: error,
+      );
     });
   }
 
