@@ -1,7 +1,10 @@
+## 2.8.9
+
+- Add some logs
+
 ## 2.8.8
 
 - add invitation id in result
-
 
 ## 2.8.7
 
