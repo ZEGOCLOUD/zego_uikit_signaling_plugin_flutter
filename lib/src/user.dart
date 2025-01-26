@@ -84,17 +84,29 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
 
   /// logout
   @override
-  Future<ZegoSignalingPluginDisconnectUserResult> disconnectUser(
-      [Duration timeout = const Duration(seconds: 2)]) async {
+  Future<ZegoSignalingPluginDisconnectUserResult> disconnectUser([
+    Duration timeout = const Duration(seconds: 2),
+  ]) async {
     ZegoSignalingLoggerService.logInfo(
       'disconnectUser, current id:${ZegoSignalingPluginCore().currentUser?.userID}, '
-      'current name:${ZegoSignalingPluginCore().currentUser?.userName}',
+      'current name:${ZegoSignalingPluginCore().currentUser?.userName}, '
+      'connectionState:${ZegoSignalingPluginCore().eventCenter.connectionState}',
       tag: 'signaling',
       subTag: 'user',
     );
 
+    if (null == ZegoSignalingPluginCore().currentUser) {
+      ZegoSignalingLoggerService.logInfo(
+        'disconnectUser, current user is null',
+        tag: 'signaling',
+        subTag: 'user',
+      );
+
+      const ZegoSignalingPluginDisconnectUserResult(timeout: false);
+    }
+
     ZegoSignalingPluginCore().currentUser = null;
-    ZIM.getInstance()!.logout();
+    ZIM.getInstance()?.logout();
 
     if (ZegoSignalingPluginCore().eventCenter.connectionState ==
         ZIMConnectionState.reconnecting) {
