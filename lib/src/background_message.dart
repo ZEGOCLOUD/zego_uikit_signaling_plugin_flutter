@@ -3,13 +3,62 @@ part of '../zego_uikit_signaling_plugin.dart';
 /// @nodoc
 class ZegoSignalingPluginBackgroundMessageAPIImpl
     implements ZegoSignalingPluginBackgroundMessageAPI {
+  bool defaultBackgroundHandlerInit = false;
+
+  void _initBackgroundMessageHandler() {
+    if (defaultBackgroundHandlerInit) {
+      ZegoSignalingLoggerService.logInfo(
+        'had init',
+        tag: 'signaling',
+        subTag: 'background message, init default handler',
+      );
+
+      return;
+    }
+
+    defaultBackgroundHandlerInit = true;
+
+    ZegoSignalingLoggerService.logInfo(
+      'init',
+      tag: 'signaling',
+      subTag: 'background message, init default handler',
+    );
+    ZPNs.setBackgroundMessageHandler(onSignalingBackgroundMessageReceived);
+  }
+
+  Future<void> clearBackgroundMessageHandler()  async {
+    await clearAndroidHandler();
+  }
+
   /// register background message handler
   /// only for Android
+  ///
+  ///
+  /// ```dart
+  /// @pragma('vm:entry-point')
+  /// Future<void> handler1(ZPNsMessage message) async {
+  ///     String title,
+  ///     String content,
+  ///     Map<String, Object?> extras,
+  ///     ZegoUIKitCallPushSourceType pushSourceType,
+  ///     ) {
+  ///   debugPrint(
+  ///       'handler 1 recv, title:$title, content:$content, extras:$extras, push type :$pushSourceType');
+  /// }
+  ///
+  /// await setBackgroundMessageHandler(
+  /// handler1,
+  /// key: 'handler1',
+  /// );
+  /// ```
   @override
   Future<ZegoSignalingPluginSetMessageHandlerResult>
       setBackgroundMessageHandler(
-    ZegoSignalingPluginZPNsBackgroundMessageHandler handler,
-  ) async {
+    ZegoSignalingPluginZPNsBackgroundMessageHandler handler, {
+    String key = 'default',
+  }) async {
+    _initBackgroundMessageHandler();
+
     ZegoSignalingLoggerService.logInfo(
       'register background message handler',
       tag: 'signaling',
@@ -39,7 +88,12 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
       );
     }
 
-    ZPNs.setBackgroundMessageHandler(handler);
+    await registerBackgroundMessageHandler(
+      ZegoSignalingPluginBackgroundMessageHandler(
+        key: key,
+        callback: handler,
+      ),
+    );
 
     return const ZegoSignalingPluginSetMessageHandlerResult();
   }

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:io' as io;
 
 // Flutter imports:
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:flutter/services.dart';
 
 // Package imports:
@@ -13,6 +13,9 @@ import 'package:zego_zim/zego_zim.dart';
 import 'package:zego_zpns/zego_zpns.dart';
 
 // Project imports:
+import 'package:zego_uikit_signaling_plugin/src/background_message/defines.dart';
+import 'package:zego_uikit_signaling_plugin/src/background_message/handler.dart';
+import 'package:zego_uikit_signaling_plugin/src/background_message/cache.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/core.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/event_center.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/test_sdk.dart';
