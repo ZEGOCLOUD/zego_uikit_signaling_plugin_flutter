@@ -1,3 +1,7 @@
+## 2.8.10 
+
+- Support for additional listening offline message handler
+
 ## 2.8.9
 
 - Add some logs
