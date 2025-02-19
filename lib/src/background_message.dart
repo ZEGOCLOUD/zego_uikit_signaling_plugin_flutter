@@ -26,8 +26,14 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
     ZPNs.setBackgroundMessageHandler(onSignalingBackgroundMessageReceived);
   }
 
-  Future<void> clearBackgroundMessageHandler()  async {
-    await clearAndroidHandler();
+  @override
+  Future<void> removeBackgroundMessageHandler({String key = ''}) async {
+    ZegoSignalingLoggerService.logInfo(
+      'remove handler, key:$key',
+      tag: 'signaling',
+      subTag: 'background message handler',
+    );
+    await clearAndroidHandler(key: key);
   }
 
   /// register background message handler
