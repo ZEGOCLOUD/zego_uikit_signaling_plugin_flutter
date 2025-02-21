@@ -1,3 +1,7 @@
+## 2.8.11
+
+- add API, removeBackgroundMessageHandler
+
 ## 2.8.10 
 
 - Support for additional listening offline message handler
