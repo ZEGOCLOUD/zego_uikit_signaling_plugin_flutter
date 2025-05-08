@@ -14,7 +14,7 @@ dependencies:
 
   zego_plugin_adapter: ^2.13.9
 
-  zego_zim: ^2.17.1+1
+  zego_zim: ^2.20.0+1
   zego_zpns: ^2.8.0
   zego_callkit: ^1.0.0+4
 
