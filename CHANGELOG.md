@@ -1,3 +1,7 @@
+## 2.8.14
+
+- update zego_zim
+
 ## 2.8.13
 
 - update zim
