@@ -49,13 +49,14 @@ Future<void> clearAndroidHandler({String key = ''}) async {
       } catch (e) {
         debugPrint('signaling, '
             'background message handler,'
-            'get cache, parse handler json error:$e');
+            'get cache, parse handler json error:$e, '
+            'json:$jsonString');
       }
 
       handlersMap.remove(key);
       debugPrint('signaling, '
           'background message handler,'
-          'remove $key, update handler to $handlersMap');
+          'remove $key, update handler cache to $handlersMap');
       await prefs.setString(handlerCacheKey, jsonEncode(handlersMap));
     }
   }

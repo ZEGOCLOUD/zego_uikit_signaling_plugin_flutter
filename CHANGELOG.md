@@ -1,3 +1,7 @@
+## 2.8.15
+
+- add some logs
+
 ## 2.8.14
 
 - update zego_zim

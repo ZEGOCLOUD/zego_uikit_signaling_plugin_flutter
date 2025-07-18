@@ -32,13 +32,27 @@ Future<void> registerBackgroundMessageHandler(
         PluginUtilities.getCallbackHandle(handler.callback)!;
 
     ZegoSignalingLoggerService.logInfo(
-      'register, add ${callbackHandle.toRawHandle()}, cache:$handlersMap',
+      'register, previous cache:$handlersMap, '
+      'now add, key:${handler.key}, handle:${callbackHandle.toRawHandle()}, ',
       tag: 'signaling',
       subTag: 'background message handler',
     );
 
     handlersMap[handler.key] = callbackHandle.toRawHandle();
+
+    ZegoSignalingLoggerService.logInfo(
+      'register, now cache:$handlersMap,',
+      tag: 'signaling',
+      subTag: 'background message handler',
+    );
+
     await prefs.setString(handlerCacheKey, jsonEncode(handlersMap));
+  }).then((_) {
+    ZegoSignalingLoggerService.logInfo(
+      'register done, key:${handler.key}',
+      tag: 'signaling',
+      subTag: 'background message handler',
+    );
   });
 }
 

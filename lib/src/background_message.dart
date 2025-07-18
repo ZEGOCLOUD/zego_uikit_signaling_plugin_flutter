@@ -66,14 +66,15 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
     _initBackgroundMessageHandler();
 
     ZegoSignalingLoggerService.logInfo(
-      'register background message handler',
+      'register background message handler, '
+      'key:$key',
       tag: 'signaling',
       subTag: 'background message',
     );
 
     if ((!kIsWeb) && (!io.Platform.isAndroid)) {
       ZegoSignalingLoggerService.logInfo(
-        'Only Support Android Platform.',
+        'Only Support Android Platform, ignore',
         tag: 'signaling',
         subTag: 'background message',
       );
