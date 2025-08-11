@@ -14,7 +14,10 @@ class ZegoSignalingPluginCallKitAPIImpl
       subTag: 'callkit',
     );
 
-    CallKitEventHandler.didReceiveIncomingPush = handler;
+    // Convert handler type for zego_callkit
+    CallKitEventHandler.didReceiveIncomingPush = (Map extras, UUID uuid) {
+      handler(extras, (uuid as UUIDImpl).uuidString);
+    };
   }
 
   /// set init configuration for callkit
@@ -28,6 +31,7 @@ class ZegoSignalingPluginCallKitAPIImpl
       subTag: 'callkit',
     );
 
+    // Convert to zego_callkit types
     var cxConfiguration = CXProviderConfiguration(
       localizedName: configuration.localizedName,
       iconTemplateImageName: configuration.iconTemplateImageName,
@@ -40,14 +44,39 @@ class ZegoSignalingPluginCallKitAPIImpl
 
   /// report call end
   @override
-  Future<void> reportCallEnded(CXCallEndedReason endedReason, UUID uuid) async {
+  Future<void> reportCallEnded(
+    ZegoSignalingPluginCXCallEndedReason endedReason,
+    String uuid,
+  ) async {
     ZegoSignalingLoggerService.logInfo(
       'report call ended, endedReason:$endedReason, uuid:$uuid',
       tag: 'signaling',
       subTag: 'callkit',
     );
 
-    CallKit.getInstance().reportCallEnded(endedReason, uuid);
+    // Convert to zego_callkit types
+    final uuidImpl = UUIDImpl(uuidString_: uuid);
+    final zegoCallEndedReason = _convertToZegoCallEndedReason(endedReason);
+    CallKit.getInstance().reportCallEnded(zegoCallEndedReason, uuidImpl);
+  }
+
+  /// Convert ZegoSignalingPluginCXCallEndedReason to CXCallEndedReason
+  CXCallEndedReason _convertToZegoCallEndedReason(
+      ZegoSignalingPluginCXCallEndedReason reason) {
+    switch (reason) {
+      case ZegoSignalingPluginCXCallEndedReason.CXCallEndedReasonFailed:
+        return CXCallEndedReason.CXCallEndedReasonFailed;
+      case ZegoSignalingPluginCXCallEndedReason.CXCallEndedReasonRemoteEnded:
+        return CXCallEndedReason.CXCallEndedReasonRemoteEnded;
+      case ZegoSignalingPluginCXCallEndedReason.CXCallEndedReasonUnanswered:
+        return CXCallEndedReason.CXCallEndedReasonUnanswered;
+      case ZegoSignalingPluginCXCallEndedReason
+          .CXCallEndedReasonAnsweredElsewhere:
+        return CXCallEndedReason.CXCallEndedReasonAnsweredElsewhere;
+      case ZegoSignalingPluginCXCallEndedReason
+          .CXCallEndedReasonDeclinedElsewhere:
+        return CXCallEndedReason.CXCallEndedReasonDeclinedElsewhere;
+    }
   }
 }
 
@@ -146,7 +175,7 @@ class ZegoSignalingPluginCallKitEventImpl
 
   /// callkit perform set muted call action event
   @override
-  Stream<ZegoSignalingPluginCallKitSetMutedCallActionEvent>
+  Stream<ZegoSignalingPluginCallKitActionEvent>
       getCallkitPerformSetMutedCallActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter

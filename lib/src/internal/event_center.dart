@@ -12,6 +12,9 @@ import 'package:zego_uikit_signaling_plugin/src/internal/core.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/zim_extension.dart';
 import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
 
+import 'package:zego_uikit_signaling_plugin/src/callkit_adapter/index.dart'
+    as adapter;
+
 part 'event_native_style.dart';
 
 /// @nodoc
@@ -917,8 +920,9 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      callkitTimedOutPerformingActionEvent
-          .add(ZegoSignalingPluginCallKitActionEvent(action: action));
+      final event = adapter.ZegoSignalingPluginCallKitEventConverter
+          .convertTimedOutAction(action);
+      callkitTimedOutPerformingActionEvent.add(event);
     };
     CallKitEventHandler.performStartCallAction = (CXAction action) {
       ZegoSignalingLoggerService.logInfo(
@@ -927,8 +931,9 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      callkitPerformStartCallActionEvent
-          .add(ZegoSignalingPluginCallKitActionEvent(action: action));
+      final event = adapter.ZegoSignalingPluginCallKitEventConverter
+          .convertStartCallAction(action);
+      callkitPerformStartCallActionEvent.add(event);
     };
     CallKitEventHandler.performAnswerCallAction = (CXAction action) {
       ZegoSignalingLoggerService.logInfo(
@@ -937,8 +942,9 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      callkitPerformAnswerCallActionEvent
-          .add(ZegoSignalingPluginCallKitActionEvent(action: action));
+      final event = adapter.ZegoSignalingPluginCallKitEventConverter
+          .convertAnswerCallAction(action);
+      callkitPerformAnswerCallActionEvent.add(event);
     };
     CallKitEventHandler.performEndCallAction = (CXAction action) {
       ZegoSignalingLoggerService.logInfo(
@@ -947,8 +953,10 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      callkitPerformEndCallActionEvent
-          .add(ZegoSignalingPluginCallKitActionEvent(action: action));
+      final event =
+          adapter.ZegoSignalingPluginCallKitEventConverter.convertEndCallAction(
+              action);
+      callkitPerformEndCallActionEvent.add(event);
     };
     CallKitEventHandler.performSetHeldCallAction = (CXAction action) {
       ZegoSignalingLoggerService.logInfo(
@@ -957,8 +965,10 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      callkitPerformSetHeldCallActionEvent
-          .add(ZegoSignalingPluginCallKitActionEvent(action: action));
+      final event =
+          adapter.ZegoSignalingPluginCallKitEventConverter.convertSetHeldAction(
+              action);
+      callkitPerformSetHeldCallActionEvent.add(event);
     };
     CallKitEventHandler.performSetMutedCallAction =
         (CXSetMutedCallAction action) {
@@ -968,8 +978,9 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      callkitPerformSetMutedCallActionEvent.add(
-          ZegoSignalingPluginCallKitSetMutedCallActionEvent(action: action));
+      final event = adapter.ZegoSignalingPluginCallKitEventConverter
+          .convertSetMutedAction(action);
+      callkitPerformSetMutedCallActionEvent.add(event);
     };
     CallKitEventHandler.performSetGroupCallAction = (CXAction action) {
       ZegoSignalingLoggerService.logInfo(
@@ -978,8 +989,9 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      callkitPerformSetGroupCallActionEvent
-          .add(ZegoSignalingPluginCallKitActionEvent(action: action));
+      final event = adapter.ZegoSignalingPluginCallKitEventConverter
+          .convertSetGroupAction(action);
+      callkitPerformSetGroupCallActionEvent.add(event);
     };
     CallKitEventHandler.performPlayDTMFCallAction = (CXAction action) {
       ZegoSignalingLoggerService.logInfo(
@@ -988,8 +1000,9 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center',
       );
 
-      callkitPerformPlayDTMFCallActionEvent
-          .add(ZegoSignalingPluginCallKitActionEvent(action: action));
+      final event = adapter.ZegoSignalingPluginCallKitEventConverter
+          .convertPlayDTMFAction(action);
+      callkitPerformPlayDTMFCallActionEvent.add(event);
     };
   }
 
@@ -1090,8 +1103,8 @@ class ZegoSignalingPluginEventCenter {
       StreamController<ZegoSignalingPluginCallKitActionEvent>.broadcast();
   final callkitPerformSetHeldCallActionEvent =
       StreamController<ZegoSignalingPluginCallKitActionEvent>.broadcast();
-  final callkitPerformSetMutedCallActionEvent = StreamController<
-      ZegoSignalingPluginCallKitSetMutedCallActionEvent>.broadcast();
+  final callkitPerformSetMutedCallActionEvent =
+      StreamController<ZegoSignalingPluginCallKitActionEvent>.broadcast();
   final callkitPerformSetGroupCallActionEvent =
       StreamController<ZegoSignalingPluginCallKitActionEvent>.broadcast();
   final callkitPerformPlayDTMFCallActionEvent =

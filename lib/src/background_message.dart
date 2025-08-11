@@ -5,6 +5,39 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
     implements ZegoSignalingPluginBackgroundMessageAPI {
   bool defaultBackgroundHandlerInit = false;
 
+  /// Convert ZPNsMessage to ZegoSignalingPluginMessage
+  ZegoSignalingPluginMessage _convertZPNsMessageToZegoMessage(
+      ZPNsMessage zpnsMessage) {
+    return ZegoSignalingPluginMessage(
+      pushSourceType: _convertPushSourceType(zpnsMessage.pushSourceType),
+    )
+      ..title = zpnsMessage.title
+      ..content = zpnsMessage.content
+      ..payload = zpnsMessage.payload
+      ..extras = zpnsMessage.extras;
+  }
+
+  /// Convert ZPNsPushSourceType to ZegoSignalingPluginPushSourceType
+  ZegoSignalingPluginPushSourceType _convertPushSourceType(
+      ZPNsPushSourceType zpnsType) {
+    switch (zpnsType) {
+      case ZPNsPushSourceType.APNs:
+        return ZegoSignalingPluginPushSourceType.apns;
+      case ZPNsPushSourceType.ZEGO:
+        return ZegoSignalingPluginPushSourceType.zego;
+      case ZPNsPushSourceType.FCM:
+        return ZegoSignalingPluginPushSourceType.fcm;
+      case ZPNsPushSourceType.HuaWei:
+        return ZegoSignalingPluginPushSourceType.huaWei;
+      case ZPNsPushSourceType.XiaoMi:
+        return ZegoSignalingPluginPushSourceType.xiaoMi;
+      case ZPNsPushSourceType.Oppo:
+        return ZegoSignalingPluginPushSourceType.oppo;
+      case ZPNsPushSourceType.Vivo:
+        return ZegoSignalingPluginPushSourceType.vivo;
+    }
+  }
+
   void _initBackgroundMessageHandler() {
     if (defaultBackgroundHandlerInit) {
       ZegoSignalingLoggerService.logInfo(
@@ -139,7 +172,11 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
       );
     }
 
-    ZPNsEventHandler.onThroughMessageReceived = handler;
+    // Convert our handler type to the expected ZPNsEventHandler type
+    ZPNsEventHandler.onThroughMessageReceived = handler != null
+        ? (ZPNsMessage message) =>
+            handler(_convertZPNsMessageToZegoMessage(message))
+        : null;
 
     return const ZegoSignalingPluginSetMessageHandlerResult();
   }

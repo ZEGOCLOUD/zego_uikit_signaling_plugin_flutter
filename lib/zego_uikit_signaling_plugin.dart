@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 
 // Package imports:
+import 'package:zego_callkit/src/internal/utils/uuid_impl.dart' show UUIDImpl;
 import 'package:zego_callkit/zego_callkit.dart';
 import 'package:zego_plugin_adapter/zego_plugin_adapter.dart';
 import 'package:zego_zim/zego_zim.dart';
