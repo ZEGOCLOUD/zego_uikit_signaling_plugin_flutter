@@ -18,10 +18,7 @@ dependencies:
   zego_zpns: ^2.8.0
   zego_callkit: ^1.0.0+4
 
-  flutter_logs: 
-    git:
-      url: https://github.com/yoer/flutter_logs.git
-      ref: master
+  flutter_logs_yoer: ^2.2.1
   plugin_platform_interface: ^2.1.8
   shared_preferences: ^2.2.3
 

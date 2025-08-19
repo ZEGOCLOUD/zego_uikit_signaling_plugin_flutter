@@ -283,7 +283,8 @@ class ZegoSignalingPluginInvitationAPIImpl
         )
         .then((ZIMCallRejectionSentResult zimResult) {
       ZegoSignalingLoggerService.logInfo(
-        'refuse invitation, done, invitation id:${zimResult.callID}',
+        'refuse invitation, done, '
+        'invitation id:${zimResult.callID}, ',
         tag: 'signaling',
         subTag: 'invitation',
       );
@@ -293,7 +294,9 @@ class ZegoSignalingPluginInvitationAPIImpl
       );
     }).catchError((error) {
       ZegoSignalingLoggerService.logError(
-        'refuse invitation, error:${error.toString()}',
+        'refuse invitation, '
+        'invitation id:$invitationID, '
+        'error:${error.toString()}',
         tag: 'signaling',
         subTag: 'invitation',
       );

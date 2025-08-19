@@ -2,7 +2,7 @@
 import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 
 // Package imports:
-import 'package:flutter_logs/flutter_logs.dart';
+import 'package:flutter_logs_yoer/flutter_logs_yoer.dart';
 
 /// @nodoc
 class ZegoSignalingLoggerService {
@@ -19,7 +19,7 @@ class ZegoSignalingLoggerService {
     }
 
     try {
-      await FlutterLogs.initLogs(
+      await FlutterLogsYoer.initLogs(
               logLevelsEnabled: [
                 LogLevel.INFO,
                 LogLevel.WARNING,
@@ -30,14 +30,14 @@ class ZegoSignalingLoggerService {
               directoryStructure: DirectoryStructure.SINGLE_FILE_FOR_DAY,
               logTypesEnabled: ['device', 'network', 'errors'],
               logFileExtension: LogFileExtension.LOG,
-              logsWriteDirectoryName: 'zego_prebuilt',
-              logsExportDirectoryName: 'zego_prebuilt/Exported',
+              logsWriteDirectoryName: 'ZegoUIKits',
+              logsExportDirectoryName: 'ZegoUIKits/Exported',
               useCachesDirectory: true,
               debugFileOperations: true,
               isDebuggable: true)
           .then((value) {
-        FlutterLogs.setDebugLevel(0);
-        FlutterLogs.logInfo(
+        FlutterLogsYoer.setDebugLevel(0);
+        FlutterLogsYoer.logInfo(
           'signaling',
           'log init done',
           '==========================================',
@@ -52,7 +52,7 @@ class ZegoSignalingLoggerService {
 
   /// clear logs
   Future<void> clearLogs() async {
-    FlutterLogs.clearLogs();
+    FlutterLogsYoer.clearLogs();
   }
 
   /// log info
@@ -67,7 +67,7 @@ class ZegoSignalingLoggerService {
       return;
     }
 
-    return FlutterLogs.logInfo(tag, subTag, logMessage);
+    return FlutterLogsYoer.logInfo(tag, subTag, logMessage);
   }
 
   /// log warn
@@ -82,7 +82,7 @@ class ZegoSignalingLoggerService {
       return;
     }
 
-    return FlutterLogs.logWarn(tag, subTag, logMessage);
+    return FlutterLogsYoer.logWarn(tag, subTag, logMessage);
   }
 
   /// log error
@@ -97,7 +97,7 @@ class ZegoSignalingLoggerService {
       return;
     }
 
-    return FlutterLogs.logError(tag, subTag, logMessage);
+    return FlutterLogsYoer.logError(tag, subTag, logMessage);
   }
 
   /// log error trace
@@ -113,6 +113,6 @@ class ZegoSignalingLoggerService {
       return;
     }
 
-    return FlutterLogs.logErrorTrace(tag, subTag, logMessage, e);
+    return FlutterLogsYoer.logErrorTrace(tag, subTag, logMessage, e);
   }
 }
