@@ -70,9 +70,11 @@ class ZegoSignalingPluginCallKitAPIImpl
         return CXCallEndedReason.CXCallEndedReasonRemoteEnded;
       case ZegoSignalingPluginCXCallEndedReason.callEndedReasonUnanswered:
         return CXCallEndedReason.CXCallEndedReasonUnanswered;
-      case ZegoSignalingPluginCXCallEndedReason.callEndedReasonAnsweredElsewhere:
+      case ZegoSignalingPluginCXCallEndedReason
+          .callEndedReasonAnsweredElsewhere:
         return CXCallEndedReason.CXCallEndedReasonAnsweredElsewhere;
-      case ZegoSignalingPluginCXCallEndedReason.callEndedReasonDeclinedElsewhere:
+      case ZegoSignalingPluginCXCallEndedReason
+          .callEndedReasonDeclinedElsewhere:
         return CXCallEndedReason.CXCallEndedReasonDeclinedElsewhere;
     }
   }
