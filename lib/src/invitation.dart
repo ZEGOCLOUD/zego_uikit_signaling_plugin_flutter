@@ -36,7 +36,7 @@ class ZegoSignalingPluginInvitationAPIImpl
       ZegoSignalingLoggerService.logInfo(
         'send invitation, done, invitation id:${zimResult.callID}, '
         'error user list:${zimResult.info.errorUserList.map((e) => '${e.userID}, reason:${e.reason}')}, '
-        'error invitees:${zimResult.info.errorInvitees.map((e) => '${e.userID}, ')}',
+        'error invitees:${zimResult.info.errorUserList.map((e) => '${e.userID}, ')}',
         tag: 'signaling',
         subTag: 'invitation',
       );

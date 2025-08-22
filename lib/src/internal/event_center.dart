@@ -56,6 +56,7 @@ class ZegoSignalingPluginEventCenter {
 
       passThroughEvent.onMessageReactionsChanged?.call(zim, infos);
     };
+    // TODO: onReceivePeerMessage is deprecated, use onPeerMessageReceived instead when available
     ZIMEventHandler.onReceivePeerMessage = (
       ZIM zim,
       List<ZIMMessage> messageList,
@@ -70,6 +71,7 @@ class ZegoSignalingPluginEventCenter {
       passThroughEvent.onReceivePeerMessage?.call(zim, messageList, fromUserID);
     };
 
+    // TODO: onReceiveRoomMessage is deprecated, use onRoomMessageReceived instead when available
     ZIMEventHandler.onReceiveRoomMessage = (
       ZIM zim,
       List<ZIMMessage> messageList,
@@ -83,6 +85,7 @@ class ZegoSignalingPluginEventCenter {
 
       passThroughEvent.onReceiveRoomMessage?.call(zim, messageList, fromRoomID);
     };
+    // TODO: onReceiveGroupMessage is deprecated, use onGroupMessageReceived instead when available
     ZIMEventHandler.onReceiveGroupMessage = (
       ZIM zim,
       List<ZIMMessage> messageList,
@@ -329,6 +332,7 @@ class ZegoSignalingPluginEventCenter {
         invitationID,
       );
     };
+    // TODO: onCallInvitationAccepted is deprecated since 2.9.0, use onCallUserStateChanged instead
     ZIMEventHandler.onCallInvitationAccepted = (
       ZIM zim,
       ZIMCallInvitationAcceptedInfo info,
@@ -353,6 +357,7 @@ class ZegoSignalingPluginEventCenter {
         invitationID,
       );
     };
+    // TODO: onCallInvitationRejected is deprecated since 2.9.0, use onCallUserStateChanged instead
     ZIMEventHandler.onCallInvitationRejected = (
       ZIM zim,
       ZIMCallInvitationRejectedInfo info,
@@ -459,6 +464,7 @@ class ZegoSignalingPluginEventCenter {
         invitationID,
       );
     };
+    // TODO: onCallInviteesAnsweredTimeout is deprecated since 2.9.0, use onCallUserStateChanged instead
     ZIMEventHandler.onCallInviteesAnsweredTimeout = (
       ZIM zim,
       List<String> invitees,
@@ -654,6 +660,7 @@ class ZegoSignalingPluginEventCenter {
         roomID,
       );
     };
+    // TODO: onReceiveRoomMessage is deprecated, use onRoomMessageReceived instead when available
     ZIMEventHandler.onReceiveRoomMessage = (
       ZIM zim,
       List<ZIMMessage> messageList,

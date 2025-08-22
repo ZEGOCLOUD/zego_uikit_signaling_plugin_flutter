@@ -64,17 +64,15 @@ class ZegoSignalingPluginCallKitAPIImpl
   CXCallEndedReason _convertToZegoCallEndedReason(
       ZegoSignalingPluginCXCallEndedReason reason) {
     switch (reason) {
-      case ZegoSignalingPluginCXCallEndedReason.CXCallEndedReasonFailed:
+      case ZegoSignalingPluginCXCallEndedReason.callEndedReasonFailed:
         return CXCallEndedReason.CXCallEndedReasonFailed;
-      case ZegoSignalingPluginCXCallEndedReason.CXCallEndedReasonRemoteEnded:
+      case ZegoSignalingPluginCXCallEndedReason.callEndedReasonRemoteEnded:
         return CXCallEndedReason.CXCallEndedReasonRemoteEnded;
-      case ZegoSignalingPluginCXCallEndedReason.CXCallEndedReasonUnanswered:
+      case ZegoSignalingPluginCXCallEndedReason.callEndedReasonUnanswered:
         return CXCallEndedReason.CXCallEndedReasonUnanswered;
-      case ZegoSignalingPluginCXCallEndedReason
-          .CXCallEndedReasonAnsweredElsewhere:
+      case ZegoSignalingPluginCXCallEndedReason.callEndedReasonAnsweredElsewhere:
         return CXCallEndedReason.CXCallEndedReasonAnsweredElsewhere;
-      case ZegoSignalingPluginCXCallEndedReason
-          .CXCallEndedReasonDeclinedElsewhere:
+      case ZegoSignalingPluginCXCallEndedReason.callEndedReasonDeclinedElsewhere:
         return CXCallEndedReason.CXCallEndedReasonDeclinedElsewhere;
     }
   }
