@@ -1,7 +1,7 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
 /// @nodoc
-class ZegoSignalingPluginBackgroundMessageAPIImpl
+mixin class ZegoSignalingPluginBackgroundMessageAPIImpl
     implements ZegoSignalingPluginBackgroundMessageAPI {
   bool defaultBackgroundHandlerInit = false;
 
@@ -183,5 +183,5 @@ class ZegoSignalingPluginBackgroundMessageAPIImpl
 }
 
 /// @nodoc
-class ZegoSignalingPluginBackgroundMessageEventImpl
+mixin class ZegoSignalingPluginBackgroundMessageEventImpl
     implements ZegoSignalingPluginBackgroundMessageEvent {}

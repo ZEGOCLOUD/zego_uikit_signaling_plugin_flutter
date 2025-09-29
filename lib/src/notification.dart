@@ -1,7 +1,7 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
 /// @nodoc
-class ZegoSignalingPluginNotificationAPIImpl
+mixin class ZegoSignalingPluginNotificationAPIImpl
     implements ZegoSignalingPluginNotificationAPI {
   /// enable notify when app running in background or quit
   @override
@@ -126,7 +126,7 @@ class ZegoSignalingPluginNotificationAPIImpl
 }
 
 /// @nodoc
-class ZegoSignalingPluginNotificationEventImpl
+mixin class ZegoSignalingPluginNotificationEventImpl
     implements ZegoSignalingPluginNotificationEvent {
   /// getNotificationArrivedEventStream
   @override

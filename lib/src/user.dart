@@ -1,7 +1,8 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
 /// @nodoc
-class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
+mixin class ZegoSignalingPluginUserAPIImpl
+    implements ZegoSignalingPluginUserAPI {
   /// login
   @override
   Future<ZegoSignalingPluginConnectUserResult> connectUser({
@@ -202,7 +203,8 @@ class ZegoSignalingPluginUserAPIImpl implements ZegoSignalingPluginUserAPI {
 }
 
 /// @nodoc
-class ZegoSignalingPluginUserEventImpl implements ZegoSignalingPluginUserEvent {
+mixin class ZegoSignalingPluginUserEventImpl
+    implements ZegoSignalingPluginUserEvent {
   /// connection state
   @override
   ZegoSignalingPluginConnectionState getConnectionState() {

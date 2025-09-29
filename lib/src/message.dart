@@ -1,7 +1,7 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
 /// @nodoc
-class ZegoSignalingPluginMessageAPIImpl
+mixin class ZegoSignalingPluginMessageAPIImpl
     implements ZegoSignalingPluginMessageAPI {
   /// send in-room text message
   @override
@@ -82,7 +82,7 @@ class ZegoSignalingPluginMessageAPIImpl
 }
 
 /// @nodoc
-class ZegoSignalingPluginMessageEventImpl
+mixin class ZegoSignalingPluginMessageEventImpl
     implements ZegoSignalingPluginMessageEvent {
   /// in-room text message received event
   @override

@@ -1,7 +1,7 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
 /// @nodoc
-class ZegoSignalingPluginInvitationAPIImpl
+mixin class ZegoSignalingPluginInvitationAPIImpl
     implements ZegoSignalingPluginInvitationAPI {
   /// send invitation
   @override
@@ -505,7 +505,7 @@ class ZegoSignalingPluginInvitationAPIImpl
 }
 
 /// @nodoc
-class ZegoSignalingPluginInvitationEventImpl
+mixin class ZegoSignalingPluginInvitationEventImpl
     implements ZegoSignalingPluginInvitationEvent {
   /// user state changed event
   @override

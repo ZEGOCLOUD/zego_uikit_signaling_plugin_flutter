@@ -1,7 +1,7 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
 /// @nodoc
-class ZegoSignalingPluginCallKitAPIImpl
+mixin class ZegoSignalingPluginCallKitAPIImpl
     implements ZegoSignalingPluginCallKitAPI {
   /// set incoming push received handler
   @override
@@ -71,17 +71,17 @@ class ZegoSignalingPluginCallKitAPIImpl
       case ZegoSignalingPluginCXCallEndedReason.callEndedReasonUnanswered:
         return CXCallEndedReason.CXCallEndedReasonUnanswered;
       case ZegoSignalingPluginCXCallEndedReason
-          .callEndedReasonAnsweredElsewhere:
+            .callEndedReasonAnsweredElsewhere:
         return CXCallEndedReason.CXCallEndedReasonAnsweredElsewhere;
       case ZegoSignalingPluginCXCallEndedReason
-          .callEndedReasonDeclinedElsewhere:
+            .callEndedReasonDeclinedElsewhere:
         return CXCallEndedReason.CXCallEndedReasonDeclinedElsewhere;
     }
   }
 }
 
 /// @nodoc
-class ZegoSignalingPluginCallKitEventImpl
+mixin class ZegoSignalingPluginCallKitEventImpl
     implements ZegoSignalingPluginCallKitEvent {
   /// Called when the provider has been reset. Delegates must respond to this callback by cleaning up all internal call state (disconnecting communication channels, releasing network resources, etc.). This callback can be treated as a request to end all calls without the need to respond to any actions
   @override

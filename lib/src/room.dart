@@ -1,7 +1,8 @@
 part of '../zego_uikit_signaling_plugin.dart';
 
 /// @nodoc
-class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
+mixin class ZegoSignalingPluginRoomAPIImpl
+    implements ZegoSignalingPluginRoomAPI {
   /// join room(create and enter)
   @override
   Future<ZegoSignalingPluginJoinRoomResult> joinRoom({
@@ -455,7 +456,8 @@ class ZegoSignalingPluginRoomAPIImpl implements ZegoSignalingPluginRoomAPI {
 }
 
 /// @nodoc
-class ZegoSignalingPluginRoomEventImpl implements ZegoSignalingPluginRoomEvent {
+mixin class ZegoSignalingPluginRoomEventImpl
+    implements ZegoSignalingPluginRoomEvent {
   /// room properties updated event
   @override
   Stream<ZegoSignalingPluginRoomPropertiesUpdatedEvent>
