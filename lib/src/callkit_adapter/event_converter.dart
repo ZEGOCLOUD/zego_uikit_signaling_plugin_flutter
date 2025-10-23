@@ -212,7 +212,7 @@ class ZegoSignalingPluginCallKitEventConverter {
       actionId: actionId,
       actionType: ZegoSignalingPluginCallKitActionType.timedOut.name,
       actionData: ZegoSignalingPluginCallKitTimedOutActionData(
-        callUUID: action.callUUID.uuidString,
+        callUUID: '',
       ),
       fulfill: () => _actionManager.fulfillAction(actionId),
       fail: () => _actionManager.failAction(actionId),
