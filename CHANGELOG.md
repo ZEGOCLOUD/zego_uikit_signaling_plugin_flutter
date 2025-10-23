@@ -1,3 +1,7 @@
+## 2.8.19
+
+- Update dependency
+
 ## 2.8.18
 
 - Update environment
