@@ -67,6 +67,70 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     });
   }
 
+  /// switch room
+  Future<ZegoSignalingPluginJoinRoomResult> switchRoom({
+    required String fromRoomID,
+    required String toRoomID,
+    required String toRoomName,
+    Map<String, String> toRoomAttributes = const {},
+    int toRoomDestroyDelayTime = 0,
+  }) async {
+    ZegoSignalingLoggerService.logInfo(
+      'switch room, '
+      'from room id:$fromRoomID, '
+      'to room:{$toRoomID, $toRoomName}, ',
+      tag: 'signaling',
+      subTag: 'room',
+    );
+
+    return ZIM
+        .getInstance()!
+        .switchRoom(
+          fromRoomID,
+          ZIMRoomInfo()
+            ..roomID = toRoomID
+            ..roomName = toRoomName,
+          true,
+          ZIMRoomAdvancedConfig()
+            ..roomAttributes = toRoomAttributes
+            ..roomDestroyDelayTime = toRoomDestroyDelayTime,
+        )
+        .then((zimResult) {
+      ZegoSignalingLoggerService.logInfo(
+        'switch room finish',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
+      assert(zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
+          'zimResult.roomInfo.baseInfo.roomID.isNotEmpty');
+
+      return const ZegoSignalingPluginJoinRoomResult();
+    }).catchError((error) {
+      ZegoSignalingLoggerService.logError(
+        'switch room, error:${error.toString()}',
+        tag: 'signaling',
+        subTag: 'room',
+      );
+
+      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+            ZegoSignalingError(
+              code: ZegoSignalingErrorCode.roomLoginError,
+              message: 'from room:$fromRoomID, '
+                  'to room:{$toRoomID, $toRoomName}, '
+                  'to room attributes:$toRoomAttributes, '
+                  'tp room destroy delay time:$toRoomDestroyDelayTime, '
+                  'exception:$error, ${ZegoSignalingErrorCode.zimErrorCodeDocumentTips}',
+              method: 'switchRoom',
+            ),
+          );
+
+      return ZegoSignalingPluginJoinRoomResult(
+        error: error,
+      );
+    });
+  }
+
   Future<ZegoSignalingPluginJoinRoomResult> _joinRoom({
     required String roomID,
   }) async {
