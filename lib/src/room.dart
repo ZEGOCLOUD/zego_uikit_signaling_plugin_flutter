@@ -13,7 +13,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
   }) async {
     ZegoSignalingLoggerService.logInfo(
       'join room, room id:$roomID, room name:$roomName',
-      tag: 'signaling',
+      tag: 'signaling-room',
       subTag: 'room',
     );
 
@@ -30,7 +30,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
         .then((zimResult) {
       ZegoSignalingLoggerService.logInfo(
         'join room finish',
-        tag: 'signaling',
+        tag: 'signaling-room',
         subTag: 'room',
       );
 
@@ -41,7 +41,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     }).catchError((error) {
       ZegoSignalingLoggerService.logError(
         'join room, error:${error.toString()}',
-        tag: 'signaling',
+        tag: 'signaling-room',
         subTag: 'room',
       );
 
@@ -67,20 +67,39 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     });
   }
 
-  Future<ZegoSignalingPluginJoinRoomResult> _joinRoom({
-    required String roomID,
+  /// switch room
+  @override
+  Future<ZegoSignalingPluginJoinRoomResult> switchRoom({
+    required String fromRoomID,
+    required String toRoomID,
+    required String toRoomName,
+    Map<String, String> toRoomAttributes = const {},
+    int toRoomDestroyDelayTime = 0,
   }) async {
     ZegoSignalingLoggerService.logInfo(
-      'zim join room, room id:$roomID',
-      tag: 'signaling',
-      subTag: 'room',
+      'from room id:$fromRoomID, '
+      'to room:{$toRoomID, $toRoomName}, ',
+      tag: 'signaling-room',
+      subTag: 'switch room',
     );
 
-    return ZIM.getInstance()!.joinRoom(roomID).then((zimResult) {
+    return ZIM
+        .getInstance()!
+        .switchRoom(
+          fromRoomID,
+          ZIMRoomInfo()
+            ..roomID = toRoomID
+            ..roomName = toRoomName,
+          true,
+          ZIMRoomAdvancedConfig()
+            ..roomAttributes = toRoomAttributes
+            ..roomDestroyDelayTime = toRoomDestroyDelayTime,
+        )
+        .then((zimResult) {
       ZegoSignalingLoggerService.logInfo(
-        'zim join room finish',
-        tag: 'signaling',
-        subTag: 'room',
+        'finish',
+        tag: 'signaling-room',
+        subTag: 'switch room',
       );
 
       assert(zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
@@ -89,9 +108,54 @@ mixin class ZegoSignalingPluginRoomAPIImpl
       return const ZegoSignalingPluginJoinRoomResult();
     }).catchError((error) {
       ZegoSignalingLoggerService.logError(
-        'zim join room, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'room',
+        'error:${error.toString()}',
+        tag: 'signaling-room',
+        subTag: 'switch room',
+      );
+
+      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+            ZegoSignalingError(
+              code: ZegoSignalingErrorCode.roomLoginError,
+              message: 'from room:$fromRoomID, '
+                  'to room:{$toRoomID, $toRoomName}, '
+                  'to room attributes:$toRoomAttributes, '
+                  'tp room destroy delay time:$toRoomDestroyDelayTime, '
+                  'exception:$error, ${ZegoSignalingErrorCode.zimErrorCodeDocumentTips}',
+              method: 'switchRoom',
+            ),
+          );
+
+      return ZegoSignalingPluginJoinRoomResult(
+        error: error,
+      );
+    });
+  }
+
+  Future<ZegoSignalingPluginJoinRoomResult> _joinRoom({
+    required String roomID,
+  }) async {
+    ZegoSignalingLoggerService.logInfo(
+      'room id:$roomID',
+      tag: 'signaling-room',
+      subTag: 'join room',
+    );
+
+    return ZIM.getInstance()!.joinRoom(roomID).then((zimResult) {
+      ZegoSignalingLoggerService.logInfo(
+        'finish',
+        tag: 'signaling-room',
+        subTag: 'join room',
+      );
+
+      assert(zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
+          'zimResult.roomInfo.baseInfo.roomID.isNotEmpty');
+
+      return const ZegoSignalingPluginJoinRoomResult();
+    }).catchError((error) {
+      ZegoSignalingLoggerService.logError(
+        'error:${error.toString()}',
+        tag: 'signaling-room',
+        subTag: 'join room',
       );
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(
@@ -114,9 +178,9 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     required String roomID,
   }) async {
     ZegoSignalingLoggerService.logInfo(
-      'leave room, room id:$roomID',
-      tag: 'signaling',
-      subTag: 'room',
+      'room id:$roomID',
+      tag: 'signaling-room',
+      subTag: 'leave room',
     );
 
     return ZIM
@@ -125,9 +189,9 @@ mixin class ZegoSignalingPluginRoomAPIImpl
         .then((value) => const ZegoSignalingPluginLeaveRoomResult())
         .catchError((error) {
       ZegoSignalingLoggerService.logError(
-        'leave room, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'room',
+        'error:${error.toString()}',
+        tag: 'signaling-room',
+        subTag: 'leave room',
       );
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(
@@ -135,7 +199,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
               code: ZegoSignalingErrorCode.roomLogoutError,
               message:
                   'room id:$roomID, exception:$error, ${ZegoSignalingErrorCode.zimErrorCodeDocumentTips}',
-              method: 'leaveRoom',
+              method: 'leave',
             ),
           );
 
@@ -158,7 +222,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     ZegoSignalingLoggerService.logInfo(
       'update room properties, room id:$roomID, properties:$roomProperties,'
       'isForce:$isForce, isDeleteAfterOwnerLeft:$isDeleteAfterOwnerLeft, isUpdateOwner:$isUpdateOwner, ',
-      tag: 'signaling',
+      tag: 'signaling-room',
       subTag: 'room',
     );
 
@@ -179,7 +243,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     }).catchError((error) {
       ZegoSignalingLoggerService.logError(
         'update room properties, error:${error.toString()}',
-        tag: 'signaling',
+        tag: 'signaling-room',
         subTag: 'room',
       );
 
@@ -210,7 +274,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
   }) async {
     ZegoSignalingLoggerService.logInfo(
       'delete room properties, room id:$roomID, keys:$keys, isForce:$isForce',
-      tag: 'signaling',
+      tag: 'signaling-room',
       subTag: 'room',
     );
 
@@ -229,7 +293,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
       if (showErrorLog) {
         ZegoSignalingLoggerService.logError(
           'delete room properties, error:${error.toString()}',
-          tag: 'signaling',
+          tag: 'signaling-room',
           subTag: 'room',
         );
 
@@ -260,7 +324,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
   }) {
     ZegoSignalingLoggerService.logInfo(
       'begin room properties batch operation',
-      tag: 'signaling',
+      tag: 'signaling-room',
       subTag: 'room',
     );
 
@@ -281,7 +345,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
   }) async {
     ZegoSignalingLoggerService.logInfo(
       'end room properties batch operation',
-      tag: 'signaling',
+      tag: 'signaling-room',
       subTag: 'room',
     );
 
@@ -292,7 +356,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
         .catchError((error) {
       ZegoSignalingLoggerService.logError(
         'end room properties batch operation, error:${error.toString()}',
-        tag: 'signaling',
+        tag: 'signaling-room',
         subTag: 'room',
       );
 
@@ -325,7 +389,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
         .catchError((error) {
       ZegoSignalingLoggerService.logError(
         'query room properties, error:${error.toString()}',
-        tag: 'signaling',
+        tag: 'signaling-room',
         subTag: 'room',
       );
 
@@ -372,7 +436,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     }).catchError((error) {
       ZegoSignalingLoggerService.logError(
         'query user in-room attributes, error:${error.toString()}',
-        tag: 'signaling',
+        tag: 'signaling-room',
         subTag: 'room',
       );
 
@@ -405,7 +469,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     ZegoSignalingLoggerService.logInfo(
       'set user in-room attributes, room id:$roomID, userIDs:$userIDs, '
       'attributes:$setAttributes, isDeleteAfterOwnerLeft:$isDeleteAfterOwnerLeft',
-      tag: 'signaling',
+      tag: 'signaling-room',
       subTag: 'room',
     );
 
@@ -432,7 +496,7 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     }).catchError((error) {
       ZegoSignalingLoggerService.logError(
         'set user in-room attributes, error:${error.toString()}',
-        tag: 'signaling',
+        tag: 'signaling-room',
         subTag: 'room',
       );
 
@@ -476,13 +540,6 @@ mixin class ZegoSignalingPluginRoomEventImpl
         .eventCenter
         .roomPropertiesBatchUpdatedEvent
         .stream;
-  }
-
-  /// get room state
-  @override
-  ZegoSignalingPluginRoomState getRoomState() {
-    return ZegoSignalingPluginRoomState
-        .values[ZegoSignalingPluginCore().eventCenter.roomState.index];
   }
 
   /// room state changed event
