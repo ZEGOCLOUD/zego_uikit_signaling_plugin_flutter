@@ -4,6 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'zego_uikit_signaling_plugin'
+  # zego_uikit_signaling_plugin:
   s.version          = '2.8.19'
   s.summary          = 'A new Flutter project.'
   s.description      = <<-DESC

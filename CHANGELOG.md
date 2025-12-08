@@ -1,3 +1,7 @@
+## 2.8.20
+
+- add API, switchRoom
+
 ## 2.8.19
 
 - Update dependency
@@ -13,7 +17,7 @@
 ## 2.8.16
 
 - Features
-  - The location for generating iOS logs has been changed to the same directory as the Zego SDK, and the folder name has been changed to ZegoUIKits 
+    - The location for generating iOS logs has been changed to the same directory as the Zego SDK, and the folder name has been changed to ZegoUIKits
 
 ## 2.8.15
 
@@ -35,7 +39,7 @@
 
 - add API, removeBackgroundMessageHandler
 
-## 2.8.10 
+## 2.8.10
 
 - Support for additional listening offline message handler
 
@@ -50,7 +54,7 @@
 ## 2.8.7
 
 - Bugs
-  - Fix test zim types crash on debug mode
+    - Fix test zim types crash on debug mode
 
 ## 2.8.6
 
@@ -79,7 +83,7 @@
 ## 2.8.0
 
 - Features
-  - Support login by token
+    - Support login by token
 
 ## 2.7.15
 
@@ -100,7 +104,7 @@
 ## 2.7.11
 
 - Bugs
-  - Fix namespace error after grade v8.0
+    - Fix namespace error after grade v8.0
 
 ## 2.7.10
 
@@ -128,7 +132,7 @@
 
 ## 2.7.4
 
- - Upgrade zego_zim to 2.13.1
+- Upgrade zego_zim to 2.13.1
 
 ## 2.7.3
 
@@ -136,7 +140,7 @@
 
 ## 2.7.2
 
- - fix certificateIndex bug.
+- fix certificateIndex bug.
 
 ## 2.7.1
 
