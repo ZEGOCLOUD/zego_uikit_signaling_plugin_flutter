@@ -47,6 +47,13 @@ mixin class ZegoSignalingPluginRoomAPIImpl
 
       if (error is PlatformException &&
           int.parse(error.code) ==
+              ZIMErrorCode.roomModuleUserIsAlreadyInTheRoom) {
+        /// user in room
+        return const ZegoSignalingPluginJoinRoomResult();
+      }
+
+      if (error is PlatformException &&
+          int.parse(error.code) ==
               ZIMErrorCode.roomModuleTheRoomAlreadyExists) {
         /// room is exist, just call join room
         return _joinRoom(roomID: roomID);
@@ -220,8 +227,12 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     bool isUpdateOwner = false,
   }) async {
     ZegoSignalingLoggerService.logInfo(
-      'update room properties, room id:$roomID, properties:$roomProperties,'
-      'isForce:$isForce, isDeleteAfterOwnerLeft:$isDeleteAfterOwnerLeft, isUpdateOwner:$isUpdateOwner, ',
+      'update room properties, '
+      'room id:$roomID, '
+      'properties:$roomProperties,'
+      'isForce:$isForce, '
+      'isDeleteAfterOwnerLeft:$isDeleteAfterOwnerLeft, '
+      'isUpdateOwner:$isUpdateOwner, ',
       tag: 'signaling-room',
       subTag: 'room',
     );
@@ -273,7 +284,10 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     bool showErrorLog = true,
   }) async {
     ZegoSignalingLoggerService.logInfo(
-      'delete room properties, room id:$roomID, keys:$keys, isForce:$isForce',
+      'delete room properties, '
+      'room id:$roomID, '
+      'keys:$keys, '
+      'isForce:$isForce',
       tag: 'signaling-room',
       subTag: 'room',
     );
@@ -323,7 +337,11 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     bool isUpdateOwner = false,
   }) {
     ZegoSignalingLoggerService.logInfo(
-      'begin room properties batch operation',
+      'begin room properties batch operation, '
+      'roomID:$roomID, '
+      'isForce:$isForce, '
+      'isDeleteAfterOwnerLeft:$isDeleteAfterOwnerLeft, '
+      'isUpdateOwner:$isUpdateOwner, ',
       tag: 'signaling-room',
       subTag: 'room',
     );
@@ -344,7 +362,8 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     required String roomID,
   }) async {
     ZegoSignalingLoggerService.logInfo(
-      'end room properties batch operation',
+      'end room properties batch operation, '
+      'roomID:$roomID, ',
       tag: 'signaling-room',
       subTag: 'room',
     );
@@ -467,8 +486,11 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     bool isDeleteAfterOwnerLeft = true,
   }) {
     ZegoSignalingLoggerService.logInfo(
-      'set user in-room attributes, room id:$roomID, userIDs:$userIDs, '
-      'attributes:$setAttributes, isDeleteAfterOwnerLeft:$isDeleteAfterOwnerLeft',
+      'set user in-room attributes, '
+      'room id:$roomID, '
+      'userIDs:$userIDs, '
+      'attributes:$setAttributes, '
+      'isDeleteAfterOwnerLeft:$isDeleteAfterOwnerLeft, ',
       tag: 'signaling-room',
       subTag: 'room',
     );
