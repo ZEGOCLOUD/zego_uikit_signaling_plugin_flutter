@@ -103,7 +103,7 @@ mixin class ZegoSignalingPluginUserAPIImpl
         subTag: 'user',
       );
 
-      const ZegoSignalingPluginDisconnectUserResult(timeout: false);
+      return const ZegoSignalingPluginDisconnectUserResult(timeout: false);
     }
 
     ZegoSignalingPluginCore().currentUser = null;
