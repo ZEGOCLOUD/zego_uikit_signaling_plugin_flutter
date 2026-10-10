@@ -1,3 +1,8 @@
+## 2.8.22
+
+- Update dependency
+  - Use `zego_callkit_for_uikit` for UIKit-specific CallKit integration.
+
 ## 2.8.21
 
 - Update dependency
