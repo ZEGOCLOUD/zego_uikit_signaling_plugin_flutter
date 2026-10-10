@@ -16,7 +16,7 @@ dependencies:
 
   zego_zim: ^2.28.0
   zego_zpns: ^2.8.0
-  zego_callkit: ^1.0.0+4
+  zego_callkit_for_uikit: ^1.0.0+4
 
   flutter_logs_yoer: ^2.2.1
   plugin_platform_interface: ^2.1.8
