@@ -1,3 +1,6 @@
+## 2.8.23
+
+- Add iOS Swift Package Manager support while retaining CocoaPods support.
 ## 2.8.22
 
 - Update dependency

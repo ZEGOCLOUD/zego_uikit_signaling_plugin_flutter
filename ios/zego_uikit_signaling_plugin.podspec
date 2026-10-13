@@ -5,7 +5,7 @@
 Pod::Spec.new do |s|
   s.name             = 'zego_uikit_signaling_plugin'
   # zego_uikit_signaling_plugin:
-  s.version          = '2.8.22'
+  s.version          = '2.8.23'
   s.summary          = 'A new Flutter project.'
   s.description      = <<-DESC
 A new Flutter project.
@@ -14,8 +14,8 @@ A new Flutter project.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
-  s.public_header_files = 'Classes/**/*.h'
+  s.source_files = 'zego_uikit_signaling_plugin/Sources/zego_uikit_signaling_plugin/**/*'
+  s.public_header_files = 'zego_uikit_signaling_plugin/Sources/zego_uikit_signaling_plugin/include/zego_uikit_signaling_plugin/**/*.h'
   s.dependency 'Flutter'
   s.platform = :ios, '9.0'
 
