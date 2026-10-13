@@ -36,39 +36,44 @@ mixin class ZegoSignalingPluginUserAPIImpl
     ZIMLoginConfig config = ZIMLoginConfig()
       ..userName = name
       ..token = token;
-    return ZIM.getInstance()!.login(targetUser.userID, config).then((value) {
-      ZegoSignalingLoggerService.logInfo(
-        'connectUser success.',
-        tag: 'signaling',
-        subTag: 'user',
-      );
+    return ZIM
+        .getInstance()!
+        .login(targetUser.userID, config)
+        .then((value) {
+          ZegoSignalingLoggerService.logInfo(
+            'connectUser success.',
+            tag: 'signaling',
+            subTag: 'user',
+          );
 
-      ZegoSignalingPluginCore().currentUser = targetUser;
+          ZegoSignalingPluginCore().currentUser = targetUser;
 
-      return const ZegoSignalingPluginConnectUserResult();
-    }).catchError((error) {
-      if (error is PlatformException &&
-          int.parse(error.code) ==
-              ZIMErrorCode.networkModuleUserHasAlreadyLogged &&
-          ZegoSignalingPluginCore().currentUser?.userID == targetUser.userID &&
-          ZegoSignalingPluginCore().currentUser?.userName ==
-              targetUser.userName) {
-        ZegoSignalingLoggerService.logError(
-          'connectUser, user is same who current login',
-          tag: 'signaling',
-          subTag: 'user',
-        );
+          return const ZegoSignalingPluginConnectUserResult();
+        })
+        .catchError((error) {
+          if (error is PlatformException &&
+              int.parse(error.code) ==
+                  ZIMErrorCode.networkModuleUserHasAlreadyLogged &&
+              ZegoSignalingPluginCore().currentUser?.userID ==
+                  targetUser.userID &&
+              ZegoSignalingPluginCore().currentUser?.userName ==
+                  targetUser.userName) {
+            ZegoSignalingLoggerService.logError(
+              'connectUser, user is same who current login',
+              tag: 'signaling',
+              subTag: 'user',
+            );
 
-        return const ZegoSignalingPluginConnectUserResult();
-      }
+            return const ZegoSignalingPluginConnectUserResult();
+          }
 
-      ZegoSignalingLoggerService.logInfo(
-        'connectUser, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'user',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'connectUser, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'user',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.userLoginError,
               message:
@@ -77,10 +82,8 @@ mixin class ZegoSignalingPluginUserAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginConnectUserResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginConnectUserResult(error: error);
+        });
   }
 
   /// logout
@@ -95,6 +98,9 @@ mixin class ZegoSignalingPluginUserAPIImpl
       tag: 'signaling',
       subTag: 'user',
     );
+
+    ZegoSignalingPluginCore().eventCenter.outgoingNormalInvitationTracker
+        .clear();
 
     if (null == ZegoSignalingPluginCore().currentUser) {
       ZegoSignalingLoggerService.logInfo(
@@ -135,7 +141,8 @@ mixin class ZegoSignalingPluginUserAPIImpl
           if (timer.isActive) timer.cancel();
           if (!completer.isCompleted) {
             completer.complete(
-                const ZegoSignalingPluginDisconnectUserResult(timeout: false));
+              const ZegoSignalingPluginDisconnectUserResult(timeout: false),
+            );
           }
           ZegoSignalingLoggerService.logInfo(
             'disconnectUser, waitForDisconnect success',
@@ -150,7 +157,8 @@ mixin class ZegoSignalingPluginUserAPIImpl
         if (timer.isActive) timer.cancel();
         if (!completer.isCompleted) {
           completer.complete(
-              const ZegoSignalingPluginDisconnectUserResult(timeout: true));
+            const ZegoSignalingPluginDisconnectUserResult(timeout: true),
+          );
         }
         ZegoSignalingLoggerService.logInfo(
           'disconnectUser, waitForDisconnect timeout',
@@ -180,13 +188,13 @@ mixin class ZegoSignalingPluginUserAPIImpl
         .renewToken(token)
         .then((value) => const ZegoSignalingPluginRenewTokenResult())
         .catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'renewToken error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'user',
-      );
+          ZegoSignalingLoggerService.logError(
+            'renewToken error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'user',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.renewTokenError,
               message:
@@ -195,10 +203,8 @@ mixin class ZegoSignalingPluginUserAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginRenewTokenResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginRenewTokenResult(error: error);
+        });
   }
 }
 
@@ -208,14 +214,16 @@ mixin class ZegoSignalingPluginUserEventImpl
   /// connection state
   @override
   ZegoSignalingPluginConnectionState getConnectionState() {
-    return ZegoSignalingPluginConnectionState
-        .values[ZegoSignalingPluginCore().eventCenter.connectionState.index];
+    return ZegoSignalingPluginConnectionState.values[ZegoSignalingPluginCore()
+        .eventCenter
+        .connectionState
+        .index];
   }
 
   /// connection state changed event
   @override
   Stream<ZegoSignalingPluginConnectionStateChangedEvent>
-      getConnectionStateChangedEventStream() {
+  getConnectionStateChangedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .connectionStateChangedEvent
@@ -225,7 +233,7 @@ mixin class ZegoSignalingPluginUserEventImpl
   /// token will expire event
   @override
   Stream<ZegoSignalingPluginTokenWillExpireEvent>
-      getTokenWillExpireEventStream() {
+  getTokenWillExpireEventStream() {
     return ZegoSignalingPluginCore().eventCenter.tokenWillExpireEvent.stream;
   }
 }

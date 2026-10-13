@@ -17,10 +17,11 @@ import 'defines.dart';
 
 /// Convert ZPNsMessage to ZegoSignalingPluginMessage
 ZegoSignalingPluginMessage _convertZPNsMessageToZegoMessage(
-    ZPNsMessage zpnsMessage) {
+  ZPNsMessage zpnsMessage,
+) {
   return ZegoSignalingPluginMessage(
-    pushSourceType: _convertPushSourceType(zpnsMessage.pushSourceType),
-  )
+      pushSourceType: _convertPushSourceType(zpnsMessage.pushSourceType),
+    )
     ..title = zpnsMessage.title
     ..content = zpnsMessage.content
     ..payload = zpnsMessage.payload
@@ -29,7 +30,8 @@ ZegoSignalingPluginMessage _convertZPNsMessageToZegoMessage(
 
 /// Convert ZPNsPushSourceType to ZegoSignalingPluginPushSourceType
 ZegoSignalingPluginPushSourceType _convertPushSourceType(
-    ZPNsPushSourceType zpnsType) {
+  ZPNsPushSourceType zpnsType,
+) {
   switch (zpnsType) {
     case ZPNsPushSourceType.APNs:
       return ZegoSignalingPluginPushSourceType.apns;
@@ -50,14 +52,16 @@ ZegoSignalingPluginPushSourceType _convertPushSourceType(
 
 @pragma('vm:entry-point')
 Future<void> onSignalingBackgroundMessageReceived(ZPNsMessage message) async {
-  debugPrint('signaling, '
-      'background message handler,'
-      'onSignalingBackgroundMessageReceived, '
-      'title:${message.title}, '
-      'content:${message.content}, '
-      'payload:${message.payload}, '
-      'extras:${message.extras}, '
-      'pushSourceType:${message.pushSourceType}, ');
+  debugPrint(
+    'signaling, '
+    'background message handler,'
+    'onSignalingBackgroundMessageReceived, '
+    'title:${message.title}, '
+    'content:${message.content}, '
+    'payload:${message.payload}, '
+    'extras:${message.extras}, '
+    'pushSourceType:${message.pushSourceType}, ',
+  );
 
   await invokeBackgroundMessageHandler(message);
 }
@@ -65,49 +69,57 @@ Future<void> onSignalingBackgroundMessageReceived(ZPNsMessage message) async {
 Future<void> registerBackgroundMessageHandler(
   ZegoSignalingPluginBackgroundMessageHandler handler,
 ) async {
-  await getAndroidHandlers().then((handlersMap) async {
-    final prefs = await SharedPreferences.getInstance();
-    final CallbackHandle callbackHandle =
-        PluginUtilities.getCallbackHandle(handler.callback)!;
+  await getAndroidHandlers()
+      .then((handlersMap) async {
+        final prefs = await SharedPreferences.getInstance();
+        final CallbackHandle callbackHandle = PluginUtilities.getCallbackHandle(
+          handler.callback,
+        )!;
 
-    ZegoSignalingLoggerService.logInfo(
-      'register, previous cache:$handlersMap, '
-      'now add, key:${handler.key}, handle:${callbackHandle.toRawHandle()}, ',
-      tag: 'signaling',
-      subTag: 'background message handler',
-    );
+        ZegoSignalingLoggerService.logInfo(
+          'register, previous cache:$handlersMap, '
+          'now add, key:${handler.key}, handle:${callbackHandle.toRawHandle()}, ',
+          tag: 'signaling',
+          subTag: 'background message handler',
+        );
 
-    handlersMap[handler.key] = callbackHandle.toRawHandle();
+        handlersMap[handler.key] = callbackHandle.toRawHandle();
 
-    ZegoSignalingLoggerService.logInfo(
-      'register, now cache:$handlersMap,',
-      tag: 'signaling',
-      subTag: 'background message handler',
-    );
+        ZegoSignalingLoggerService.logInfo(
+          'register, now cache:$handlersMap,',
+          tag: 'signaling',
+          subTag: 'background message handler',
+        );
 
-    await prefs.setString(handlerCacheKey, jsonEncode(handlersMap));
-  }).then((_) {
-    ZegoSignalingLoggerService.logInfo(
-      'register done, key:${handler.key}',
-      tag: 'signaling',
-      subTag: 'background message handler',
-    );
-  });
+        await prefs.setString(handlerCacheKey, jsonEncode(handlersMap));
+      })
+      .then((_) {
+        ZegoSignalingLoggerService.logInfo(
+          'register done, key:${handler.key}',
+          tag: 'signaling',
+          subTag: 'background message handler',
+        );
+      });
 }
 
 Future<void> invokeBackgroundMessageHandler(ZPNsMessage message) async {
   await getAndroidHandlers().then((handlersMap) {
-    debugPrint('signaling, '
-        'background message handler,'
-        'invoke, cache map:$handlersMap');
+    debugPrint(
+      'signaling, '
+      'background message handler,'
+      'invoke, cache map:$handlersMap',
+    );
 
     handlersMap.forEach((key, callbackHandle) {
       try {
-        final callbackHandler =
-            CallbackHandle.fromRawHandle(callbackHandle as int? ?? 0);
-        debugPrint('signaling, '
-            'background message handler,'
-            'invoke, key:$key, handle:$callbackHandle');
+        final callbackHandler = CallbackHandle.fromRawHandle(
+          callbackHandle as int? ?? 0,
+        );
+        debugPrint(
+          'signaling, '
+          'background message handler,'
+          'invoke, key:$key, handle:$callbackHandle',
+        );
 
         final callback = PluginUtilities.getCallbackFromHandle(callbackHandler);
         if (callback != null) {
@@ -116,9 +128,11 @@ Future<void> invokeBackgroundMessageHandler(ZPNsMessage message) async {
           callback.call(zegoMessage);
         }
       } catch (e) {
-        debugPrint('signaling, '
-            'background message handler,'
-            'invoke offline handler error:$e');
+        debugPrint(
+          'signaling, '
+          'background message handler,'
+          'invoke offline handler error:$e',
+        );
       }
     });
   });

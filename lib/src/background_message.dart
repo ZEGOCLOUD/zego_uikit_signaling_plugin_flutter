@@ -7,10 +7,11 @@ mixin class ZegoSignalingPluginBackgroundMessageAPIImpl
 
   /// Convert ZPNsMessage to ZegoSignalingPluginMessage
   ZegoSignalingPluginMessage _convertZPNsMessageToZegoMessage(
-      ZPNsMessage zpnsMessage) {
+    ZPNsMessage zpnsMessage,
+  ) {
     return ZegoSignalingPluginMessage(
-      pushSourceType: _convertPushSourceType(zpnsMessage.pushSourceType),
-    )
+        pushSourceType: _convertPushSourceType(zpnsMessage.pushSourceType),
+      )
       ..title = zpnsMessage.title
       ..content = zpnsMessage.content
       ..payload = zpnsMessage.payload
@@ -19,7 +20,8 @@ mixin class ZegoSignalingPluginBackgroundMessageAPIImpl
 
   /// Convert ZPNsPushSourceType to ZegoSignalingPluginPushSourceType
   ZegoSignalingPluginPushSourceType _convertPushSourceType(
-      ZPNsPushSourceType zpnsType) {
+    ZPNsPushSourceType zpnsType,
+  ) {
     switch (zpnsType) {
       case ZPNsPushSourceType.APNs:
         return ZegoSignalingPluginPushSourceType.apns;
@@ -92,7 +94,7 @@ mixin class ZegoSignalingPluginBackgroundMessageAPIImpl
   /// ```
   @override
   Future<ZegoSignalingPluginSetMessageHandlerResult>
-      setBackgroundMessageHandler(
+  setBackgroundMessageHandler(
     ZegoSignalingPluginZPNsBackgroundMessageHandler handler, {
     String key = 'default',
   }) async {
@@ -113,12 +115,12 @@ mixin class ZegoSignalingPluginBackgroundMessageAPIImpl
       );
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(
-            ZegoSignalingError(
-              code: ZegoSignalingErrorCode.platformNotSupport,
-              message: 'only support android platform.',
-              method: 'setBackgroundMessageHandler',
-            ),
-          );
+        ZegoSignalingError(
+          code: ZegoSignalingErrorCode.platformNotSupport,
+          message: 'only support android platform.',
+          method: 'setBackgroundMessageHandler',
+        ),
+      );
 
       return ZegoSignalingPluginSetMessageHandlerResult(
         error: PlatformException(
@@ -129,10 +131,7 @@ mixin class ZegoSignalingPluginBackgroundMessageAPIImpl
     }
 
     await registerBackgroundMessageHandler(
-      ZegoSignalingPluginBackgroundMessageHandler(
-        key: key,
-        callback: handler,
-      ),
+      ZegoSignalingPluginBackgroundMessageHandler(key: key, callback: handler),
     );
 
     return const ZegoSignalingPluginSetMessageHandlerResult();
@@ -157,12 +156,12 @@ mixin class ZegoSignalingPluginBackgroundMessageAPIImpl
       );
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(
-            ZegoSignalingError(
-              code: ZegoSignalingErrorCode.platformNotSupport,
-              message: 'only support android platform.',
-              method: 'setThroughMessageHandler',
-            ),
-          );
+        ZegoSignalingError(
+          code: ZegoSignalingErrorCode.platformNotSupport,
+          message: 'only support android platform.',
+          method: 'setThroughMessageHandler',
+        ),
+      );
 
       return ZegoSignalingPluginSetMessageHandlerResult(
         error: PlatformException(
@@ -175,7 +174,7 @@ mixin class ZegoSignalingPluginBackgroundMessageAPIImpl
     // Convert our handler type to the expected ZPNsEventHandler type
     ZPNsEventHandler.onThroughMessageReceived = handler != null
         ? (ZPNsMessage message) =>
-            handler(_convertZPNsMessageToZegoMessage(message))
+              handler(_convertZPNsMessageToZegoMessage(message))
         : null;
 
     return const ZegoSignalingPluginSetMessageHandlerResult();

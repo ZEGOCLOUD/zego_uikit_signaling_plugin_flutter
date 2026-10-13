@@ -6,7 +6,7 @@ mixin class ZegoSignalingPluginNotificationAPIImpl
   /// enable notify when app running in background or quit
   @override
   Future<ZegoSignalingPluginEnableNotifyResult>
-      enableNotifyWhenAppRunningInBackgroundOrQuit({
+  enableNotifyWhenAppRunningInBackgroundOrQuit({
     bool? isIOSSandboxEnvironment,
     bool enableIOSVoIP = true,
     ZegoSignalingPluginMultiCertificate certificateIndex =
@@ -37,12 +37,12 @@ mixin class ZegoSignalingPluginNotificationAPIImpl
       );
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(
-            ZegoSignalingError(
-              code: ZegoSignalingErrorCode.platformNotSupport,
-              message: 'only support android and iOS platform.',
-              method: 'enableNotifyWhenAppRunningInBackgroundOrQuit',
-            ),
-          );
+        ZegoSignalingError(
+          code: ZegoSignalingErrorCode.platformNotSupport,
+          message: 'only support android and iOS platform.',
+          method: 'enableNotifyWhenAppRunningInBackgroundOrQuit',
+        ),
+      );
 
       return ZegoSignalingPluginEnableNotifyResult(
         error: PlatformException(
@@ -92,33 +92,28 @@ mixin class ZegoSignalingPluginNotificationAPIImpl
       );
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(
-            ZegoSignalingError(
-              code: ZegoSignalingErrorCode.notificationEnableNotifyError,
-              message: 'isIOSSandboxEnvironment:$isIOSSandboxEnvironment, '
-                  'enableIOSVoIP:$enableIOSVoIP , '
-                  'certificateIndex:$certificateIndex , '
-                  'appName:$appName , '
-                  'androidChannelID:$androidChannelID , '
-                  'androidChannelName:$androidChannelName , '
-                  'androidSound:$androidSound , '
-                  'exception:$e',
-              method: 'enableNotifyWhenAppRunningInBackgroundOrQuit',
-            ),
-          );
+        ZegoSignalingError(
+          code: ZegoSignalingErrorCode.notificationEnableNotifyError,
+          message:
+              'isIOSSandboxEnvironment:$isIOSSandboxEnvironment, '
+              'enableIOSVoIP:$enableIOSVoIP , '
+              'certificateIndex:$certificateIndex , '
+              'appName:$appName , '
+              'androidChannelID:$androidChannelID , '
+              'androidChannelName:$androidChannelName , '
+              'androidSound:$androidSound , '
+              'exception:$e',
+          method: 'enableNotifyWhenAppRunningInBackgroundOrQuit',
+        ),
+      );
 
       if (e is PlatformException) {
         return ZegoSignalingPluginEnableNotifyResult(
-          error: PlatformException(
-            code: e.code,
-            message: e.message,
-          ),
+          error: PlatformException(code: e.code, message: e.message),
         );
       } else {
         return ZegoSignalingPluginEnableNotifyResult(
-          error: PlatformException(
-            code: '-2',
-            message: e.toString(),
-          ),
+          error: PlatformException(code: '-2', message: e.toString()),
         );
       }
     }
@@ -131,7 +126,7 @@ mixin class ZegoSignalingPluginNotificationEventImpl
   /// getNotificationArrivedEventStream
   @override
   Stream<ZegoSignalingPluginNotificationArrivedEvent>
-      getNotificationArrivedEventStream() {
+  getNotificationArrivedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .notificationArrivedEvent
@@ -141,7 +136,7 @@ mixin class ZegoSignalingPluginNotificationEventImpl
   /// getNotificationClickedEventStream
   @override
   Stream<ZegoSignalingPluginNotificationClickedEvent>
-      getNotificationClickedEventStream() {
+  getNotificationClickedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .notificationClickedEvent
@@ -151,7 +146,7 @@ mixin class ZegoSignalingPluginNotificationEventImpl
   /// getNotificationRegisteredEventStream
   @override
   Stream<ZegoSignalingPluginNotificationRegisteredEvent>
-      getNotificationRegisteredEventStream() {
+  getNotificationRegisteredEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .notificationRegisteredEvent

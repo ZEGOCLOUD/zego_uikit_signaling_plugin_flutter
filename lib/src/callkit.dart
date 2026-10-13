@@ -62,7 +62,8 @@ mixin class ZegoSignalingPluginCallKitAPIImpl
 
   /// Convert ZegoSignalingPluginCXCallEndedReason to CXCallEndedReason
   CXCallEndedReason _convertToZegoCallEndedReason(
-      ZegoSignalingPluginCXCallEndedReason reason) {
+    ZegoSignalingPluginCXCallEndedReason reason,
+  ) {
     switch (reason) {
       case ZegoSignalingPluginCXCallEndedReason.callEndedReasonFailed:
         return CXCallEndedReason.CXCallEndedReasonFailed;
@@ -71,10 +72,10 @@ mixin class ZegoSignalingPluginCallKitAPIImpl
       case ZegoSignalingPluginCXCallEndedReason.callEndedReasonUnanswered:
         return CXCallEndedReason.CXCallEndedReasonUnanswered;
       case ZegoSignalingPluginCXCallEndedReason
-            .callEndedReasonAnsweredElsewhere:
+          .callEndedReasonAnsweredElsewhere:
         return CXCallEndedReason.CXCallEndedReasonAnsweredElsewhere;
       case ZegoSignalingPluginCXCallEndedReason
-            .callEndedReasonDeclinedElsewhere:
+          .callEndedReasonDeclinedElsewhere:
         return CXCallEndedReason.CXCallEndedReasonDeclinedElsewhere;
     }
   }
@@ -86,7 +87,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// Called when the provider has been reset. Delegates must respond to this callback by cleaning up all internal call state (disconnecting communication channels, releasing network resources, etc.). This callback can be treated as a request to end all calls without the need to respond to any actions
   @override
   Stream<ZegoSignalingPluginCallKitVoidEvent>
-      getCallkitProviderDidResetEventStream() {
+  getCallkitProviderDidResetEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitProviderDidResetEvent
@@ -96,7 +97,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// Called when the provider has been fully created and is ready to send actions and receive updates
   @override
   Stream<ZegoSignalingPluginCallKitVoidEvent>
-      getCallkitProviderDidBeginEventStream() {
+  getCallkitProviderDidBeginEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitProviderDidBeginEvent
@@ -106,7 +107,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// Called when the provider's audio session activation state changes.
   @override
   Stream<ZegoSignalingPluginCallKitVoidEvent>
-      getCallkitActivateAudioEventStream() {
+  getCallkitActivateAudioEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitActivateAudioEvent
@@ -116,7 +117,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// callkit deactivate audio event stream
   @override
   Stream<ZegoSignalingPluginCallKitVoidEvent>
-      getCallkitDeactivateAudioEventStream() {
+  getCallkitDeactivateAudioEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitDeactivateAudioEvent
@@ -126,7 +127,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// Called when an action was not performed in time and has been inherently failed. Depending on the action, this timeout may also force the call to end. An action that has already timed out should not be fulfilled or failed by the provider delegate
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
-      getCallkitTimedOutPerformingActionEventStream() {
+  getCallkitTimedOutPerformingActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitTimedOutPerformingActionEvent
@@ -136,7 +137,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// each perform*CallAction method is called sequentially for each action in the transaction
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
-      getCallkitPerformStartCallActionEventStream() {
+  getCallkitPerformStartCallActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitPerformStartCallActionEvent
@@ -146,7 +147,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// callkit perform answer call action event
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
-      getCallkitPerformAnswerCallActionEventStream() {
+  getCallkitPerformAnswerCallActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitPerformAnswerCallActionEvent
@@ -156,7 +157,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// callkit perform end call action event
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
-      getCallkitPerformEndCallActionEventStream() {
+  getCallkitPerformEndCallActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitPerformEndCallActionEvent
@@ -166,7 +167,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// callkit perform set held call action event
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
-      getCallkitPerformSetHeldCallActionEventStream() {
+  getCallkitPerformSetHeldCallActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitPerformSetHeldCallActionEvent
@@ -176,7 +177,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// callkit perform set muted call action event
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
-      getCallkitPerformSetMutedCallActionEventStream() {
+  getCallkitPerformSetMutedCallActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitPerformSetMutedCallActionEvent
@@ -186,7 +187,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// callkit perform set group call action event
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
-      getCallkitPerformSetGroupCallActionEventStream() {
+  getCallkitPerformSetGroupCallActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitPerformSetGroupCallActionEvent
@@ -196,7 +197,7 @@ mixin class ZegoSignalingPluginCallKitEventImpl
   /// callkit perform play DTMF call action event
   @override
   Stream<ZegoSignalingPluginCallKitActionEvent>
-      getCallkitPerformPlayDTMFCallActionEventStream() {
+  getCallkitPerformPlayDTMFCallActionEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .callkitPerformPlayDTMFCallActionEvent

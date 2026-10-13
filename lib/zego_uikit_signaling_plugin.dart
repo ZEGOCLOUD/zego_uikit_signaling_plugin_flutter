@@ -7,7 +7,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 
 // Package imports:
-import 'package:zego_callkit_for_uikit/src/internal/utils/uuid_impl.dart' show UUIDImpl;
+// CallKit exposes UUID without a public string getter, so this internal type is
+// needed to preserve the existing UUID-string callback API.
+// ignore: implementation_imports
+import 'package:zego_callkit_for_uikit/src/internal/utils/uuid_impl.dart'
+    show UUIDImpl;
 import 'package:zego_callkit_for_uikit/zego_callkit.dart';
 import 'package:zego_plugin_adapter/zego_plugin_adapter.dart';
 
@@ -18,7 +22,7 @@ import 'package:zego_uikit_signaling_plugin/src/background_message/handler.dart'
 import 'package:zego_uikit_signaling_plugin/src/internal/core.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/event_center.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/test_sdk.dart';
-import 'package:zego_uikit_signaling_plugin/src/internal/zim_extension.dart';
+import 'src/internal/zim_extension.dart';
 import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
 import 'package:zego_zim/zego_zim.dart';
 import 'package:zego_zpns/zego_zpns.dart';
@@ -126,8 +130,8 @@ class ZegoUIKitSignalingPlugin
 
     ZegoSignalingLoggerService.logInfo(
       'ZIM create, '
-          'appID:$appID, '
-          'has appSign:${appSign.isNotEmpty}',
+      'appID:$appID, '
+      'has appSign:${appSign.isNotEmpty}',
       tag: 'signaling',
       subTag: 'init',
     );

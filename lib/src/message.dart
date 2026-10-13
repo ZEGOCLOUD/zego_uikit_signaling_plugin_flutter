@@ -18,15 +18,16 @@ mixin class ZegoSignalingPluginMessageAPIImpl
           ZIMMessageSendConfig(),
         )
         .then((ZIMMessageSentResult zimResult) {
-      return const ZegoSignalingPluginInRoomTextMessageResult();
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'send in-room text message, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'message',
-      );
+          return const ZegoSignalingPluginInRoomTextMessageResult();
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'send in-room text message, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'message',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.inRoomTextMessageSendError,
               message:
@@ -35,16 +36,14 @@ mixin class ZegoSignalingPluginMessageAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginInRoomTextMessageResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginInRoomTextMessageResult(error: error);
+        });
   }
 
   /// send in-room command message
   @override
   Future<ZegoSignalingPluginInRoomCommandMessageResult>
-      sendInRoomCommandMessage({
+  sendInRoomCommandMessage({
     required String roomID,
     required Uint8List message,
   }) {
@@ -57,15 +56,16 @@ mixin class ZegoSignalingPluginMessageAPIImpl
           ZIMMessageSendConfig(),
         )
         .then((ZIMMessageSentResult zimResult) {
-      return const ZegoSignalingPluginInRoomCommandMessageResult();
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'send in-room command message, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'message',
-      );
+          return const ZegoSignalingPluginInRoomCommandMessageResult();
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'send in-room command message, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'message',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.inRoomCommandMessageSendError,
               message:
@@ -74,10 +74,8 @@ mixin class ZegoSignalingPluginMessageAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginInRoomCommandMessageResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginInRoomCommandMessageResult(error: error);
+        });
   }
 }
 
@@ -87,7 +85,7 @@ mixin class ZegoSignalingPluginMessageEventImpl
   /// in-room text message received event
   @override
   Stream<ZegoSignalingPluginInRoomTextMessageReceivedEvent>
-      getInRoomTextMessageReceivedEventStream() {
+  getInRoomTextMessageReceivedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .inRoomTextMessageReceived
@@ -97,7 +95,7 @@ mixin class ZegoSignalingPluginMessageEventImpl
   /// in-room command message received event
   @override
   Stream<ZegoSignalingPluginInRoomCommandMessageReceivedEvent>
-      getInRoomCommandMessageReceivedEventStream() {
+  getInRoomCommandMessageReceivedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .inRoomCommandMessageReceived

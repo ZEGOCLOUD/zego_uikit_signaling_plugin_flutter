@@ -28,38 +28,41 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ..roomDestroyDelayTime = roomDestroyDelayTime,
         )
         .then((zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'join room finish',
-        tag: 'signaling-room',
-        subTag: 'room',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'join room finish',
+            tag: 'signaling-room',
+            subTag: 'room',
+          );
 
-      assert(zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
-          'zimResult.roomInfo.baseInfo.roomID.isNotEmpty');
+          assert(
+            zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
+            'zimResult.roomInfo.baseInfo.roomID.isNotEmpty',
+          );
 
-      return const ZegoSignalingPluginJoinRoomResult();
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'join room, error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'room',
-      );
+          return const ZegoSignalingPluginJoinRoomResult();
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'join room, error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'room',
+          );
 
-      if (error is PlatformException &&
-          int.parse(error.code) ==
-              ZIMErrorCode.roomModuleUserIsAlreadyInTheRoom) {
-        /// user in room
-        return const ZegoSignalingPluginJoinRoomResult();
-      }
+          if (error is PlatformException &&
+              int.parse(error.code) ==
+                  ZIMErrorCode.roomModuleUserIsAlreadyInTheRoom) {
+            /// user in room
+            return const ZegoSignalingPluginJoinRoomResult();
+          }
 
-      if (error is PlatformException &&
-          int.parse(error.code) ==
-              ZIMErrorCode.roomModuleTheRoomAlreadyExists) {
-        /// room is exist, just call join room
-        return _joinRoom(roomID: roomID);
-      }
+          if (error is PlatformException &&
+              int.parse(error.code) ==
+                  ZIMErrorCode.roomModuleTheRoomAlreadyExists) {
+            /// room is exist, just call join room
+            return _joinRoom(roomID: roomID);
+          }
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.roomLoginError,
               message:
@@ -68,10 +71,8 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginJoinRoomResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginJoinRoomResult(error: error);
+        });
   }
 
   /// switch room
@@ -103,27 +104,31 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ..roomDestroyDelayTime = toRoomDestroyDelayTime,
         )
         .then((zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'finish',
-        tag: 'signaling-room',
-        subTag: 'switch room',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'finish',
+            tag: 'signaling-room',
+            subTag: 'switch room',
+          );
 
-      assert(zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
-          'zimResult.roomInfo.baseInfo.roomID.isNotEmpty');
+          assert(
+            zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
+            'zimResult.roomInfo.baseInfo.roomID.isNotEmpty',
+          );
 
-      return const ZegoSignalingPluginJoinRoomResult();
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'switch room',
-      );
+          return const ZegoSignalingPluginJoinRoomResult();
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'switch room',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.roomLoginError,
-              message: 'from room:$fromRoomID, '
+              message:
+                  'from room:$fromRoomID, '
                   'to room:{$toRoomID, $toRoomName}, '
                   'to room attributes:$toRoomAttributes, '
                   'tp room destroy delay time:$toRoomDestroyDelayTime, '
@@ -132,10 +137,8 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginJoinRoomResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginJoinRoomResult(error: error);
+        });
   }
 
   Future<ZegoSignalingPluginJoinRoomResult> _joinRoom({
@@ -147,25 +150,31 @@ mixin class ZegoSignalingPluginRoomAPIImpl
       subTag: 'join room',
     );
 
-    return ZIM.getInstance()!.joinRoom(roomID).then((zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'finish',
-        tag: 'signaling-room',
-        subTag: 'join room',
-      );
+    return ZIM
+        .getInstance()!
+        .joinRoom(roomID)
+        .then((zimResult) {
+          ZegoSignalingLoggerService.logInfo(
+            'finish',
+            tag: 'signaling-room',
+            subTag: 'join room',
+          );
 
-      assert(zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
-          'zimResult.roomInfo.baseInfo.roomID.isNotEmpty');
+          assert(
+            zimResult.roomInfo.baseInfo.roomID.isNotEmpty,
+            'zimResult.roomInfo.baseInfo.roomID.isNotEmpty',
+          );
 
-      return const ZegoSignalingPluginJoinRoomResult();
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'join room',
-      );
+          return const ZegoSignalingPluginJoinRoomResult();
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'join room',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.roomLoginError,
               message: 'room id:$roomID',
@@ -173,10 +182,8 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginJoinRoomResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginJoinRoomResult(error: error);
+        });
   }
 
   /// leave room
@@ -195,13 +202,13 @@ mixin class ZegoSignalingPluginRoomAPIImpl
         .leaveRoom(roomID)
         .then((value) => const ZegoSignalingPluginLeaveRoomResult())
         .catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'leave room',
-      );
+          ZegoSignalingLoggerService.logError(
+            'error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'leave room',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.roomLogoutError,
               message:
@@ -210,16 +217,14 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginLeaveRoomResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginLeaveRoomResult(error: error);
+        });
   }
 
   /// update room properties
   @override
   Future<ZegoSignalingPluginRoomPropertiesOperationResult>
-      updateRoomProperties({
+  updateRoomProperties({
     required String roomID,
     required Map<String, String> roomProperties,
     bool isForce = false,
@@ -248,17 +253,18 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ..isUpdateOwner = isUpdateOwner,
         )
         .then((zimResult) {
-      return ZegoSignalingPluginRoomPropertiesOperationResult(
-        errorKeys: zimResult.errorKeys,
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'update room properties, error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'room',
-      );
+          return ZegoSignalingPluginRoomPropertiesOperationResult(
+            errorKeys: zimResult.errorKeys,
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'update room properties, error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'room',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.roomPropertyUpdateError,
               message:
@@ -267,17 +273,17 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginRoomPropertiesOperationResult(
-        error: error,
-        errorKeys: roomProperties.keys.toList(),
-      );
-    });
+          return ZegoSignalingPluginRoomPropertiesOperationResult(
+            error: error,
+            errorKeys: roomProperties.keys.toList(),
+          );
+        });
   }
 
   /// delete room properties
   @override
   Future<ZegoSignalingPluginRoomPropertiesOperationResult>
-      deleteRoomProperties({
+  deleteRoomProperties({
     required String roomID,
     required List<String> keys,
     required bool isForce,
@@ -300,18 +306,19 @@ mixin class ZegoSignalingPluginRoomAPIImpl
           ZIMRoomAttributesDeleteConfig()..isForce = isForce,
         )
         .then((zimResult) {
-      return ZegoSignalingPluginRoomPropertiesOperationResult(
-        errorKeys: zimResult.errorKeys,
-      );
-    }).catchError((error) {
-      if (showErrorLog) {
-        ZegoSignalingLoggerService.logError(
-          'delete room properties, error:${error.toString()}',
-          tag: 'signaling-room',
-          subTag: 'room',
-        );
+          return ZegoSignalingPluginRoomPropertiesOperationResult(
+            errorKeys: zimResult.errorKeys,
+          );
+        })
+        .catchError((error) {
+          if (showErrorLog) {
+            ZegoSignalingLoggerService.logError(
+              'delete room properties, error:${error.toString()}',
+              tag: 'signaling-room',
+              subTag: 'room',
+            );
 
-        ZegoSignalingPluginCore().errorStreamCtrl?.add(
+            ZegoSignalingPluginCore().errorStreamCtrl?.add(
               ZegoSignalingError(
                 code: ZegoSignalingErrorCode.roomPropertyDeleteError,
                 message:
@@ -319,13 +326,13 @@ mixin class ZegoSignalingPluginRoomAPIImpl
                 method: 'deleteRoomProperties',
               ),
             );
-      }
+          }
 
-      return ZegoSignalingPluginRoomPropertiesOperationResult(
-        error: error,
-        errorKeys: keys.toList(),
-      );
-    });
+          return ZegoSignalingPluginRoomPropertiesOperationResult(
+            error: error,
+            errorKeys: keys.toList(),
+          );
+        });
   }
 
   /// begin room properties batch operation
@@ -347,20 +354,18 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     );
 
     ZIM.getInstance()!.beginRoomAttributesBatchOperation(
-          roomID,
-          ZIMRoomAttributesBatchOperationConfig()
-            ..isForce = isForce
-            ..isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft
-            ..isUpdateOwner = isUpdateOwner,
-        );
+      roomID,
+      ZIMRoomAttributesBatchOperationConfig()
+        ..isForce = isForce
+        ..isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft
+        ..isUpdateOwner = isUpdateOwner,
+    );
   }
 
   /// end room properties batch operation
   @override
   Future<ZegoSignalingPluginEndRoomBatchOperationResult>
-      endRoomPropertiesBatchOperation({
-    required String roomID,
-  }) async {
+  endRoomPropertiesBatchOperation({required String roomID}) async {
     ZegoSignalingLoggerService.logInfo(
       'end room properties batch operation, '
       'roomID:$roomID, ',
@@ -373,13 +378,13 @@ mixin class ZegoSignalingPluginRoomAPIImpl
         .endRoomAttributesBatchOperation(roomID)
         .then((value) => const ZegoSignalingPluginEndRoomBatchOperationResult())
         .catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'end room properties batch operation, error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'room',
-      );
+          ZegoSignalingLoggerService.logError(
+            'end room properties batch operation, error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'room',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.roomPropertyEndBatchError,
               message:
@@ -388,10 +393,8 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginEndRoomBatchOperationResult(
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginEndRoomBatchOperationResult(error: error);
+        });
   }
 
   /// query room properties
@@ -402,17 +405,19 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     return ZIM
         .getInstance()!
         .queryRoomAllAttributes(roomID)
-        .then((zimResult) => ZegoSignalingPluginQueryRoomPropertiesResult(
-              properties: zimResult.roomAttributes,
-            ))
+        .then(
+          (zimResult) => ZegoSignalingPluginQueryRoomPropertiesResult(
+            properties: zimResult.roomAttributes,
+          ),
+        )
         .catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'query room properties, error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'room',
-      );
+          ZegoSignalingLoggerService.logError(
+            'query room properties, error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'room',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.roomPropertyQueryError,
               message:
@@ -421,17 +426,17 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginQueryRoomPropertiesResult(
-        error: error,
-        properties: const {},
-      );
-    });
+          return ZegoSignalingPluginQueryRoomPropertiesResult(
+            error: error,
+            properties: const {},
+          );
+        });
   }
 
   /// query users in room attributes
   @override
   Future<ZegoSignalingPluginQueryUsersInRoomAttributesResult>
-      queryUsersInRoomAttributes({
+  queryUsersInRoomAttributes({
     required String roomID,
     int count = 100,
     String nextFlag = '',
@@ -445,21 +450,22 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ..nextFlag = nextFlag,
         )
         .then((zimResult) {
-      return ZegoSignalingPluginQueryUsersInRoomAttributesResult(
-        nextFlag: zimResult.nextFlag,
-        attributes: {
-          for (var element in zimResult.infos)
-            element.userID: element.attributes
-        },
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'query user in-room attributes, error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'room',
-      );
+          return ZegoSignalingPluginQueryUsersInRoomAttributesResult(
+            nextFlag: zimResult.nextFlag,
+            attributes: {
+              for (var element in zimResult.infos)
+                element.userID: element.attributes,
+            },
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'query user in-room attributes, error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'room',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.userInRoomPropertyQueryError,
               message:
@@ -468,18 +474,18 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginQueryUsersInRoomAttributesResult(
-        error: error,
-        nextFlag: '',
-        attributes: const {},
-      );
-    });
+          return ZegoSignalingPluginQueryUsersInRoomAttributesResult(
+            error: error,
+            nextFlag: '',
+            attributes: const {},
+          );
+        });
   }
 
   /// set users in room attributes
   @override
   Future<ZegoSignalingPluginSetUsersInRoomAttributesResult>
-      setUsersInRoomAttributes({
+  setUsersInRoomAttributes({
     required String roomID,
     required List<String> userIDs,
     required Map<String, String> setAttributes,
@@ -498,31 +504,34 @@ mixin class ZegoSignalingPluginRoomAPIImpl
     return ZIM
         .getInstance()!
         .setRoomMembersAttributes(
-            setAttributes,
-            userIDs,
-            roomID,
-            ZIMRoomMemberAttributesSetConfig()
-              ..isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft)
+          setAttributes,
+          userIDs,
+          roomID,
+          ZIMRoomMemberAttributesSetConfig()
+            ..isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft,
+        )
         .then((ZIMRoomMembersAttributesOperatedResult zimResult) {
-      return ZegoSignalingPluginSetUsersInRoomAttributesResult(
-        errorUserList: zimResult.errorUserList,
-        errorKeys: {
-          for (var element in zimResult.infos)
-            element.attributesInfo.userID: element.errorKeys
-        },
-        attributes: {
-          for (var element in zimResult.infos)
-            element.attributesInfo.userID: element.attributesInfo.attributes
-        },
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'set user in-room attributes, error:${error.toString()}',
-        tag: 'signaling-room',
-        subTag: 'room',
-      );
+          return ZegoSignalingPluginSetUsersInRoomAttributesResult(
+            errorUserList: zimResult.errorUserList,
+            errorKeys: {
+              for (var element in zimResult.infos)
+                element.attributesInfo.userID: element.errorKeys,
+            },
+            attributes: {
+              for (var element in zimResult.infos)
+                element.attributesInfo.userID:
+                    element.attributesInfo.attributes,
+            },
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'set user in-room attributes, error:${error.toString()}',
+            tag: 'signaling-room',
+            subTag: 'room',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.userInRoomPropertySetError,
               message:
@@ -531,13 +540,13 @@ mixin class ZegoSignalingPluginRoomAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginSetUsersInRoomAttributesResult(
-        error: error,
-        errorUserList: userIDs,
-        attributes: {},
-        errorKeys: {},
-      );
-    });
+          return ZegoSignalingPluginSetUsersInRoomAttributesResult(
+            error: error,
+            errorUserList: userIDs,
+            attributes: {},
+            errorKeys: {},
+          );
+        });
   }
 }
 
@@ -547,7 +556,7 @@ mixin class ZegoSignalingPluginRoomEventImpl
   /// room properties updated event
   @override
   Stream<ZegoSignalingPluginRoomPropertiesUpdatedEvent>
-      getRoomPropertiesUpdatedEventStream() {
+  getRoomPropertiesUpdatedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .roomPropertiesUpdatedEvent
@@ -557,7 +566,7 @@ mixin class ZegoSignalingPluginRoomEventImpl
   /// room properties batch updated event
   @override
   Stream<ZegoSignalingPluginRoomPropertiesBatchUpdatedEvent>
-      getRoomPropertiesBatchUpdatedEventStream() {
+  getRoomPropertiesBatchUpdatedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .roomPropertiesBatchUpdatedEvent
@@ -567,14 +576,14 @@ mixin class ZegoSignalingPluginRoomEventImpl
   /// room state changed event
   @override
   Stream<ZegoSignalingPluginRoomStateChangedEvent>
-      getRoomStateChangedEventStream() {
+  getRoomStateChangedEventStream() {
     return ZegoSignalingPluginCore().eventCenter.roomStateChangedEvent.stream;
   }
 
   /// users in-room attributes updated event
   @override
   Stream<ZegoSignalingPluginUsersInRoomAttributesUpdatedEvent>
-      getUsersInRoomAttributesUpdatedEventStream() {
+  getUsersInRoomAttributesUpdatedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .usersInRoomAttributesUpdatedEvent
@@ -584,14 +593,14 @@ mixin class ZegoSignalingPluginRoomEventImpl
   /// room member joined event
   @override
   Stream<ZegoSignalingPluginRoomMemberJoinedEvent>
-      getRoomMemberJoinedEventStream() {
+  getRoomMemberJoinedEventStream() {
     return ZegoSignalingPluginCore().eventCenter.roomMemberJoinedEvent.stream;
   }
 
   /// room member left event
   @override
   Stream<ZegoSignalingPluginRoomMemberLeftEvent>
-      getRoomMemberLeftEventStream() {
+  getRoomMemberLeftEventStream() {
     return ZegoSignalingPluginCore().eventCenter.roomMemberLeftEvent.stream;
   }
 }

@@ -34,7 +34,8 @@ extension ZIMRoomAttributesUpdateInfoExtension on ZIMRoomAttributesUpdateInfo {
 }
 
 ZegoSignalingPluginInvitationUserState userStateConvertFunc(
-    ZIMCallUserState state) {
+  ZIMCallUserState state,
+) {
   switch (state) {
     case ZIMCallUserState.unknown:
       return ZegoSignalingPluginInvitationUserState.unknown;
@@ -46,13 +47,11 @@ ZegoSignalingPluginInvitationUserState userStateConvertFunc(
       return ZegoSignalingPluginInvitationUserState.rejected;
     case ZIMCallUserState.cancelled:
       return ZegoSignalingPluginInvitationUserState.cancelled;
-    case ZIMCallUserState.offline:
-      return ZegoSignalingPluginInvitationUserState.offline;
     case ZIMCallUserState.received:
       return ZegoSignalingPluginInvitationUserState.received;
     case ZIMCallUserState.timeout:
       return ZegoSignalingPluginInvitationUserState.timeout;
-    case ZIMCallUserState.quited:
+    case ZIMCallUserState.quit:
       return ZegoSignalingPluginInvitationUserState.quited;
     case ZIMCallUserState.ended:
       return ZegoSignalingPluginInvitationUserState.ended;

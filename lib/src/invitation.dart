@@ -33,29 +33,45 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
         .getInstance()!
         .callInvite(invitees, config)
         .then((ZIMCallInvitationSentResult zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'send invitation, done, invitation id:${zimResult.callID}, '
-        'error user list:${zimResult.info.errorUserList.map((e) => '${e.userID}, reason:${e.reason}')}, '
-        'error invitees:${zimResult.info.errorUserList.map((e) => '${e.userID}, ')}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'send invitation, done, invitation id:${zimResult.callID}, '
+            'error user list:${zimResult.info.errorUserList.map((e) => '${e.userID}, reason:${e.reason}')}, '
+            'error invitees:${zimResult.info.errorUserList.map((e) => '${e.userID}, ')}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      return ZegoSignalingPluginSendInvitationResult(
-        invitationID: zimResult.callID,
-        errorInvitees: {
-          for (var element in zimResult.info.errorUserList)
-            element.userID: element.reason
-        },
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'send invitation, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          if (!isAdvancedMode) {
+            final failedInviteeIDs = zimResult.info.errorUserList
+                .map((user) => user.userID)
+                .toSet();
+            ZegoSignalingPluginCore().eventCenter
+                .registerOutgoingNormalInvitation(
+                  ZIM.getInstance()!,
+                  zimResult.callID,
+                  invitees.where(
+                    (userID) => !failedInviteeIDs.contains(userID),
+                  ),
+                  timeout: Duration(seconds: timeout),
+                );
+          }
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          return ZegoSignalingPluginSendInvitationResult(
+            invitationID: zimResult.callID,
+            errorInvitees: {
+              for (var element in zimResult.info.errorUserList)
+                element.userID: element.reason,
+            },
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'send invitation, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
+
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.invitationSendError,
               message:
@@ -64,12 +80,12 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginSendInvitationResult(
-        invitationID: '',
-        errorInvitees: {},
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginSendInvitationResult(
+            invitationID: '',
+            errorInvitees: {},
+            error: error,
+          );
+        });
   }
 
   /// add invitation
@@ -94,28 +110,29 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
         .getInstance()!
         .callingInvite(invitees, invitationID, config)
         .then((ZIMCallingInvitationSentResult zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'add invitation, done, invitation id:${zimResult.callID}, '
-        'error user list:${zimResult.info.errorUserList.map((e) => '${e.userID}, reason:${e.reason}')}, ',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'add invitation, done, invitation id:${zimResult.callID}, '
+            'error user list:${zimResult.info.errorUserList.map((e) => '${e.userID}, reason:${e.reason}')}, ',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      return ZegoSignalingPluginSendInvitationResult(
-        invitationID: zimResult.callID,
-        errorInvitees: {
-          for (var element in zimResult.info.errorUserList)
-            element.userID: element.reason
-        },
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'add invitation, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          return ZegoSignalingPluginSendInvitationResult(
+            invitationID: zimResult.callID,
+            errorInvitees: {
+              for (var element in zimResult.info.errorUserList)
+                element.userID: element.reason,
+            },
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'add invitation, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.invitationAddError,
               message:
@@ -124,12 +141,12 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginSendInvitationResult(
-        invitationID: '',
-        errorInvitees: {},
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginSendInvitationResult(
+            invitationID: '',
+            errorInvitees: {},
+            error: error,
+          );
+        });
   }
 
   /// join invitation
@@ -152,33 +169,36 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
         .getInstance()!
         .callJoin(invitationID, config)
         .then((ZIMCallJoinSentResult zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'join invitation, done, invitation id:${zimResult.callID}, ',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'join invitation, done, invitation id:${zimResult.callID}, ',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      return ZegoSignalingPluginJoinInvitationResult(
-        invitationID: zimResult.callID,
-        callUserList: zimResult.info.callUserList
-            .map((userInfo) => ZegoSignalingPluginInvitationUserInfo(
-                  userID: userInfo.userID,
-                  state: userStateConvertFunc(userInfo.state),
-                  extendedData: userInfo.extendedData,
-                ))
-            .toList(),
-        extendedData: zimResult.info.extendedData,
-        createTime: zimResult.info.createTime,
-        joinTime: zimResult.info.joinTime,
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'join invitation, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          return ZegoSignalingPluginJoinInvitationResult(
+            invitationID: zimResult.callID,
+            callUserList: zimResult.info.callUserList
+                .map(
+                  (userInfo) => ZegoSignalingPluginInvitationUserInfo(
+                    userID: userInfo.userID,
+                    state: userStateConvertFunc(userInfo.state),
+                    extendedData: userInfo.extendedData,
+                  ),
+                )
+                .toList(),
+            extendedData: zimResult.info.extendedData,
+            createTime: zimResult.info.createTime,
+            joinTime: zimResult.info.joinTime,
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'join invitation, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.invitationJoinError,
               message:
@@ -187,11 +207,11 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginJoinInvitationResult(
-        invitationID: '',
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginJoinInvitationResult(
+            invitationID: '',
+            error: error,
+          );
+        });
   }
 
   /// cancel invitation
@@ -222,31 +242,35 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
     }
     return ZIM
         .getInstance()!
-        .callCancel(
-          invitees,
-          invitationID,
-          config,
-        )
+        .callCancel(invitees, invitationID, config)
         .then((ZIMCallCancelSentResult zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'cancel invitation, done, invitation id:${zimResult.callID}, '
-        'error invitees:${zimResult.errorInvitees}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'cancel invitation, done, invitation id:${zimResult.callID}, '
+            'error invitees:${zimResult.errorInvitees}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      return ZegoSignalingPluginCancelInvitationResult(
-        invitationID: invitationID,
-        errorInvitees: zimResult.errorInvitees,
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'cancel invitation, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          final failedInviteeIDs = zimResult.errorInvitees.toSet();
+          ZegoSignalingPluginCore().eventCenter.outgoingNormalInvitationTracker
+              .cancelRecipients(
+                invitationID,
+                invitees.where((userID) => !failedInviteeIDs.contains(userID)),
+              );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          return ZegoSignalingPluginCancelInvitationResult(
+            invitationID: invitationID,
+            errorInvitees: zimResult.errorInvitees,
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'cancel invitation, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
+
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.invitationCancelError,
               message:
@@ -255,12 +279,12 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginCancelInvitationResult(
-        invitationID: invitationID,
-        errorInvitees: invitees,
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginCancelInvitationResult(
+            invitationID: invitationID,
+            errorInvitees: invitees,
+            error: error,
+          );
+        });
   }
 
   /// refuse invitation
@@ -282,26 +306,27 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
           ZIMCallRejectConfig()..extendedData = extendedData,
         )
         .then((ZIMCallRejectionSentResult zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'refuse invitation, done, '
-        'invitation id:${zimResult.callID}, ',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'refuse invitation, done, '
+            'invitation id:${zimResult.callID}, ',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      return ZegoSignalingPluginResponseInvitationResult(
-        invitationID: invitationID,
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'refuse invitation, '
-        'invitation id:$invitationID, '
-        'error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          return ZegoSignalingPluginResponseInvitationResult(
+            invitationID: invitationID,
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'refuse invitation, '
+            'invitation id:$invitationID, '
+            'error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.invitationRefuseError,
               message:
@@ -310,11 +335,11 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginResponseInvitationResult(
-        invitationID: invitationID,
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginResponseInvitationResult(
+            invitationID: invitationID,
+            error: error,
+          );
+        });
   }
 
   /// accept invitation
@@ -336,23 +361,24 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
           ZIMCallAcceptConfig()..extendedData = extendedData,
         )
         .then((ZIMCallAcceptanceSentResult zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'accept invitation, done, invitation id:${zimResult.callID}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'accept invitation, done, invitation id:${zimResult.callID}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      return ZegoSignalingPluginResponseInvitationResult(
-        invitationID: invitationID,
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'accept invitation, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          return ZegoSignalingPluginResponseInvitationResult(
+            invitationID: invitationID,
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'accept invitation, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.invitationAcceptError,
               message:
@@ -361,22 +387,20 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginResponseInvitationResult(
-        invitationID: invitationID,
-        error: error,
-      );
-    });
+          return ZegoSignalingPluginResponseInvitationResult(
+            invitationID: invitationID,
+            error: error,
+          );
+        });
   }
 
-  ZIMPushConfig? _toZIMPushConfig(
-    ZegoSignalingPluginPushConfig? pushConfig,
-  ) {
+  ZIMPushConfig? _toZIMPushConfig(ZegoSignalingPluginPushConfig? pushConfig) {
     ZIMPushConfig? zimPushConfig = (pushConfig != null)
         ? (ZIMPushConfig()
-          ..title = pushConfig.title
-          ..content = pushConfig.message
-          ..resourcesID = pushConfig.resourceID
-          ..payload = pushConfig.payload)
+            ..title = pushConfig.title
+            ..content = pushConfig.message
+            ..resourcesID = pushConfig.resourceID
+            ..payload = pushConfig.payload)
         : null;
     if (null != pushConfig?.voipConfig) {
       zimPushConfig?.voIPConfig = ZIMVoIPConfig();
@@ -409,30 +433,31 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
         .getInstance()!
         .callEnd(invitationID, config)
         .then((ZIMCallEndSentResult zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'end invitation, done, '
-        'invitation id:${zimResult.callID}, '
-        'createTime:${zimResult.info.createTime}, '
-        'acceptTime:${zimResult.info.acceptTime}, '
-        'endTime:${zimResult.info.endTime}, ',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'end invitation, done, '
+            'invitation id:${zimResult.callID}, '
+            'createTime:${zimResult.info.createTime}, '
+            'acceptTime:${zimResult.info.acceptTime}, '
+            'endTime:${zimResult.info.endTime}, ',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      return ZegoSignalingPluginEndInvitationResult(
-        invitationID: zimResult.callID,
-        createTime: zimResult.info.createTime,
-        acceptTime: zimResult.info.acceptTime,
-        endTime: zimResult.info.endTime,
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'add invitation, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          return ZegoSignalingPluginEndInvitationResult(
+            invitationID: zimResult.callID,
+            createTime: zimResult.info.createTime,
+            acceptTime: zimResult.info.acceptTime,
+            endTime: zimResult.info.endTime,
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'add invitation, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.invitationEndError,
               message:
@@ -441,8 +466,8 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginEndInvitationResult(error: error);
-    });
+          return ZegoSignalingPluginEndInvitationResult(error: error);
+        });
   }
 
   /// quit invitation
@@ -467,30 +492,31 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
         .getInstance()!
         .callQuit(invitationID, config)
         .then((ZIMCallQuitSentResult zimResult) {
-      ZegoSignalingLoggerService.logInfo(
-        'quit invitation, done, '
-        'invitation id:${zimResult.callID}, '
-        'createTime:${zimResult.info.createTime}, '
-        'acceptTime:${zimResult.info.acceptTime}, '
-        'quitTime:${zimResult.info.quitTime}, ',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'quit invitation, done, '
+            'invitation id:${zimResult.callID}, '
+            'createTime:${zimResult.info.createTime}, '
+            'acceptTime:${zimResult.info.acceptTime}, '
+            'quitTime:${zimResult.info.quitTime}, ',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      return ZegoSignalingPluginQuitInvitationResult(
-        invitationID: zimResult.callID,
-        createTime: zimResult.info.createTime,
-        acceptTime: zimResult.info.acceptTime,
-        quitTime: zimResult.info.quitTime,
-      );
-    }).catchError((error) {
-      ZegoSignalingLoggerService.logError(
-        'quit invitation, error:${error.toString()}',
-        tag: 'signaling',
-        subTag: 'invitation',
-      );
+          return ZegoSignalingPluginQuitInvitationResult(
+            invitationID: zimResult.callID,
+            createTime: zimResult.info.createTime,
+            acceptTime: zimResult.info.acceptTime,
+            quitTime: zimResult.info.quitTime,
+          );
+        })
+        .catchError((error) {
+          ZegoSignalingLoggerService.logError(
+            'quit invitation, error:${error.toString()}',
+            tag: 'signaling',
+            subTag: 'invitation',
+          );
 
-      ZegoSignalingPluginCore().errorStreamCtrl?.add(
+          ZegoSignalingPluginCore().errorStreamCtrl?.add(
             ZegoSignalingError(
               code: ZegoSignalingErrorCode.invitationQuitError,
               message:
@@ -499,8 +525,8 @@ mixin class ZegoSignalingPluginInvitationAPIImpl
             ),
           );
 
-      return ZegoSignalingPluginQuitInvitationResult(error: error);
-    });
+          return ZegoSignalingPluginQuitInvitationResult(error: error);
+        });
   }
 }
 
@@ -510,14 +536,14 @@ mixin class ZegoSignalingPluginInvitationEventImpl
   /// user state changed event
   @override
   Stream<ZegoSignalingPluginInvitationUserStateChangedEvent>
-      getInvitationUserStateChangedEventStream() {
+  getInvitationUserStateChangedEventStream() {
     return ZegoSignalingPluginCore().eventCenter.userStateChangedEvent.stream;
   }
 
   /// incoming invitation received event
   @override
   Stream<ZegoSignalingPluginIncomingInvitationReceivedEvent>
-      getIncomingInvitationReceivedEventStream() {
+  getIncomingInvitationReceivedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .incomingInvitationReceivedEvent
@@ -527,7 +553,7 @@ mixin class ZegoSignalingPluginInvitationEventImpl
   /// incoming invitation cancelled event
   @override
   Stream<ZegoSignalingPluginIncomingInvitationCancelledEvent>
-      getIncomingInvitationCancelledEventStream() {
+  getIncomingInvitationCancelledEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .incomingInvitationCancelledEvent
@@ -537,7 +563,7 @@ mixin class ZegoSignalingPluginInvitationEventImpl
   /// outgoing invitation accepted event
   @override
   Stream<ZegoSignalingPluginOutgoingInvitationAcceptedEvent>
-      getOutgoingInvitationAcceptedEventStream() {
+  getOutgoingInvitationAcceptedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .outgoingInvitationAcceptedEvent
@@ -547,7 +573,7 @@ mixin class ZegoSignalingPluginInvitationEventImpl
   /// outgoing invitation rejected event
   @override
   Stream<ZegoSignalingPluginOutgoingInvitationRejectedEvent>
-      getOutgoingInvitationRejectedEventStream() {
+  getOutgoingInvitationRejectedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .outgoingInvitationRejectedEvent
@@ -557,7 +583,7 @@ mixin class ZegoSignalingPluginInvitationEventImpl
   /// outgoing invitation ended event
   @override
   Stream<ZegoSignalingPluginOutgoingInvitationEndedEvent>
-      getOutgoingInvitationEndedEventStream() {
+  getOutgoingInvitationEndedEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .outgoingInvitationEndedEvent
@@ -567,7 +593,7 @@ mixin class ZegoSignalingPluginInvitationEventImpl
   /// incoming invitation timeout event
   @override
   Stream<ZegoSignalingPluginIncomingInvitationTimeoutEvent>
-      getIncomingInvitationTimeoutEventStream() {
+  getIncomingInvitationTimeoutEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .incomingInvitationTimeoutEvent
@@ -577,7 +603,7 @@ mixin class ZegoSignalingPluginInvitationEventImpl
   /// outgoing invitation timeout event
   @override
   Stream<ZegoSignalingPluginOutgoingInvitationTimeoutEvent>
-      getOutgoingInvitationTimeoutEventStream() {
+  getOutgoingInvitationTimeoutEventStream() {
     return ZegoSignalingPluginCore()
         .eventCenter
         .outgoingInvitationTimeoutEvent

@@ -18,7 +18,8 @@ class ZegoSignalingPluginCallKitEventConverter {
   /// [action] zego_callkit 的开始通话 Action
   /// 返回转换后的事件
   static ZegoSignalingPluginCallKitActionEvent convertStartCallAction(
-      dynamic action) {
+    dynamic action,
+  ) {
     final actionId = _generateActionId();
     _actionManager.registerAction(actionId, action);
 
@@ -46,7 +47,8 @@ class ZegoSignalingPluginCallKitEventConverter {
   /// [action] zego_callkit 的接听通话 Action
   /// 返回转换后的事件
   static ZegoSignalingPluginCallKitActionEvent convertAnswerCallAction(
-      dynamic action) {
+    dynamic action,
+  ) {
     final actionId = _generateActionId();
     _actionManager.registerAction(actionId, action);
 
@@ -71,7 +73,8 @@ class ZegoSignalingPluginCallKitEventConverter {
   /// [action] zego_callkit 的结束通话 Action
   /// 返回转换后的事件
   static ZegoSignalingPluginCallKitActionEvent convertEndCallAction(
-      dynamic action) {
+    dynamic action,
+  ) {
     final actionId = _generateActionId();
     _actionManager.registerAction(actionId, action);
 
@@ -96,7 +99,8 @@ class ZegoSignalingPluginCallKitEventConverter {
   /// [action] zego_callkit 的设置通话保持状态 Action
   /// 返回转换后的事件
   static ZegoSignalingPluginCallKitActionEvent convertSetHeldAction(
-      dynamic action) {
+    dynamic action,
+  ) {
     final actionId = _generateActionId();
     _actionManager.registerAction(actionId, action);
 
@@ -122,7 +126,8 @@ class ZegoSignalingPluginCallKitEventConverter {
   /// [action] zego_callkit 的设置静音状态 Action
   /// 返回转换后的事件
   static ZegoSignalingPluginCallKitActionEvent convertSetMutedAction(
-      dynamic action) {
+    dynamic action,
+  ) {
     final actionId = _generateActionId();
     _actionManager.registerAction(actionId, action);
 
@@ -148,7 +153,8 @@ class ZegoSignalingPluginCallKitEventConverter {
   /// [action] zego_callkit 的设置群组通话 Action
   /// 返回转换后的事件
   static ZegoSignalingPluginCallKitActionEvent convertSetGroupAction(
-      dynamic action) {
+    dynamic action,
+  ) {
     final actionId = _generateActionId();
     _actionManager.registerAction(actionId, action);
 
@@ -173,7 +179,8 @@ class ZegoSignalingPluginCallKitEventConverter {
   /// [action] zego_callkit 的播放 DTMF 音调 Action
   /// 返回转换后的事件
   static ZegoSignalingPluginCallKitActionEvent convertPlayDTMFAction(
-      dynamic action) {
+    dynamic action,
+  ) {
     final actionId = _generateActionId();
     _actionManager.registerAction(actionId, action);
 
@@ -198,7 +205,8 @@ class ZegoSignalingPluginCallKitEventConverter {
   /// [action] zego_callkit 的超时执行 Action
   /// 返回转换后的事件
   static ZegoSignalingPluginCallKitActionEvent convertTimedOutAction(
-      dynamic action) {
+    dynamic action,
+  ) {
     final actionId = _generateActionId();
     _actionManager.registerAction(actionId, action);
 
@@ -211,9 +219,7 @@ class ZegoSignalingPluginCallKitEventConverter {
     return ZegoSignalingPluginCallKitActionEvent(
       actionId: actionId,
       actionType: ZegoSignalingPluginCallKitActionType.timedOut.name,
-      actionData: ZegoSignalingPluginCallKitTimedOutActionData(
-        callUUID: '',
-      ),
+      actionData: ZegoSignalingPluginCallKitTimedOutActionData(callUUID: ''),
       fulfill: () => _actionManager.fulfillAction(actionId),
       fail: () => _actionManager.failAction(actionId),
     );

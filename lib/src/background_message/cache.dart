@@ -23,9 +23,11 @@ Future<Map<String, dynamic>> getAndroidHandlers() async {
   try {
     handlersMap = jsonDecode(jsonString) as Map<String, dynamic>? ?? {};
   } catch (e) {
-    debugPrint('signaling, '
-        'background message handler,'
-        'get cache, parse handler json error:$e');
+    debugPrint(
+      'signaling, '
+      'background message handler,'
+      'get cache, parse handler json error:$e',
+    );
   }
 
   return handlersMap;
@@ -34,9 +36,11 @@ Future<Map<String, dynamic>> getAndroidHandlers() async {
 Future<void> clearAndroidHandler({String key = ''}) async {
   final prefs = await SharedPreferences.getInstance();
   if (key.isEmpty) {
-    debugPrint('signaling, '
-        'background message handler,'
-        'remove all handlers');
+    debugPrint(
+      'signaling, '
+      'background message handler,'
+      'remove all handlers',
+    );
 
     prefs.remove(handlerCacheKey);
   } else {
@@ -47,16 +51,20 @@ Future<void> clearAndroidHandler({String key = ''}) async {
       try {
         handlersMap = jsonDecode(jsonString) as Map<String, dynamic>? ?? {};
       } catch (e) {
-        debugPrint('signaling, '
-            'background message handler,'
-            'get cache, parse handler json error:$e, '
-            'json:$jsonString');
+        debugPrint(
+          'signaling, '
+          'background message handler,'
+          'get cache, parse handler json error:$e, '
+          'json:$jsonString',
+        );
       }
 
       handlersMap.remove(key);
-      debugPrint('signaling, '
-          'background message handler,'
-          'remove $key, update handler cache to $handlersMap');
+      debugPrint(
+        'signaling, '
+        'background message handler,'
+        'remove $key, update handler cache to $handlersMap',
+      );
       await prefs.setString(handlerCacheKey, jsonEncode(handlersMap));
     }
   }

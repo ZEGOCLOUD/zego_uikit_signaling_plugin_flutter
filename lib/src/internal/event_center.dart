@@ -9,6 +9,7 @@ import 'package:zego_zpns/zego_zpns.dart';
 
 // Project imports:
 import 'package:zego_uikit_signaling_plugin/src/internal/core.dart';
+import 'package:zego_uikit_signaling_plugin/src/internal/outgoing_normal_invitation_tracker.dart';
 import 'package:zego_uikit_signaling_plugin/src/internal/zim_extension.dart';
 import 'package:zego_uikit_signaling_plugin/src/log/logger_service.dart';
 
@@ -19,6 +20,84 @@ part 'event_native_style.dart';
 
 /// @nodoc
 class ZegoSignalingPluginEventCenter {
+  final outgoingNormalInvitationTracker = OutgoingNormalInvitationTracker();
+
+  /// Registers a normal invitation and emits terminal states that arrived
+  /// before the send result was returned.
+  void registerOutgoingNormalInvitation(
+    ZIM zim,
+    String invitationID,
+    Iterable<String> invitees, {
+    required Duration timeout,
+  }) {
+    final earlyStates = outgoingNormalInvitationTracker.register(
+      invitationID,
+      invitees,
+      timeout: timeout,
+    );
+    _emitOutgoingInvitationStates(zim, invitationID, earlyStates);
+  }
+
+  void _emitOutgoingInvitationStates(
+    ZIM zim,
+    String invitationID,
+    Iterable<NormalInvitationUserState> states,
+  ) {
+    final timedOutInvitees = <String>[];
+    for (final state in states) {
+      switch (state.state) {
+        case NormalInvitationTerminalState.accepted:
+          outgoingInvitationAcceptedEvent.add(
+            ZegoSignalingPluginOutgoingInvitationAcceptedEvent(
+              invitationID: invitationID,
+              inviteeID: state.userID,
+              extendedData: state.extendedData,
+            ),
+          );
+          passThroughEvent.onCallInvitationAccepted?.call(
+            zim,
+            ZIMCallInvitationAcceptedInfo(
+              invitee: state.userID,
+              extendedData: state.extendedData,
+            ),
+            invitationID,
+          );
+        case NormalInvitationTerminalState.rejected:
+          outgoingInvitationRejectedEvent.add(
+            ZegoSignalingPluginOutgoingInvitationRejectedEvent(
+              invitationID: invitationID,
+              inviteeID: state.userID,
+              extendedData: state.extendedData,
+            ),
+          );
+          passThroughEvent.onCallInvitationRejected?.call(
+            zim,
+            ZIMCallInvitationRejectedInfo(
+              invitee: state.userID,
+              extendedData: state.extendedData,
+            ),
+            invitationID,
+          );
+        case NormalInvitationTerminalState.timeout:
+          timedOutInvitees.add(state.userID);
+      }
+    }
+
+    if (timedOutInvitees.isNotEmpty) {
+      outgoingInvitationTimeoutEvent.add(
+        ZegoSignalingPluginOutgoingInvitationTimeoutEvent(
+          invitationID: invitationID,
+          invitees: timedOutInvitees,
+        ),
+      );
+      passThroughEvent.onCallInviteesAnsweredTimeout?.call(
+        zim,
+        timedOutInvitees,
+        invitationID,
+      );
+    }
+  }
+
   /// init
   void init() {
     ZegoSignalingLoggerService.logInfo(
@@ -38,703 +117,635 @@ class ZegoSignalingPluginEventCenter {
   /// listen passthrough event
   void _passthroughEvent() {
     // Message (Only passed through to zimkit)
-    ZIMEventHandler.onMessageReceiptChanged = (
-      ZIM zim,
-      List<ZIMMessageReceiptInfo> infos,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onMessageReceiptChanged, infos:$infos',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+    ZIMEventHandler.onMessageReceiptChanged =
+        (ZIM zim, List<ZIMMessageReceiptInfo> infos) {
+          ZegoSignalingLoggerService.logInfo(
+            'onMessageReceiptChanged, infos:$infos',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onMessageReceiptChanged?.call(zim, infos);
-    };
-    ZIMEventHandler.onMessageReactionsChanged = (
-      ZIM zim,
-      ZIMMessageReactionsChangedEventResult result,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onMessageReactionsChanged, result:$result',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          passThroughEvent.onMessageReceiptChanged?.call(zim, infos);
+        };
+    ZIMEventHandler.onMessageReactionsChanged =
+        (ZIM zim, ZIMMessageReactionsChangedEventResult result) {
+          ZegoSignalingLoggerService.logInfo(
+            'onMessageReactionsChanged, result:$result',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onMessageReactionsChanged?.call(zim, result);
-    };
-    // TODO: onReceivePeerMessage is deprecated, use onPeerMessageReceived instead when available
-    ZIMEventHandler.onReceivePeerMessage = (
-      ZIM zim,
-      List<ZIMMessage> messageList,
-      String fromUserID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onReceivePeerMessage, '
-        'messageList:${messageList.map((e) => 'type:${e.type}, messageID:${e.messageID}')},'
-        'fromUserID:$fromUserID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
-
-      passThroughEvent.onReceivePeerMessage?.call(zim, messageList, fromUserID);
-    };
-
-    // TODO: onReceiveRoomMessage is deprecated, use onRoomMessageReceived instead when available
-    ZIMEventHandler.onReceiveRoomMessage = (
-      ZIM zim,
-      List<ZIMMessage> messageList,
-      String fromRoomID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onReceiveRoomMessage, messageList:$messageList, fromRoomID:$fromRoomID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
-
-      passThroughEvent.onReceiveRoomMessage?.call(zim, messageList, fromRoomID);
-    };
-    // TODO: onReceiveGroupMessage is deprecated, use onGroupMessageReceived instead when available
-    ZIMEventHandler.onReceiveGroupMessage = (
-      ZIM zim,
-      List<ZIMMessage> messageList,
-      String fromGroupID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onReceiveGroupMessage, messageList:$messageList, fromGroupID:$fromGroupID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
-
-      passThroughEvent.onReceiveGroupMessage
-          ?.call(zim, messageList, fromGroupID);
+          passThroughEvent.onMessageReactionsChanged?.call(zim, result);
+        };
+    ZIMEventHandler
+        .onMessageReceived = (ZIM zim, ZIMMessageReceivedEventResult result) {
+      final messageList = result.messageList;
+      final info = result.receivedInfo;
+      switch (info.conversationType) {
+        case ZIMConversationType.peer:
+          ZegoSignalingLoggerService.logInfo(
+            'onReceivePeerMessage, '
+            'messageList:${messageList.map((e) => 'type:${e.type}, messageID:${e.messageID}')},'
+            'fromUserID:${info.conversationID}',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
+          passThroughEvent.onReceivePeerMessage?.call(
+            zim,
+            messageList,
+            info.conversationID,
+          );
+          break;
+        case ZIMConversationType.room:
+          _roomMessageReceived(zim, messageList, info.conversationID);
+          break;
+        case ZIMConversationType.group:
+          ZegoSignalingLoggerService.logInfo(
+            'onReceiveGroupMessage, messageList:$messageList, '
+            'fromGroupID:${info.conversationID}',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
+          passThroughEvent.onReceiveGroupMessage?.call(
+            zim,
+            messageList,
+            info.conversationID,
+          );
+          break;
+        case ZIMConversationType.unknown:
+        case ZIMConversationType.communityChannel:
+          break;
+      }
     };
 
     ZIMEventHandler.onConversationMessageReceiptChanged =
         (ZIM zim, List<ZIMMessageReceiptInfo> infos) {
-      ZegoSignalingLoggerService.logInfo(
-        'onConversationMessageReceiptChanged, infos:$infos',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'onConversationMessageReceiptChanged, infos:$infos',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onConversationMessageReceiptChanged?.call(zim, infos);
-    };
+          passThroughEvent.onConversationMessageReceiptChanged?.call(
+            zim,
+            infos,
+          );
+        };
     ZIMEventHandler.onMessageRevokeReceived =
         (ZIM zim, List<ZIMRevokeMessage> messageList) {
-      ZegoSignalingLoggerService.logInfo(
-        'onMessageRevokeReceived, messageList:$messageList',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          ZegoSignalingLoggerService.logInfo(
+            'onMessageRevokeReceived, messageList:$messageList',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onMessageRevokeReceived?.call(zim, messageList);
-    };
+          passThroughEvent.onMessageRevokeReceived?.call(zim, messageList);
+        };
 
     // Group (Only passed through to zimkit)
-    ZIMEventHandler.onGroupStateChanged = (ZIM zim,
-        ZIMGroupState state,
-        ZIMGroupEvent event,
-        ZIMGroupOperatedInfo operatedInfo,
-        ZIMGroupFullInfo groupInfo) {
-      ZegoSignalingLoggerService.logInfo(
-        'onGroupStateChanged, state:$state, event:$event, operatedInfo:$operatedInfo, groupInfo:$groupInfo',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+    ZIMEventHandler.onGroupStateChanged =
+        (
+          ZIM zim,
+          ZIMGroupState state,
+          ZIMGroupEvent event,
+          ZIMGroupOperatedInfo operatedInfo,
+          ZIMGroupFullInfo groupInfo,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onGroupStateChanged, state:$state, event:$event, operatedInfo:$operatedInfo, groupInfo:$groupInfo',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onGroupStateChanged?.call(
-        zim,
-        state,
-        event,
-        operatedInfo,
-        groupInfo,
-      );
-    };
-    ZIMEventHandler.onGroupNameUpdated = (
-      ZIM zim,
-      String groupName,
-      ZIMGroupOperatedInfo operatedInfo,
-      String groupID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onGroupNameUpdated, groupName:$groupName, operatedInfo:$operatedInfo, groupID:$groupID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          passThroughEvent.onGroupStateChanged?.call(
+            zim,
+            state,
+            event,
+            operatedInfo,
+            groupInfo,
+          );
+        };
+    ZIMEventHandler.onGroupNameUpdated =
+        (
+          ZIM zim,
+          String groupName,
+          ZIMGroupOperatedInfo operatedInfo,
+          String groupID,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onGroupNameUpdated, groupName:$groupName, operatedInfo:$operatedInfo, groupID:$groupID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onGroupNameUpdated
-          ?.call(zim, groupName, operatedInfo, groupID);
-    };
+          passThroughEvent.onGroupNameUpdated?.call(
+            zim,
+            groupName,
+            operatedInfo,
+            groupID,
+          );
+        };
 
-    ZIMEventHandler.onGroupAvatarUrlUpdated = (
-      ZIM zim,
-      String groupAvatarUrl,
-      ZIMGroupOperatedInfo operatedInfo,
-      String groupID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onGroupAvatarUrlUpdated, groupAvatarUrl:$groupAvatarUrl, operatedInfo:$operatedInfo, groupID:$groupID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+    ZIMEventHandler.onGroupAvatarUrlUpdated =
+        (
+          ZIM zim,
+          String groupAvatarUrl,
+          ZIMGroupOperatedInfo operatedInfo,
+          String groupID,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onGroupAvatarUrlUpdated, groupAvatarUrl:$groupAvatarUrl, operatedInfo:$operatedInfo, groupID:$groupID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onGroupAvatarUrlUpdated
-          ?.call(zim, groupAvatarUrl, operatedInfo, groupID);
-    };
+          passThroughEvent.onGroupAvatarUrlUpdated?.call(
+            zim,
+            groupAvatarUrl,
+            operatedInfo,
+            groupID,
+          );
+        };
 
-    ZIMEventHandler.onGroupNoticeUpdated = (
-      ZIM zim,
-      String groupNotice,
-      ZIMGroupOperatedInfo operatedInfo,
-      String groupID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onGroupNoticeUpdated, groupNotice:$groupNotice, operatedInfo:$operatedInfo, groupID:$groupID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+    ZIMEventHandler.onGroupNoticeUpdated =
+        (
+          ZIM zim,
+          String groupNotice,
+          ZIMGroupOperatedInfo operatedInfo,
+          String groupID,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onGroupNoticeUpdated, groupNotice:$groupNotice, operatedInfo:$operatedInfo, groupID:$groupID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onGroupNoticeUpdated?.call(
-        zim,
-        groupNotice,
-        operatedInfo,
-        groupID,
-      );
-    };
-    ZIMEventHandler.onGroupAttributesUpdated = (
-      ZIM zim,
-      List<ZIMGroupAttributesUpdateInfo> updateInfo,
-      ZIMGroupOperatedInfo operatedInfo,
-      String groupID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onGroupAttributesUpdated, updateInfo:$updateInfo, operatedInfo:$operatedInfo, groupID:$groupID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          passThroughEvent.onGroupNoticeUpdated?.call(
+            zim,
+            groupNotice,
+            operatedInfo,
+            groupID,
+          );
+        };
+    ZIMEventHandler.onGroupAttributesUpdated =
+        (
+          ZIM zim,
+          List<ZIMGroupAttributesUpdateInfo> updateInfo,
+          ZIMGroupOperatedInfo operatedInfo,
+          String groupID,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onGroupAttributesUpdated, updateInfo:$updateInfo, operatedInfo:$operatedInfo, groupID:$groupID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onGroupAttributesUpdated?.call(
-        zim,
-        updateInfo,
-        operatedInfo,
-        groupID,
-      );
-    };
-    ZIMEventHandler.onGroupMemberStateChanged = (
-      ZIM zim,
-      ZIMGroupMemberState state,
-      ZIMGroupMemberEvent event,
-      List<ZIMGroupMemberInfo> userList,
-      ZIMGroupOperatedInfo operatedInfo,
-      String groupID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onGroupMemberStateChanged, state:$state, event:$event, userList:$userList, operatedInfo:$operatedInfo, groupID:$groupID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          passThroughEvent.onGroupAttributesUpdated?.call(
+            zim,
+            updateInfo,
+            operatedInfo,
+            groupID,
+          );
+        };
+    ZIMEventHandler.onGroupMemberStateChanged =
+        (
+          ZIM zim,
+          ZIMGroupMemberState state,
+          ZIMGroupMemberEvent event,
+          List<ZIMGroupMemberInfo> userList,
+          ZIMGroupOperatedInfo operatedInfo,
+          String groupID,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onGroupMemberStateChanged, state:$state, event:$event, userList:$userList, operatedInfo:$operatedInfo, groupID:$groupID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onGroupMemberStateChanged?.call(
-        zim,
-        state,
-        event,
-        userList,
-        operatedInfo,
-        groupID,
-      );
-    };
-    ZIMEventHandler.onGroupMemberInfoUpdated = (
-      ZIM zim,
-      List<ZIMGroupMemberInfo> userInfo,
-      ZIMGroupOperatedInfo operatedInfo,
-      String groupID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onGroupMemberInfoUpdated, userInfo:$userInfo, operatedInfo:$operatedInfo, groupID:$groupID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          passThroughEvent.onGroupMemberStateChanged?.call(
+            zim,
+            state,
+            event,
+            userList,
+            operatedInfo,
+            groupID,
+          );
+        };
+    ZIMEventHandler.onGroupMemberInfoUpdated =
+        (
+          ZIM zim,
+          List<ZIMGroupMemberInfo> userInfo,
+          ZIMGroupOperatedInfo operatedInfo,
+          String groupID,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onGroupMemberInfoUpdated, userInfo:$userInfo, operatedInfo:$operatedInfo, groupID:$groupID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      passThroughEvent.onGroupMemberInfoUpdated?.call(
-        zim,
-        userInfo,
-        operatedInfo,
-        groupID,
-      );
-    };
+          passThroughEvent.onGroupMemberInfoUpdated?.call(
+            zim,
+            userInfo,
+            operatedInfo,
+            groupID,
+          );
+        };
 
     // Conversation (Only passed through to zimkit)
-    ZIMEventHandler.onConversationChanged = (
-      ZIM zim,
-      List<ZIMConversationChangeInfo> conversationChangeInfoList,
-    ) {
-      passThroughEvent.onConversationChanged
-          ?.call(zim, conversationChangeInfoList);
-    };
+    ZIMEventHandler.onConversationChanged =
+        (ZIM zim, List<ZIMConversationChangeInfo> conversationChangeInfoList) {
+          passThroughEvent.onConversationChanged?.call(
+            zim,
+            conversationChangeInfoList,
+          );
+        };
     ZIMEventHandler.onConversationTotalUnreadMessageCountUpdated =
         (ZIM zim, int totalUnreadMessageCount) {
-      passThroughEvent.onConversationTotalUnreadMessageCountUpdated
-          ?.call(zim, totalUnreadMessageCount);
-    };
+          passThroughEvent.onConversationTotalUnreadMessageCountUpdated?.call(
+            zim,
+            totalUnreadMessageCount,
+          );
+        };
   }
 
   /// listen invitation event
   void _invitationEvent() {
-    ZIMEventHandler.onCallInvitationReceived = (
-      ZIM zim,
-      ZIMCallInvitationReceivedInfo info,
-      String invitationID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onCallInvitationReceived, invitationID:$invitationID, '
-        'info:${info.toStringX()} ',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
-      incomingInvitationReceivedEvent.add(
-        ZegoSignalingPluginIncomingInvitationReceivedEvent(
-          invitationID: invitationID,
-          mode: fromZIMInvitationMode(info.mode),
-          inviterID: info.inviter,
-          timeoutSecond: info.timeout,
-          extendedData: info.extendedData,
-          createTime: info.createTime,
-          callUserList: info.callUserList
-              .map((userInfo) => ZegoSignalingPluginInvitationUserInfo(
-                    userID: userInfo.userID,
-                    state: userStateConvertFunc(userInfo.state),
-                    extendedData: userInfo.extendedData,
-                  ))
-              .toList(),
-        ),
-      );
-      passThroughEvent.onCallInvitationReceived?.call(
-        zim,
-        info,
-        invitationID,
-      );
-    };
+    ZIMEventHandler.onCallInvitationReceived =
+        (ZIM zim, ZIMCallInvitationReceivedInfo info, String invitationID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onCallInvitationReceived, invitationID:$invitationID, '
+            'info:${info.toStringX()} ',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
+          incomingInvitationReceivedEvent.add(
+            ZegoSignalingPluginIncomingInvitationReceivedEvent(
+              invitationID: invitationID,
+              mode: fromZIMInvitationMode(info.mode),
+              inviterID: info.inviter,
+              timeoutSecond: info.timeout,
+              extendedData: info.extendedData,
+              createTime: info.createTime,
+              callUserList: info.callUserList
+                  .map(
+                    (userInfo) => ZegoSignalingPluginInvitationUserInfo(
+                      userID: userInfo.userID,
+                      state: userStateConvertFunc(userInfo.state),
+                      extendedData: userInfo.extendedData,
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
+          passThroughEvent.onCallInvitationReceived?.call(
+            zim,
+            info,
+            invitationID,
+          );
+        };
 
-    ZIMEventHandler.onCallInvitationCancelled = (
-      ZIM zim,
-      ZIMCallInvitationCancelledInfo info,
-      String invitationID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onCallInvitationCancelled, info:$info, invitationID:$invitationID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+    ZIMEventHandler.onCallInvitationCancelled =
+        (ZIM zim, ZIMCallInvitationCancelledInfo info, String invitationID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onCallInvitationCancelled, info:$info, invitationID:$invitationID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      incomingInvitationCancelledEvent.add(
-        ZegoSignalingPluginIncomingInvitationCancelledEvent(
-          invitationID: invitationID,
-          mode: fromZIMInvitationMode(info.mode),
-          inviterID: info.inviter,
-          extendedData: info.extendedData,
-        ),
-      );
-      passThroughEvent.onCallInvitationCancelled?.call(
-        zim,
-        info,
-        invitationID,
-      );
-    };
-    // TODO: onCallInvitationAccepted is deprecated since 2.9.0, use onCallUserStateChanged instead
-    ZIMEventHandler.onCallInvitationAccepted = (
-      ZIM zim,
-      ZIMCallInvitationAcceptedInfo info,
-      String invitationID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onCallInvitationAccepted, info:$info, invitationID:$invitationID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          incomingInvitationCancelledEvent.add(
+            ZegoSignalingPluginIncomingInvitationCancelledEvent(
+              invitationID: invitationID,
+              mode: fromZIMInvitationMode(info.mode),
+              inviterID: info.inviter,
+              extendedData: info.extendedData,
+            ),
+          );
+          passThroughEvent.onCallInvitationCancelled?.call(
+            zim,
+            info,
+            invitationID,
+          );
+        };
+    ZIMEventHandler.onCallInvitationEnded =
+        (ZIM zim, ZIMCallInvitationEndedInfo info, String invitationID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onCallInvitationEnded, info:{'
+            '${info.mode}'
+            '}, invitationID:$invitationID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      outgoingInvitationAcceptedEvent.add(
-        ZegoSignalingPluginOutgoingInvitationAcceptedEvent(
-          invitationID: invitationID,
-          inviteeID: info.invitee,
-          extendedData: info.extendedData,
-        ),
-      );
-      passThroughEvent.onCallInvitationAccepted?.call(
-        zim,
-        info,
-        invitationID,
-      );
-    };
-    // TODO: onCallInvitationRejected is deprecated since 2.9.0, use onCallUserStateChanged instead
-    ZIMEventHandler.onCallInvitationRejected = (
-      ZIM zim,
-      ZIMCallInvitationRejectedInfo info,
-      String invitationID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onCallInvitationRejected, info:$info, invitationID:$invitationID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          outgoingInvitationEndedEvent.add(
+            ZegoSignalingPluginOutgoingInvitationEndedEvent(
+              invitationID: invitationID,
+              mode: fromZIMInvitationMode(info.mode),
+              callerID: info.caller,
+              operatedUserID: info.operatedUserID,
+              endTime: info.endTime,
+              extendedData: info.extendedData,
+            ),
+          );
+          passThroughEvent.onCallInvitationEnded?.call(zim, info, invitationID);
+        };
+    ZIMEventHandler.onCallUserStateChanged =
+        (ZIM zim, ZIMCallUserStateChangeInfo info, String invitationID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onCallUserStateChanged, '
+            'callUserList:${info.callUserList.map((userInfo) => '{userID:${userInfo.userID}, state:${userInfo.state}, extendedData:${userInfo.extendedData}}')},'
+            'invitationID:$invitationID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      outgoingInvitationRejectedEvent.add(
-        ZegoSignalingPluginOutgoingInvitationRejectedEvent(
-          invitationID: invitationID,
-          inviteeID: info.invitee,
-          extendedData: info.extendedData,
-        ),
-      );
-      passThroughEvent.onCallInvitationRejected?.call(
-        zim,
-        info,
-        invitationID,
-      );
-    };
-    ZIMEventHandler.onCallInvitationEnded = (
-      ZIM zim,
-      ZIMCallInvitationEndedInfo info,
-      String invitationID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onCallInvitationEnded, info:{'
-        '${info.mode}'
-        '}, invitationID:$invitationID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          userStateChangedEvent.add(
+            ZegoSignalingPluginInvitationUserStateChangedEvent(
+              invitationID: invitationID,
+              callUserList: info.callUserList
+                  .map(
+                    (userInfo) => ZegoSignalingPluginInvitationUserInfo(
+                      userID: userInfo.userID,
+                      state: userStateConvertFunc(userInfo.state),
+                      extendedData: userInfo.extendedData,
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
 
-      outgoingInvitationEndedEvent.add(
-        ZegoSignalingPluginOutgoingInvitationEndedEvent(
-          invitationID: invitationID,
-          mode: fromZIMInvitationMode(info.mode),
-          callerID: info.caller,
-          operatedUserID: info.operatedUserID,
-          endTime: info.endTime,
-          extendedData: info.extendedData,
-        ),
-      );
-      passThroughEvent.onCallInvitationEnded?.call(
-        zim,
-        info,
-        invitationID,
-      );
-    };
-    ZIMEventHandler.onCallUserStateChanged = (
-      ZIM zim,
-      ZIMCallUserStateChangeInfo info,
-      String invitationID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onCallUserStateChanged, '
-        'callUserList:${info.callUserList.map((userInfo) => '{userID:${userInfo.userID}, state:${userInfo.state}, extendedData:${userInfo.extendedData}}')},'
-        'invitationID:$invitationID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          final outgoingStates = <NormalInvitationUserState>[];
+          for (final userInfo in info.callUserList) {
+            final terminalState = switch (userInfo.state) {
+              ZIMCallUserState.accepted =>
+                NormalInvitationTerminalState.accepted,
+              ZIMCallUserState.rejected =>
+                NormalInvitationTerminalState.rejected,
+              ZIMCallUserState.timeout => NormalInvitationTerminalState.timeout,
+              _ => null,
+            };
+            if (terminalState == null) continue;
 
-      userStateChangedEvent.add(
-        ZegoSignalingPluginInvitationUserStateChangedEvent(
-          invitationID: invitationID,
-          callUserList: info.callUserList
-              .map((userInfo) => ZegoSignalingPluginInvitationUserInfo(
-                    userID: userInfo.userID,
-                    state: userStateConvertFunc(userInfo.state),
-                    extendedData: userInfo.extendedData,
-                  ))
-              .toList(),
-        ),
-      );
-      passThroughEvent.onCallUserStateChanged?.call(
-        zim,
-        info,
-        invitationID,
-      );
-    };
-    ZIMEventHandler.onCallInvitationTimeout = (
-      ZIM zim,
-      ZIMCallInvitationTimeoutInfo info,
-      String invitationID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onCallInvitationTimeout, mode:${info.mode}, invitationID:$invitationID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+            final state = NormalInvitationUserState(
+              userID: userInfo.userID,
+              state: terminalState,
+              extendedData: userInfo.extendedData,
+            );
+            if (outgoingNormalInvitationTracker.processState(
+              invitationID,
+              state,
+            )) {
+              outgoingStates.add(state);
+            }
+          }
+          _emitOutgoingInvitationStates(zim, invitationID, outgoingStates);
 
-      incomingInvitationTimeoutEvent.add(
-        ZegoSignalingPluginIncomingInvitationTimeoutEvent(
-          invitationID: invitationID,
-          mode: fromZIMInvitationMode(info.mode),
-        ),
-      );
-      passThroughEvent.onCallInvitationTimeout?.call(
-        zim,
-        invitationID,
-      );
-    };
-    // TODO: onCallInviteesAnsweredTimeout is deprecated since 2.9.0, use onCallUserStateChanged instead
-    ZIMEventHandler.onCallInviteesAnsweredTimeout = (
-      ZIM zim,
-      List<String> invitees,
-      String invitationID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onCallInviteesAnsweredTimeout, invitees:$invitees, invitationID:$invitationID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          passThroughEvent.onCallUserStateChanged?.call(
+            zim,
+            info,
+            invitationID,
+          );
+        };
+    ZIMEventHandler.onCallInvitationTimeout =
+        (ZIM zim, ZIMCallInvitationTimeoutInfo info, String invitationID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onCallInvitationTimeout, mode:${info.mode}, invitationID:$invitationID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      outgoingInvitationTimeoutEvent.add(
-        ZegoSignalingPluginOutgoingInvitationTimeoutEvent(
-          invitationID: invitationID,
-          invitees: invitees,
-        ),
-      );
-      passThroughEvent.onCallInviteesAnsweredTimeout?.call(
-        zim,
-        invitees,
-        invitationID,
-      );
-    };
+          incomingInvitationTimeoutEvent.add(
+            ZegoSignalingPluginIncomingInvitationTimeoutEvent(
+              invitationID: invitationID,
+              mode: fromZIMInvitationMode(info.mode),
+            ),
+          );
+          passThroughEvent.onCallInvitationTimeout?.call(zim, invitationID);
+        };
   }
 
   /// listen room event
   void _roomEvent() {
-    ZIMEventHandler.onRoomMemberJoined = (
-      ZIM zim,
-      List<ZIMUserInfo> memberList,
-      String roomID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onRoomMemberJoined, memberList:$memberList, roomID:$roomID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+    ZIMEventHandler.onRoomMemberJoined =
+        (ZIM zim, List<ZIMUserInfo> memberList, String roomID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onRoomMemberJoined, memberList:$memberList, roomID:$roomID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      roomMemberJoinedEvent.add(
-        ZegoSignalingPluginRoomMemberJoinedEvent(
-          roomID: roomID,
-          usersID: memberList.map((e) => e.userID).toList(),
-          usersName: memberList.map((e) => e.userName).toList(),
-        ),
-      );
-      passThroughEvent.onRoomMemberJoined?.call(
-        zim,
-        memberList,
-        roomID,
-      );
-    };
-    ZIMEventHandler.onRoomMemberLeft = (
-      ZIM zim,
-      List<ZIMUserInfo> memberList,
-      String roomID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onRoomMemberLeft, memberList:$memberList, roomID:$roomID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          roomMemberJoinedEvent.add(
+            ZegoSignalingPluginRoomMemberJoinedEvent(
+              roomID: roomID,
+              usersID: memberList.map((e) => e.userID).toList(),
+              usersName: memberList.map((e) => e.userName).toList(),
+            ),
+          );
+          passThroughEvent.onRoomMemberJoined?.call(zim, memberList, roomID);
+        };
+    ZIMEventHandler.onRoomMemberLeft =
+        (ZIM zim, List<ZIMUserInfo> memberList, String roomID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onRoomMemberLeft, memberList:$memberList, roomID:$roomID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      roomMemberLeftEvent.add(
-        ZegoSignalingPluginRoomMemberLeftEvent(
-          roomID: roomID,
-          usersID: memberList.map((e) => e.userID).toList(),
-          usersName: memberList.map((e) => e.userName).toList(),
-        ),
-      );
-      passThroughEvent.onRoomMemberLeft?.call(
-        zim,
-        memberList,
-        roomID,
-      );
-    };
-    ZIMEventHandler.onRoomStateChanged = (
-      ZIM zim,
-      ZIMRoomState state,
-      ZIMRoomEvent event,
-      Map extendedData,
-      String roomID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onRoomStateChanged, state:$state, event:$event, extendedData:$extendedData, roomID:$roomID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          roomMemberLeftEvent.add(
+            ZegoSignalingPluginRoomMemberLeftEvent(
+              roomID: roomID,
+              usersID: memberList.map((e) => e.userID).toList(),
+              usersName: memberList.map((e) => e.userName).toList(),
+            ),
+          );
+          passThroughEvent.onRoomMemberLeft?.call(zim, memberList, roomID);
+        };
+    ZIMEventHandler.onRoomStateChanged =
+        (
+          ZIM zim,
+          ZIMRoomState state,
+          ZIMRoomEvent event,
+          Map extendedData,
+          String roomID,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onRoomStateChanged, state:$state, event:$event, extendedData:$extendedData, roomID:$roomID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      roomStateChangedEvent.add(
-        ZegoSignalingPluginRoomStateChangedEvent(
-          roomID: roomID,
-          state: ZegoSignalingPluginRoomState.values[state.index],
-          action: ZegoSignalingPluginRoomAction.values[event.index],
-          extendedData: extendedData,
-        ),
-      );
-      passThroughEvent.onRoomStateChanged?.call(
-        zim,
-        state,
-        event,
-        extendedData,
-        roomID,
-      );
-    };
-    ZIMEventHandler.onRoomAttributesUpdated = (
-      ZIM zim,
-      ZIMRoomAttributesUpdateInfo updateInfo,
-      String roomID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onRoomAttributesUpdated, updateInfo:${updateInfo.toStringX()}, roomID:$roomID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          roomStateChangedEvent.add(
+            ZegoSignalingPluginRoomStateChangedEvent(
+              roomID: roomID,
+              state: ZegoSignalingPluginRoomState.values[state.index],
+              action: ZegoSignalingPluginRoomAction.values[event.index],
+              extendedData: extendedData,
+            ),
+          );
+          passThroughEvent.onRoomStateChanged?.call(
+            zim,
+            state,
+            event,
+            extendedData,
+            roomID,
+          );
+        };
+    ZIMEventHandler.onRoomAttributesUpdated =
+        (ZIM zim, ZIMRoomAttributesUpdateInfo updateInfo, String roomID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onRoomAttributesUpdated, updateInfo:${updateInfo.toStringX()}, roomID:$roomID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      roomPropertiesUpdatedEvent.add(
-        ZegoSignalingPluginRoomPropertiesUpdatedEvent(
-          roomID: roomID,
-          setProperties: ZIMRoomAttributesUpdateAction.set == updateInfo.action
-              ? updateInfo.roomAttributes
-              : {},
-          deleteProperties:
-              ZIMRoomAttributesUpdateAction.delete == updateInfo.action
+          roomPropertiesUpdatedEvent.add(
+            ZegoSignalingPluginRoomPropertiesUpdatedEvent(
+              roomID: roomID,
+              setProperties:
+                  ZIMRoomAttributesUpdateAction.set == updateInfo.action
                   ? updateInfo.roomAttributes
                   : {},
-        ),
-      );
-      passThroughEvent.onRoomAttributesUpdated?.call(
-        zim,
-        updateInfo,
-        roomID,
-      );
-    };
-    ZIMEventHandler.onRoomAttributesBatchUpdated = (
-      ZIM zim,
-      List<ZIMRoomAttributesUpdateInfo> updateInfo,
-      String roomID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onRoomAttributesBatchUpdated, updateInfo:$updateInfo, roomID:$roomID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+              deleteProperties:
+                  ZIMRoomAttributesUpdateAction.delete == updateInfo.action
+                  ? updateInfo.roomAttributes
+                  : {},
+            ),
+          );
+          passThroughEvent.onRoomAttributesUpdated?.call(
+            zim,
+            updateInfo,
+            roomID,
+          );
+        };
+    ZIMEventHandler.onRoomAttributesBatchUpdated =
+        (ZIM zim, List<ZIMRoomAttributesUpdateInfo> updateInfo, String roomID) {
+          ZegoSignalingLoggerService.logInfo(
+            'onRoomAttributesBatchUpdated, updateInfo:$updateInfo, roomID:$roomID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      roomPropertiesBatchUpdatedEvent.add(
-        ZegoSignalingPluginRoomPropertiesBatchUpdatedEvent(
-          roomID: roomID,
-          setProperties: updateInfo
-              .where((element) =>
-                  ZIMRoomAttributesUpdateAction.set == element.action)
-              .map((e) => e.roomAttributes)
-              .fold({}, (value, element) => value..addAll(element)),
-          deleteProperties: updateInfo
-              .where((element) =>
-                  ZIMRoomAttributesUpdateAction.delete == element.action)
-              .map((e) => e.roomAttributes)
-              .fold({}, (value, element) => value..addAll(element)),
-        ),
-      );
-      passThroughEvent.onRoomAttributesBatchUpdated?.call(
-        zim,
-        updateInfo,
-        roomID,
-      );
-    };
-    ZIMEventHandler.onRoomMemberAttributesUpdated = (
-      ZIM zim,
-      List<ZIMRoomMemberAttributesUpdateInfo> infos,
-      ZIMRoomOperatedInfo operatedInfo,
-      String roomID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onRoomMemberAttributesUpdated, infos:$infos, operatedInfo:$operatedInfo, roomID:$roomID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          roomPropertiesBatchUpdatedEvent.add(
+            ZegoSignalingPluginRoomPropertiesBatchUpdatedEvent(
+              roomID: roomID,
+              setProperties: updateInfo
+                  .where(
+                    (element) =>
+                        ZIMRoomAttributesUpdateAction.set == element.action,
+                  )
+                  .map((e) => e.roomAttributes)
+                  .fold({}, (value, element) => value..addAll(element)),
+              deleteProperties: updateInfo
+                  .where(
+                    (element) =>
+                        ZIMRoomAttributesUpdateAction.delete == element.action,
+                  )
+                  .map((e) => e.roomAttributes)
+                  .fold({}, (value, element) => value..addAll(element)),
+            ),
+          );
+          passThroughEvent.onRoomAttributesBatchUpdated?.call(
+            zim,
+            updateInfo,
+            roomID,
+          );
+        };
+    ZIMEventHandler.onRoomMemberAttributesUpdated =
+        (
+          ZIM zim,
+          List<ZIMRoomMemberAttributesUpdateInfo> infos,
+          ZIMRoomOperatedInfo operatedInfo,
+          String roomID,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onRoomMemberAttributesUpdated, infos:$infos, operatedInfo:$operatedInfo, roomID:$roomID',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-      usersInRoomAttributesUpdatedEvent.add(
-        ZegoSignalingPluginUsersInRoomAttributesUpdatedEvent(
-          roomID: roomID,
-          editorID: operatedInfo.userID,
-          attributes: {
-            for (var element in infos)
-              element.attributesInfo.userID: element.attributesInfo.attributes
-          },
-        ),
-      );
-      passThroughEvent.onRoomMemberAttributesUpdated?.call(
-        zim,
-        infos,
-        operatedInfo,
-        roomID,
-      );
-    };
-    // TODO: onReceiveRoomMessage is deprecated, use onRoomMessageReceived instead when available
-    ZIMEventHandler.onReceiveRoomMessage = (
-      ZIM zim,
-      List<ZIMMessage> messageList,
-      String fromRoomID,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onReceiveRoomMessage, messageList:$messageList, fromRoomID:$fromRoomID',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
+          usersInRoomAttributesUpdatedEvent.add(
+            ZegoSignalingPluginUsersInRoomAttributesUpdatedEvent(
+              roomID: roomID,
+              editorID: operatedInfo.userID,
+              attributes: {
+                for (var element in infos)
+                  element.attributesInfo.userID:
+                      element.attributesInfo.attributes,
+              },
+            ),
+          );
+          passThroughEvent.onRoomMemberAttributesUpdated?.call(
+            zim,
+            infos,
+            operatedInfo,
+            roomID,
+          );
+        };
+  }
 
-      List<ZegoSignalingPluginInRoomTextMessage> textMessages = [];
-      List<ZegoSignalingPluginInRoomCommandMessage> commandMessages = [];
-      for (var message in messageList) {
-        if (message is ZIMTextMessage) {
-          textMessages.add(ZegoSignalingPluginInRoomTextMessage(
+  void _roomMessageReceived(
+    ZIM zim,
+    List<ZIMMessage> messageList,
+    String fromRoomID,
+  ) {
+    ZegoSignalingLoggerService.logInfo(
+      'onReceiveRoomMessage, messageList:$messageList, fromRoomID:$fromRoomID',
+      tag: 'signaling',
+      subTag: 'event center zim',
+    );
+
+    List<ZegoSignalingPluginInRoomTextMessage> textMessages = [];
+    List<ZegoSignalingPluginInRoomCommandMessage> commandMessages = [];
+    for (var message in messageList) {
+      if (message is ZIMTextMessage) {
+        textMessages.add(
+          ZegoSignalingPluginInRoomTextMessage(
             orderKey: message.orderKey,
             senderUserID: message.senderUserID,
             text: message.message,
             timestamp: message.timestamp,
-          ));
-        } else if (message is ZIMCommandMessage) {
-          commandMessages.add(ZegoSignalingPluginInRoomCommandMessage(
+          ),
+        );
+      } else if (message is ZIMCommandMessage) {
+        commandMessages.add(
+          ZegoSignalingPluginInRoomCommandMessage(
             orderKey: message.orderKey,
             senderUserID: message.senderUserID,
             message: message.message,
             timestamp: message.timestamp,
-          ));
-        } else {
-          ZegoSignalingLoggerService.logError(
-            'onReceiveRoomMessage, message type(${message.type}) is not support',
-            tag: 'signaling',
-            subTag: 'event center zim',
-          );
-        }
-      }
-      if (textMessages.isNotEmpty) {
-        inRoomTextMessageReceived.add(
-          ZegoSignalingPluginInRoomTextMessageReceivedEvent(
-            messages: textMessages,
-            roomID: fromRoomID,
           ),
         );
-      }
-      if (commandMessages.isNotEmpty) {
-        inRoomCommandMessageReceived.add(
-          ZegoSignalingPluginInRoomCommandMessageReceivedEvent(
-            messages: commandMessages,
-            roomID: fromRoomID,
-          ),
+      } else {
+        ZegoSignalingLoggerService.logError(
+          'onReceiveRoomMessage, message type(${message.type}) is not support',
+          tag: 'signaling',
+          subTag: 'event center zim',
         );
       }
-
-      passThroughEvent.onReceiveRoomMessage?.call(
-        zim,
-        messageList,
-        fromRoomID,
+    }
+    if (textMessages.isNotEmpty) {
+      inRoomTextMessageReceived.add(
+        ZegoSignalingPluginInRoomTextMessageReceivedEvent(
+          messages: textMessages,
+          roomID: fromRoomID,
+        ),
       );
-    };
+    }
+    if (commandMessages.isNotEmpty) {
+      inRoomCommandMessageReceived.add(
+        ZegoSignalingPluginInRoomCommandMessageReceivedEvent(
+          messages: commandMessages,
+          roomID: fromRoomID,
+        ),
+      );
+    }
+
+    passThroughEvent.onReceiveRoomMessage?.call(zim, messageList, fromRoomID);
   }
 
   /// listen base event
   void _baseEvent() {
-    ZIMEventHandler.onError = (
-      ZIM zim,
-      ZIMError errorInfo,
-    ) {
+    ZIMEventHandler.onError = (ZIM zim, ZIMError errorInfo) {
       ZegoSignalingLoggerService.logInfo(
         'onError, errorInfo:$errorInfo',
         tag: 'signaling',
@@ -747,73 +758,66 @@ class ZegoSignalingPluginEventCenter {
           message: errorInfo.message,
         ),
       );
-      passThroughEvent.onError?.call(
-        zim,
-        errorInfo,
-      );
+      passThroughEvent.onError?.call(zim, errorInfo);
 
       ZegoSignalingPluginCore().errorStreamCtrl?.add(
-            ZegoSignalingError(
-              code: errorInfo.code,
-              message: errorInfo.message,
-              method: 'onError',
-            ),
-          );
-    };
-    ZIMEventHandler.onConnectionStateChanged = (
-      ZIM zim,
-      ZIMConnectionState state,
-      ZIMConnectionEvent event,
-      Map extendedData,
-    ) {
-      ZegoSignalingLoggerService.logInfo(
-        'onConnectionStateChanged, state:$state, event:$event, extendedData:$extendedData',
-        tag: 'signaling',
-        subTag: 'event center zim',
-      );
-
-      if (state == ZIMConnectionState.disconnected) {
-        ZegoSignalingLoggerService.logInfo(
-          'onConnectionStateChanged, disconnected, clear current user',
-          tag: 'signaling',
-          subTag: 'event center zim',
-        );
-
-        ZegoSignalingPluginCore().currentUser = null;
-      }
-
-      connectionState = state;
-      connectionStateChangedEvent.add(
-        ZegoSignalingPluginConnectionStateChangedEvent(
-          state: ZegoSignalingPluginConnectionState.values[state.index],
-          action: ZegoSignalingPluginConnectionAction.values[event.index],
-          extendedData: extendedData,
+        ZegoSignalingError(
+          code: errorInfo.code,
+          message: errorInfo.message,
+          method: 'onError',
         ),
       );
-      passThroughEvent.onConnectionStateChanged?.call(
-        zim,
-        state,
-        event,
-        extendedData,
-      );
     };
+    ZIMEventHandler.onConnectionStateChanged =
+        (
+          ZIM zim,
+          ZIMConnectionState state,
+          ZIMConnectionEvent event,
+          Map extendedData,
+        ) {
+          ZegoSignalingLoggerService.logInfo(
+            'onConnectionStateChanged, state:$state, event:$event, extendedData:$extendedData',
+            tag: 'signaling',
+            subTag: 'event center zim',
+          );
 
-    ZIMEventHandler.onTokenWillExpire = (
-      ZIM zim,
-      int second,
-    ) {
+          if (state == ZIMConnectionState.disconnected) {
+            ZegoSignalingLoggerService.logInfo(
+              'onConnectionStateChanged, disconnected, clear current user',
+              tag: 'signaling',
+              subTag: 'event center zim',
+            );
+
+            ZegoSignalingPluginCore().currentUser = null;
+          }
+
+          connectionState = state;
+          connectionStateChangedEvent.add(
+            ZegoSignalingPluginConnectionStateChangedEvent(
+              state: ZegoSignalingPluginConnectionState.values[state.index],
+              action: ZegoSignalingPluginConnectionAction.values[event.index],
+              extendedData: extendedData,
+            ),
+          );
+          passThroughEvent.onConnectionStateChanged?.call(
+            zim,
+            state,
+            event,
+            extendedData,
+          );
+        };
+
+    ZIMEventHandler.onTokenWillExpire = (ZIM zim, int second) {
       ZegoSignalingLoggerService.logInfo(
         'onTokenWillExpire, second:$second',
         tag: 'signaling',
         subTag: 'event center zim',
       );
 
-      tokenWillExpireEvent
-          .add(ZegoSignalingPluginTokenWillExpireEvent(second: second));
-      passThroughEvent.onTokenWillExpire?.call(
-        zim,
-        second,
+      tokenWillExpireEvent.add(
+        ZegoSignalingPluginTokenWillExpireEvent(second: second),
       );
+      passThroughEvent.onTokenWillExpire?.call(zim, second);
     };
   }
 
@@ -837,9 +841,7 @@ class ZegoSignalingPluginEventCenter {
           code: registerMessage.errorCode,
         ),
       );
-      passThroughEvent.onZPNsRegistered?.call(
-        registerMessage,
-      );
+      passThroughEvent.onZPNsRegistered?.call(registerMessage);
     };
 
     ZPNsEventHandler.onNotificationArrived = (ZPNsMessage message) {
@@ -860,9 +862,7 @@ class ZegoSignalingPluginEventCenter {
           extras: message.extras,
         ),
       );
-      passThroughEvent.onZPNsNotificationArrived?.call(
-        message,
-      );
+      passThroughEvent.onZPNsNotificationArrived?.call(message);
     };
 
     ZPNsEventHandler.onNotificationClicked = (ZPNsMessage message) {
@@ -883,9 +883,7 @@ class ZegoSignalingPluginEventCenter {
           extras: message.extras,
         ),
       );
-      passThroughEvent.onZPNsNotificationClicked?.call(
-        message,
-      );
+      passThroughEvent.onZPNsNotificationClicked?.call(message);
     };
   }
 
@@ -934,8 +932,11 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center zpns',
       );
 
-      final event = adapter.ZegoSignalingPluginCallKitEventConverter
-          .convertTimedOutAction(action);
+      final event =
+          adapter
+              .ZegoSignalingPluginCallKitEventConverter.convertTimedOutAction(
+            action,
+          );
       callkitTimedOutPerformingActionEvent.add(event);
     };
     CallKitEventHandler.performStartCallAction = (CXAction action) {
@@ -945,8 +946,11 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center zpns',
       );
 
-      final event = adapter.ZegoSignalingPluginCallKitEventConverter
-          .convertStartCallAction(action);
+      final event =
+          adapter
+              .ZegoSignalingPluginCallKitEventConverter.convertStartCallAction(
+            action,
+          );
       callkitPerformStartCallActionEvent.add(event);
     };
     CallKitEventHandler.performAnswerCallAction = (CXAction action) {
@@ -956,8 +960,11 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center zpns',
       );
 
-      final event = adapter.ZegoSignalingPluginCallKitEventConverter
-          .convertAnswerCallAction(action);
+      final event =
+          adapter
+              .ZegoSignalingPluginCallKitEventConverter.convertAnswerCallAction(
+            action,
+          );
       callkitPerformAnswerCallActionEvent.add(event);
     };
     CallKitEventHandler.performEndCallAction = (CXAction action) {
@@ -969,7 +976,8 @@ class ZegoSignalingPluginEventCenter {
 
       final event =
           adapter.ZegoSignalingPluginCallKitEventConverter.convertEndCallAction(
-              action);
+            action,
+          );
       callkitPerformEndCallActionEvent.add(event);
     };
     CallKitEventHandler.performSetHeldCallAction = (CXAction action) {
@@ -981,19 +989,23 @@ class ZegoSignalingPluginEventCenter {
 
       final event =
           adapter.ZegoSignalingPluginCallKitEventConverter.convertSetHeldAction(
-              action);
+            action,
+          );
       callkitPerformSetHeldCallActionEvent.add(event);
     };
-    CallKitEventHandler.performSetMutedCallAction =
-        (CXSetMutedCallAction action) {
+    CallKitEventHandler
+        .performSetMutedCallAction = (CXSetMutedCallAction action) {
       ZegoSignalingLoggerService.logInfo(
         'performSetMutedCallAction',
         tag: 'signaling',
         subTag: 'event center zpns',
       );
 
-      final event = adapter.ZegoSignalingPluginCallKitEventConverter
-          .convertSetMutedAction(action);
+      final event =
+          adapter
+              .ZegoSignalingPluginCallKitEventConverter.convertSetMutedAction(
+            action,
+          );
       callkitPerformSetMutedCallActionEvent.add(event);
     };
     CallKitEventHandler.performSetGroupCallAction = (CXAction action) {
@@ -1003,8 +1015,11 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center zpns',
       );
 
-      final event = adapter.ZegoSignalingPluginCallKitEventConverter
-          .convertSetGroupAction(action);
+      final event =
+          adapter
+              .ZegoSignalingPluginCallKitEventConverter.convertSetGroupAction(
+            action,
+          );
       callkitPerformSetGroupCallActionEvent.add(event);
     };
     CallKitEventHandler.performPlayDTMFCallAction = (CXAction action) {
@@ -1014,14 +1029,18 @@ class ZegoSignalingPluginEventCenter {
         subTag: 'event center zpns',
       );
 
-      final event = adapter.ZegoSignalingPluginCallKitEventConverter
-          .convertPlayDTMFAction(action);
+      final event =
+          adapter
+              .ZegoSignalingPluginCallKitEventConverter.convertPlayDTMFAction(
+            action,
+          );
       callkitPerformPlayDTMFCallActionEvent.add(event);
     };
   }
 
   ZegoSignalingPluginInvitationMode fromZIMInvitationMode(
-      ZIMCallInvitationMode mode) {
+    ZIMCallInvitationMode mode,
+  ) {
     switch (mode) {
       case ZIMCallInvitationMode.unknown:
         return ZegoSignalingPluginInvitationMode.unknown;
@@ -1037,28 +1056,46 @@ class ZegoSignalingPluginEventCenter {
   // base
   final errorEvent =
       StreamController<ZegoSignalingPluginErrorEvent>.broadcast();
-  final connectionStateChangedEvent = StreamController<
-      ZegoSignalingPluginConnectionStateChangedEvent>.broadcast();
+  final connectionStateChangedEvent =
+      StreamController<
+        ZegoSignalingPluginConnectionStateChangedEvent
+      >.broadcast();
   final tokenWillExpireEvent =
       StreamController<ZegoSignalingPluginTokenWillExpireEvent>.broadcast();
 
   // invitation
-  final userStateChangedEvent = StreamController<
-      ZegoSignalingPluginInvitationUserStateChangedEvent>.broadcast();
-  final incomingInvitationReceivedEvent = StreamController<
-      ZegoSignalingPluginIncomingInvitationReceivedEvent>.broadcast();
-  final incomingInvitationCancelledEvent = StreamController<
-      ZegoSignalingPluginIncomingInvitationCancelledEvent>.broadcast();
-  final outgoingInvitationAcceptedEvent = StreamController<
-      ZegoSignalingPluginOutgoingInvitationAcceptedEvent>.broadcast();
-  final outgoingInvitationRejectedEvent = StreamController<
-      ZegoSignalingPluginOutgoingInvitationRejectedEvent>.broadcast();
-  final outgoingInvitationEndedEvent = StreamController<
-      ZegoSignalingPluginOutgoingInvitationEndedEvent>.broadcast();
-  final incomingInvitationTimeoutEvent = StreamController<
-      ZegoSignalingPluginIncomingInvitationTimeoutEvent>.broadcast();
-  final outgoingInvitationTimeoutEvent = StreamController<
-      ZegoSignalingPluginOutgoingInvitationTimeoutEvent>.broadcast();
+  final userStateChangedEvent =
+      StreamController<
+        ZegoSignalingPluginInvitationUserStateChangedEvent
+      >.broadcast();
+  final incomingInvitationReceivedEvent =
+      StreamController<
+        ZegoSignalingPluginIncomingInvitationReceivedEvent
+      >.broadcast();
+  final incomingInvitationCancelledEvent =
+      StreamController<
+        ZegoSignalingPluginIncomingInvitationCancelledEvent
+      >.broadcast();
+  final outgoingInvitationAcceptedEvent =
+      StreamController<
+        ZegoSignalingPluginOutgoingInvitationAcceptedEvent
+      >.broadcast();
+  final outgoingInvitationRejectedEvent =
+      StreamController<
+        ZegoSignalingPluginOutgoingInvitationRejectedEvent
+      >.broadcast();
+  final outgoingInvitationEndedEvent =
+      StreamController<
+        ZegoSignalingPluginOutgoingInvitationEndedEvent
+      >.broadcast();
+  final incomingInvitationTimeoutEvent =
+      StreamController<
+        ZegoSignalingPluginIncomingInvitationTimeoutEvent
+      >.broadcast();
+  final outgoingInvitationTimeoutEvent =
+      StreamController<
+        ZegoSignalingPluginOutgoingInvitationTimeoutEvent
+      >.broadcast();
 
   // room
   final roomMemberJoinedEvent =
@@ -1067,21 +1104,33 @@ class ZegoSignalingPluginEventCenter {
       StreamController<ZegoSignalingPluginRoomMemberLeftEvent>.broadcast();
   final roomStateChangedEvent =
       StreamController<ZegoSignalingPluginRoomStateChangedEvent>.broadcast();
-  final roomPropertiesUpdatedEvent = StreamController<
-      ZegoSignalingPluginRoomPropertiesUpdatedEvent>.broadcast();
-  final roomPropertiesBatchUpdatedEvent = StreamController<
-      ZegoSignalingPluginRoomPropertiesBatchUpdatedEvent>.broadcast();
-  final usersInRoomAttributesUpdatedEvent = StreamController<
-      ZegoSignalingPluginUsersInRoomAttributesUpdatedEvent>.broadcast();
+  final roomPropertiesUpdatedEvent =
+      StreamController<
+        ZegoSignalingPluginRoomPropertiesUpdatedEvent
+      >.broadcast();
+  final roomPropertiesBatchUpdatedEvent =
+      StreamController<
+        ZegoSignalingPluginRoomPropertiesBatchUpdatedEvent
+      >.broadcast();
+  final usersInRoomAttributesUpdatedEvent =
+      StreamController<
+        ZegoSignalingPluginUsersInRoomAttributesUpdatedEvent
+      >.broadcast();
 
-  final inRoomTextMessageReceived = StreamController<
-      ZegoSignalingPluginInRoomTextMessageReceivedEvent>.broadcast();
-  final inRoomCommandMessageReceived = StreamController<
-      ZegoSignalingPluginInRoomCommandMessageReceivedEvent>.broadcast();
+  final inRoomTextMessageReceived =
+      StreamController<
+        ZegoSignalingPluginInRoomTextMessageReceivedEvent
+      >.broadcast();
+  final inRoomCommandMessageReceived =
+      StreamController<
+        ZegoSignalingPluginInRoomCommandMessageReceivedEvent
+      >.broadcast();
 
   /// zpns notification
-  final notificationRegisteredEvent = StreamController<
-      ZegoSignalingPluginNotificationRegisteredEvent>.broadcast();
+  final notificationRegisteredEvent =
+      StreamController<
+        ZegoSignalingPluginNotificationRegisteredEvent
+      >.broadcast();
   final notificationArrivedEvent =
       StreamController<ZegoSignalingPluginNotificationArrivedEvent>.broadcast();
   final notificationClickedEvent =
