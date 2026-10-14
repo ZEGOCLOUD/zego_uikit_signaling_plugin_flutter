@@ -1,3 +1,4 @@
+/// The public entry point for ZegoUIKit signaling and call invitation features.
 // Dart imports:
 import 'dart:async';
 import 'dart:io' as io;

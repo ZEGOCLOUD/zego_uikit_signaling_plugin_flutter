@@ -3,6 +3,7 @@
 - Add iOS Swift Package Manager support while retaining CocoaPods support.
 - Require Dart 3.12 and Flutter 3.44 or later.
 - Upgrade `zego_zim` to 3.2.0, `zego_zpns` to 2.8.1, `zego_callkit_for_uikit` to 1.0.0+6, and `shared_preferences` to 2.5.6.
+- Document the public package entry point.
 - Use current ZIM message and call state callbacks while preserving normal invitation events for locally sent calls.
 ## 2.8.22
 
