@@ -1,4 +1,6 @@
 /// The public entry point for ZegoUIKit signaling and call invitation features.
+library zego_uikit_signaling_plugin; // ignore: unnecessary_library_name
+
 // Dart imports:
 import 'dart:async';
 import 'dart:io' as io;
